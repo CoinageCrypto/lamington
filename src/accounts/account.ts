@@ -23,4 +23,22 @@ export class Account {
 			},
 		};
 	}
+
+	public get active() {
+		return [
+			{
+				actor: this.name,
+				permission: 'active',
+			},
+		];
+	}
+
+	public get owner() {
+		return [
+			{
+				actor: this.name,
+				permission: 'owner',
+			},
+		];
+	}
 }

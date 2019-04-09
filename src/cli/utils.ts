@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as Mocha from 'mocha';
 import * as mkdirpCallback from 'mkdirp';
 import * as rimrafCallback from 'rimraf';
+import * as qrcode from 'qrcode-terminal';
 import { writeFile as writeFileCallback, exists as existsCallback } from 'fs';
 import * as globCallback from 'glob';
 import * as path from 'path';
@@ -23,6 +24,8 @@ import { untilBlockNumber } from '../accounts';
 
 const EOS_VERSION = '1.7.0';
 const CDT_VERSION = '1.6.1';
+// const CONTRACTS_VERSION = '1.6.0';
+// const DOCKER_IMAGE_NAME = `lamington:eos${EOS_VERSION}-cdt${CDT_VERSION}-contracts${CONTRACTS_VERSION}`;
 const DOCKER_IMAGE_NAME = `lamington:eos${EOS_VERSION}-cdt${CDT_VERSION}`;
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 
@@ -43,24 +46,24 @@ export const buildImage = async () => {
 		`
 FROM ubuntu:18.04
 
-RUN apt-get update
-RUN apt-get install -y wget sudo curl
-RUN wget https://github.com/EOSIO/eosio.cdt/releases/download/v${CDT_VERSION}/eosio.cdt_${CDT_VERSION}-1_amd64.deb
-RUN sudo apt install -y ./eosio.cdt_${CDT_VERSION}-1_amd64.deb
-RUN wget https://github.com/EOSIO/eos/releases/download/v${EOS_VERSION}/eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb
-RUN sudo apt install -y ./eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb`
+RUN apt-get update && apt-get install -y --no-install-recommends wget curl build-essential cmake ca-certificates
+RUN wget https://github.com/EOSIO/eosio.cdt/releases/download/v${CDT_VERSION}/eosio.cdt_${CDT_VERSION}-1_amd64.deb && apt install -y ./eosio.cdt_${CDT_VERSION}-1_amd64.deb && rm -f *.deb
+RUN wget https://github.com/EOSIO/eos/releases/download/v${EOS_VERSION}/eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb && apt install -y ./eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb && rm -f *.deb
+RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
+`
 	);
 
-	console.log(await docker.command(`build -t ${DOCKER_IMAGE_NAME} "${TEMP_DOCKER_DIRECTORY}"`));
+	await docker.command(`build -t ${DOCKER_IMAGE_NAME} "${TEMP_DOCKER_DIRECTORY}"`);
 
 	// Clean up after ourselves.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
 };
 
-export const startContainer = () =>
-	docker.command(
+export const startContainer = async () => {
+	await docker.command(
 		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${workingDirectory}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${DOCKER_IMAGE_NAME} /bin/bash -c "./scripts/init_blockchain.sh"`
 	);
+};
 
 export const stopContainer = () => docker.command('stop lamington');
 
@@ -95,10 +98,16 @@ export const startEos = async () => {
 	await mkdirp(path.join(workingDirectory, '.lamington', 'data'));
 
 	if (!(await imageExists())) {
-		console.log('Container does not yet exist. Building...');
+		console.log('--------------------------------------------------------------');
+		console.log('Docker image does not yet exist. Building...');
 		console.log(
 			'Note: This will take a few minutes but only happens once for each version of the EOS tools you use.'
 		);
+		console.log();
+		console.log(`We've prepared some hold music for you: https://youtu.be/6g4dkBF5anU`);
+		console.log();
+		qrcode.generate('https://youtu.be/6g4dkBF5anU');
+
 		await buildImage();
 	}
 
@@ -107,14 +116,17 @@ export const startEos = async () => {
 
 		await untilEosIsReady();
 
-		console.log();
-		console.log('==========================================');
-		console.log('    EOS running, admin account created.');
-		console.log();
-		console.log(' RPC: http://localhost:8888');
-		console.log(' Docker Container: lamington');
-		console.log('==========================================');
-		console.log();
+		console.log(
+			'                                        \n\
+==================================================== \n\
+                                                     \n\
+      EOS running, admin account created.            \n\
+                                                     \n\
+      RPC: http://localhost:8888                     \n\
+	  Docker Container: lamington                    \n\
+                                                     \n\
+===================================================='
+		);
 	} catch (error) {
 		console.error('Could not start EOS blockchain. Error: ', error);
 		process.exit(1);

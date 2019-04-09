@@ -8,6 +8,9 @@ PATH="$PATH:/opt/eosio/bin:/opt/eosio/bin/scripts"
 
 set -m
 
+# Clear the data directory
+rm -rf /mnt/dev/data
+
 # start nodeos ( local node of blockchain )
 # run it in a background job such that docker run could continue
 nodeos -e -p eosio -d /mnt/dev/data \

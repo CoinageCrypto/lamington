@@ -20,12 +20,19 @@ export class EOSManager {
 		// when this is actually following the getting started docs on EOSJS.
 		EOSManager.rpc = new JsonRpc('http://127.0.0.1:8888', { fetch: fetch as any });
 		EOSManager.api = new Api({
-			chainId: 'cf057bbfb72640471fd910bcb67639c22df9f92470936cddc1ade0e2f2e7dc4f',
 			rpc: EOSManager.rpc,
 			signatureProvider: EOSManager.signatureProvider,
 			// Same deal here, type mismatch when there really shouldn't be.
 			textDecoder: new TextDecoder() as any,
 			textEncoder: new TextEncoder(),
 		});
+	};
+
+	static transact = (
+		transaction: any,
+		eos = EOSManager.api,
+		options = { blocksBehind: 0, expireSeconds: 30 }
+	) => {
+		return eos.transact(transaction, options);
 	};
 }

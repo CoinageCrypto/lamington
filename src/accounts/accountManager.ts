@@ -42,112 +42,73 @@ export class AccountManager {
 			EOSManager.signatureProvider.keys.set(account.publicKey, account.privateKey);
 		}
 
-		return await eos.transact(
+		const systemContract = await eos.getContract('eosio');
+
+		const actions: any = [
 			{
-				actions: [
-					{
-						account: 'eosio',
-						name: 'newaccount',
-						authorization: [
+				account: 'eosio',
+				name: 'newaccount',
+				authorization: creator.active,
+				data: {
+					creator: creator.name,
+					name: account.name,
+					owner: {
+						threshold: 1,
+						keys: [
 							{
-								actor: creator.name,
-								permission: 'active',
+								key: account.publicKey,
+								weight: 1,
 							},
 						],
-						data: {
-							creator: creator.name,
-							name: account.name,
-							owner: {
-								threshold: 1,
-								keys: [
-									{
-										key: account.publicKey,
-										weight: 1,
-									},
-								],
-								accounts: [],
-								waits: [],
-							},
-							active: {
-								threshold: 1,
-								keys: [
-									{
-										key: account.publicKey,
-										weight: 1,
-									},
-								],
-								accounts: [],
-								waits: [],
-							},
-						},
+						accounts: [],
+						waits: [],
 					},
-					{
-						account: 'eosio',
-						name: 'buyrambytes',
-						authorization: [
+					active: {
+						threshold: 1,
+						keys: [
 							{
-								actor: creator.name,
-								permission: 'active',
+								key: account.publicKey,
+								weight: 1,
 							},
 						],
-						data: {
-							payer: creator.name,
-							receiver: account.name,
-							bytes: 8192,
-						},
+						accounts: [],
+						waits: [],
 					},
-					{
-						account: 'eosio',
-						name: 'delegatebw',
-						authorization: [
-							{
-								actor: creator.name,
-								permission: 'active',
-							},
-						],
-						data: {
-							from: creator.name,
-							receiver: account.name,
-							stake_net_quantity: '10.0000 SYS',
-							stake_cpu_quantity: '10.0000 SYS',
-							transfer: false,
-						},
-					},
-				],
+				},
 			},
-			// {
-			// 	actions: [
-			// 		{
-			// 			newaccount: {
-			// 				creator: creator.name,
-			// 				name: account.name,
-			// 				owner: account.publicKey,
-			// 				active: account.publicKey,
-			// 			},
-			// 		},
-			// 		{
-			// 			buyrambytes: {
-			// 				payer: creator.name,
-			// 				receiver: account.name,
-			// 				bytes: 8192,
-			// 			},
-			// 		},
-			// 		{
-			// 			delegatebw: {
-			// 				from: creator.name,
-			// 				receiver: account.name,
-			// 				stake_net_quantity: '10.0000 SYS',
-			// 				stake_cpu_quantity: '10.0000 SYS',
-			// 				transfer: 0,
-			// 			},
-			// 		},
-			// 	],
-			// },
-			{
-				blocksBehind: 3,
-				expireSeconds: 30,
-			}
-		);
+		];
+
+		// Do we need to buyrambytes? If there's a system contract with that action we do.
+		if (systemContract.actions.has('buyrambytes')) {
+			actions.push({
+				account: 'eosio',
+				name: 'buyrambytes',
+				authorization: creator.active,
+				data: {
+					payer: creator.name,
+					receiver: account,
+					bytes: 8192,
+				},
+			});
+		}
+
+		// Same deal for delegatebw. Only if it's actually a thing.
+		if (systemContract.actions.has('delegatebw')) {
+			actions.push({
+				account: 'eosio',
+				name: 'delegatebw',
+				authorization: creator.active,
+				data: {
+					from: creator.name,
+					receiver: account.name,
+					stake_net_quantity: '10.0000 SYS',
+					stake_cpu_quantity: '10.0000 SYS',
+					transfer: false,
+				},
+			});
+		}
+
+		return await EOSManager.transact({ actions }, eos);
 	};
 
 	private static flattenOptions(options?: AccountCreationOptions) {
