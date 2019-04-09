@@ -20,7 +20,7 @@ export const docker = new Docker();
 const workingDirectory = process.cwd();
 
 import { EOSManager } from '../eosManager';
-import { untilBlockNumber } from '../accounts';
+import { untilBlockNumber, sleep } from '../utils';
 
 const EOS_VERSION = '1.7.0';
 const CDT_VERSION = '1.6.1';
@@ -66,9 +66,6 @@ export const startContainer = async () => {
 };
 
 export const stopContainer = () => docker.command('stop lamington');
-
-export const sleep = async (delayInMs: number) =>
-	new Promise(resolve => setTimeout(resolve, delayInMs));
 
 export const untilEosIsReady = async (attempts = 8) => {
 	let attempt = 0;
@@ -175,4 +172,47 @@ export const runTests = async () => {
 	mocha.run(failures => {
 		process.exitCode = failures ? 1 : 0; // exit with non-zero status if there were failures
 	});
+};
+
+export const buildAll = async () => {
+	const contracts = await glob('./**/*.cpp');
+	const errors = [];
+
+	for (const contract of contracts) {
+		const basename = path.basename(contract, '.cpp');
+
+		try {
+			console.log(`- Compiling ${basename}:`);
+
+			const result = await docker.command(
+				// Arg 1 is filename, arg 2 is contract name. They're the same for us.
+				`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
+					'opt',
+					'eosio',
+					'bin',
+					'project',
+					contract
+				)}" "${path.dirname(contract)}" "${basename}"`
+			);
+
+			console.log(result.raw);
+		} catch (error) {
+			errors.push({
+				error: `Failed to compile contract ${basename}`,
+				underlyingError: error,
+			});
+		}
+	}
+
+	if (errors.length > 0) {
+		for (const error of errors) {
+			console.error(error.error);
+			console.error(' -> ', error.underlyingError);
+		}
+
+		console.error();
+		console.error(`${errors.length} contract(s) failed to compile. Quitting.`);
+
+		process.exit(1);
+	}
 };

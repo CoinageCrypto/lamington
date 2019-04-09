@@ -1,4 +1,4 @@
-import { eosIsReady, startEos, runTests, stopContainer } from './utils';
+import { eosIsReady, startEos, runTests, stopContainer, buildAll } from './utils';
 
 const run = async () => {
 	if (await eosIsReady()) {
@@ -8,6 +8,9 @@ const run = async () => {
 
 	console.log('Starting EOS...');
 	await startEos();
+
+	console.log('Building smart contracts...');
+	await buildAll();
 
 	console.log('Running tests...');
 	await runTests();

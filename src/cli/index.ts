@@ -7,6 +7,7 @@ program
 	.allowUnknownOption(false)
 	.version(packageConfig.version)
 	.description(packageConfig.description)
+	.command('build', 'build all smart contracts')
 	.command('start eos', 'start the eos blockchain in docker')
 	.command('stop eos', 'stop the eos blockchain in docker')
 	.command('test', 'run your unit / integration tests')
