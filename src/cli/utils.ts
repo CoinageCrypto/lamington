@@ -163,11 +163,6 @@ export const runTests = async () => {
 		mocha.addFile(path.join(workingDirectory, testFile));
 	}
 
-	// Now we're all ready to go. Let's make sure we have enough blocks that our tests will
-	// work out of the box.
-	console.log('Waiting for block #4.');
-	await untilBlockNumber(4);
-
 	// Run the tests.
 	mocha.run(failures => {
 		process.exitCode = failures ? 1 : 0; // exit with non-zero status if there were failures

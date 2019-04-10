@@ -1,4 +1,5 @@
 import { Api } from 'eosjs';
+import { convertLegacyPublicKey } from 'eosjs/dist/eosjs-numeric';
 import * as ecc from 'eosjs-ecc';
 
 import { Account } from './account';
@@ -11,6 +12,12 @@ interface AccountCreationOptions {
 }
 
 export class AccountManager {
+	static createAccount = async (options?: AccountCreationOptions) => {
+		const [account] = await AccountManager.createAccounts(1, options);
+
+		return account;
+	};
+
 	static createAccounts = async (numberOfAccounts = 1, options?: AccountCreationOptions) => {
 		const accounts = [];
 		for (let i = 0; i < numberOfAccounts; i++) {
@@ -39,8 +46,12 @@ export class AccountManager {
 		if (!account.privateKey) throw new Error('Missing private key.');
 
 		if (EOSManager.signatureProvider) {
-			EOSManager.signatureProvider.keys.set(account.publicKey, account.privateKey);
+			const nonLegacyPublicKey = convertLegacyPublicKey(account.publicKey);
+			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
+			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
 		}
+
+		console.log('Signature provider', EOSManager.signatureProvider);
 
 		const systemContract = await eos.getContract('eosio');
 
@@ -78,7 +89,9 @@ export class AccountManager {
 			},
 		];
 
-		// Do we need to buyrambytes? If there's a system contract with that action we do.
+		// Note: You can deploy the system without system contracts. In this scenario,
+		// newaccount alone is enough. If there is a system contract with that action,
+		// then we definitely need to do it though.
 		if (systemContract.actions.has('buyrambytes')) {
 			actions.push({
 				account: 'eosio',

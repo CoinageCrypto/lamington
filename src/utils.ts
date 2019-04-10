@@ -13,3 +13,5 @@ export const untilBlockNumber = async (number: number) => {
 
 export const sleep = async (delayInMs: number) =>
 	new Promise(resolve => setTimeout(resolve, delayInMs));
+
+export const nextBlock = () => sleep(500);
