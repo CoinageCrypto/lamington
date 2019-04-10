@@ -182,20 +182,7 @@ export const buildAll = async () => {
 		const basename = path.basename(contract, '.cpp');
 
 		try {
-			console.log(`- Compiling ${basename}:`);
-
-			const result = await docker.command(
-				// Arg 1 is filename, arg 2 is contract name. They're the same for us.
-				`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
-					'opt',
-					'eosio',
-					'bin',
-					'project',
-					contract
-				)}" "${path.dirname(contract)}" "${basename}"`
-			);
-
-			console.log(result.raw);
+			await build(contract);
 		} catch (error) {
 			errors.push({
 				error: `Failed to compile contract ${basename}`,
@@ -215,4 +202,21 @@ export const buildAll = async () => {
 
 		process.exit(1);
 	}
+};
+
+export const build = async (contractPath: string) => {
+	const basename = path.basename(contractPath, '.cpp');
+
+	console.log(`- Compiling ${basename}:`);
+
+	return await docker.command(
+		// Arg 1 is filename, arg 2 is contract name. They're the same for us.
+		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
+			'opt',
+			'eosio',
+			'bin',
+			'project',
+			contractPath
+		)}" "${path.dirname(contractPath)}" "${basename}"`
+	);
 };
