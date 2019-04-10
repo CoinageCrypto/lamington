@@ -14,8 +14,6 @@ export class ContractDeployer {
 		account: Account,
 		contractIdentifier: string
 	) {
-		console.log('Available keys', await EOSManager.signatureProvider.getAvailableKeys());
-
 		const buffer = new Serialize.SerialBuffer({
 			textEncoder: EOSManager.api.textEncoder,
 			textDecoder: EOSManager.api.textDecoder,
@@ -40,52 +38,22 @@ export class ContractDeployer {
 		);
 		abiDefinition.serialize(buffer, abi);
 
-		const requiredKeys = await EOSManager.rpc.getRequiredKeys({
-			transaction: {
-				actions: [
-					{
-						account: `eosio`,
-						name: `setcode`,
-						authorization: account.active,
-						data: {
-							account: account.name,
-							vmtype: 0,
-							vmversion: 0,
-							code: wasm.toString(`hex`),
-						},
-					},
-					{
-						account: `eosio`,
-						name: `setabi`,
-						authorization: account.active,
-						data: {
-							account: account.name,
-							abi: Buffer.from(buffer.asUint8Array()).toString(`hex`),
-						},
-					},
-				],
-			},
-			availableKeys: await EOSManager.signatureProvider.getAvailableKeys(),
-		});
-
-		console.log('Required keys', requiredKeys);
-
 		await EOSManager.transact({
 			actions: [
 				{
-					account: `eosio`,
-					name: `setcode`,
+					account: 'eosio',
+					name: 'setcode',
 					authorization: account.active,
 					data: {
 						account: account.name,
 						vmtype: 0,
 						vmversion: 0,
-						code: wasm.toString(`hex`),
+						code: wasm.toString('hex'),
 					},
 				},
 				{
-					account: `eosio`,
-					name: `setabi`,
+					account: 'eosio',
+					name: 'setabi',
 					authorization: account.active,
 					data: {
 						account: account.name,

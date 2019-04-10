@@ -28,10 +28,6 @@ export class AccountManager {
 
 			await AccountManager.setupAccount(account, options);
 
-			if (EOSManager.signatureProvider) {
-				EOSManager.signatureProvider.keys.set(publicKey, privateKey);
-			}
-
 			accounts.push(account);
 		}
 
@@ -50,8 +46,6 @@ export class AccountManager {
 			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
 			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
 		}
-
-		console.log('Signature provider', EOSManager.signatureProvider);
 
 		const systemContract = await eos.getContract('eosio');
 
@@ -90,8 +84,8 @@ export class AccountManager {
 		];
 
 		// Note: You can deploy the system without system contracts. In this scenario,
-		// newaccount alone is enough. If there is a system contract with that action,
-		// then we definitely need to do it though.
+		// newaccount alone is enough. If there is a system contract with the buyrambytes action,
+		// then we definitely need to do it, but if there isn't, then trying to call it is an error.
 		if (systemContract.actions.has('buyrambytes')) {
 			actions.push({
 				account: 'eosio',
