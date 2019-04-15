@@ -20,7 +20,8 @@ export const docker = new Docker();
 const workingDirectory = process.cwd();
 
 import { EOSManager } from '../eosManager';
-import { untilBlockNumber, sleep } from '../utils';
+import { sleep } from '../utils';
+import { generateTypes } from '../contracts';
 
 const EOS_VERSION = '1.7.0';
 const CDT_VERSION = '1.6.1';
@@ -174,13 +175,11 @@ export const buildAll = async () => {
 	const errors = [];
 
 	for (const contract of contracts) {
-		const basename = path.basename(contract, '.cpp');
-
 		try {
 			await build(contract);
 		} catch (error) {
 			errors.push({
-				error: `Failed to compile contract ${basename}`,
+				error: `Failed to compile contract ${contract}`,
 				underlyingError: error,
 			});
 		}
@@ -199,12 +198,15 @@ export const buildAll = async () => {
 	}
 };
 
+export const pathToIdentifier = (contractPath: string) =>
+	contractPath.substr(0, contractPath.lastIndexOf('.'));
+
 export const build = async (contractPath: string) => {
 	const basename = path.basename(contractPath, '.cpp');
 
 	console.log(`- Compiling ${basename}:`);
 
-	return await docker.command(
+	await docker.command(
 		// Arg 1 is filename, arg 2 is contract name. They're the same for us.
 		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
 			'opt',
@@ -214,4 +216,6 @@ export const build = async (contractPath: string) => {
 			contractPath
 		)}" "${path.dirname(contractPath)}" "${basename}"`
 	);
+
+	await generateTypes(pathToIdentifier(contractPath));
 };

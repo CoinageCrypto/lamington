@@ -20,6 +20,7 @@ export class AccountManager {
 
 	static createAccounts = async (numberOfAccounts = 1, options?: AccountCreationOptions) => {
 		const accounts = [];
+
 		for (let i = 0; i < numberOfAccounts; i++) {
 			const privateKey = await ecc.unsafeRandomKey();
 			const publicKey = await ecc.privateToPublic(privateKey);

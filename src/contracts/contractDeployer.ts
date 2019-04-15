@@ -63,7 +63,9 @@ export class ContractDeployer {
 			],
 		});
 
-		return new Contract();
+		const { actions, types } = await EOSManager.api.getContract(account.name);
+
+		return new Contract(EOSManager.api, contractIdentifier, account, actions, types) as T;
 	}
 
 	public static async deployClean<T extends Contract>(contractIdentifier: string) {
