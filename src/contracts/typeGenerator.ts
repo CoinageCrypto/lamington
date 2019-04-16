@@ -40,17 +40,6 @@ export const generateAllTypes = async () => {
 export const generateTypes = async (contractIdentifier: string) => {
 	console.log(`Generating types for ${contractIdentifier}`);
 
-	const result: GeneratorLevel = [
-		'// =====================================================',
-		'// WARNING: GENERATED FILE',
-		'//',
-		'// Any changes you make will be overwritten by Lamington',
-		'// =====================================================',
-		'',
-		`import { Account, Contract, TableRowsResult } from 'lamington';`,
-		'',
-	];
-
 	const contractName = path.basename(contractIdentifier);
 	const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
 	const abi = JSON.parse(fs.readFileSync(path.resolve(abiPath), 'utf8'));
@@ -60,6 +49,22 @@ export const generateTypes = async (contractIdentifier: string) => {
 		{},
 		...abi.structs.map((struct: any) => ({ [struct['name']]: struct }))
 	);
+
+	const result: GeneratorLevel = [
+		'// =====================================================',
+		'// WARNING: GENERATED FILE',
+		'//',
+		'// Any changes you make will be overwritten by Lamington',
+		'// =====================================================',
+		'',
+	];
+
+	// Imports
+	const imports = ['Account', 'Contract'];
+	if (contractTables.length > 0) imports.push('TableRowsResult');
+
+	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
+	result.push('');
 
 	// Generate table row types from ABI
 	for (const table of contractTables) {
