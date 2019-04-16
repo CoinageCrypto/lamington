@@ -47,16 +47,25 @@ export const assertRowCount = async (
 
 export const assertEOSError = async (
 	operation: Promise<any>,
-	eosErrorText: string,
+	eosErrorName: string,
 	description: string
 ) => {
 	try {
 		await operation;
 	} catch (error) {
-		const expectedError = error.search(eosErrorText) >= 0;
-		assert(expectedError, `Expected ${description}, got '${error}' instead`);
-		return;
+		if (error.json && error.json.error && error.json.error.name) {
+			assert(
+				error.json.error.name === eosErrorName,
+				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
+			);
+			return;
+		} else {
+			assert.fail(
+				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
+			);
+		}
 	}
+
 	assert.fail(`Expected ${description} but operation completed successfully.`);
 };
 
