@@ -47,7 +47,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'// Any changes you make will be overwritten by Lamington',
 		'// =====================================================',
 		'',
-		`import { Account, Contract } from 'lamington';`,
+		`import { Account, Contract, TableRowsResult } from 'lamington';`,
 		'',
 	];
 
@@ -70,40 +70,39 @@ export const generateTypes = async (contractIdentifier: string) => {
 		};
 
 		result.push(tableInterface);
-	}
-
-	// Generate the types of the function arguments for each function.
-	for (const action of contractActions) {
-		if (contractStructs[action.name].fields.length > 0) {
-			const paramInterface = {
-				[`export interface ${pascalCase(contractName)}${pascalCase(
-					action.name
-				)}Params`]: contractStructs[action.name].fields.map(
-					(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
-				),
-			};
-
-			result.push(paramInterface);
-			result.push('');
-		}
+		result.push('');
 	}
 
 	// Generate contract type from ABI
+	const generatedContractActions = contractActions.map((action: any) => {
+		// With a function for each action
+		const parameters = contractStructs[action.name].fields.map(
+			(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
+		);
+
+		// Optional parameter at the end on every contract method.
+		parameters.push('options?: { from?: Account }');
+
+		return `${action.name}(${parameters.join(', ')}): Promise<any>;`;
+	});
+
+	const generatedTables = contractTables.map(
+		(table: any) =>
+			`${table.name}(scope?: string): Promise<TableRowsResult<${pascalCase(
+				contractName
+			)}${pascalCase(table.name)}>>`
+	);
+
 	const contractInterface = {
-		[`export interface ${pascalCase(contractName)} extends Contract`]: contractActions.map(
-			(action: any) => {
-				if (contractStructs[action.name].fields.length > 0) {
-					return `${action.name}(params: ${pascalCase(contractName)}${pascalCase(
-						action.name
-					)}Params, options?: { from?: Account }): Promise<any>`;
-				} else {
-					return `${action.name}(options?: { from?: Account }): Promise<any>`;
-				}
-			}
-		),
+		[`export interface ${pascalCase(contractName)} extends Contract`]: [
+			...generatedContractActions,
+			'',
+			...generatedTables,
+		],
 	};
 
 	result.push(contractInterface);
+	result.push('');
 
 	await saveInterface(contractIdentifier, result);
 };

@@ -3,6 +3,7 @@ import { nextBlock } from '../utils';
 import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';
+import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 
 export interface ContractActionParameters {
 	[key: string]: any;
@@ -23,10 +24,15 @@ export class Contract implements EOSJSContract {
 		return this._account;
 	}
 
+	public get identifier(): string {
+		return this._identifier;
+	}
+
 	constructor(
 		eos: Api,
 		identifier: string,
 		account: Account,
+		abi: Abi,
 		actions: Map<string, Type>,
 		types: Map<string, Type>
 	) {
@@ -36,49 +42,56 @@ export class Contract implements EOSJSContract {
 		this.actions = actions;
 		this.types = types;
 
+		// Set up all the actions as methods on the contract.
 		for (const action of actions.values()) {
-			if (action.fields.length > 0) {
-				(this as any)[action.name] = function(
-					params: ContractActionParameters,
-					options?: ContractActionOptions
+			(this as any)[action.name] = function() {
+				const data: { [key: string]: any } = {};
+
+				// Copy the params across for the call.
+				if (
+					arguments.length != action.fields.length &&
+					arguments.length + 1 != action.fields.length
 				) {
-					let authorization = (options && options.from) || account;
-
-					return EOSManager.transact(
-						{
-							actions: [
-								{
-									account: account.name,
-									name: action.name,
-									authorization: authorization.active,
-									data: {
-										...params,
-									},
-								},
-							],
-						},
-						eos
+					throw new Error(
+						`Insufficient arguments supplied to ${action.name}. Expected ${
+							action.fields.length
+						} got ${arguments.length}.`
 					);
-				};
-			} else {
-				(this as any)[action.name] = function(options?: ContractActionOptions) {
-					let authorization = (options && options.from) || account;
+				}
 
-					return EOSManager.transact(
-						{
-							actions: [
-								{
-									account: account.name,
-									name: action.name,
-									authorization: authorization.active,
-									data: {},
-								},
-							],
-						},
-						eos
-					);
-				};
-			}
+				for (let i = 0; i < action.fields.length; i++) {
+					data[action.fields[i].name] = arguments[i];
+				}
+
+				// Who are we acting as?
+				// We default to sending transactions from the contract account.
+				let authorization = account;
+
+				if (arguments[action.fields.length] instanceof Account) {
+					authorization = arguments[action.fields.length];
+				}
+
+				return EOSManager.transact(
+					{
+						actions: [
+							{
+								account: account.name,
+								name: action.name,
+								authorization: authorization.active,
+								data,
+							},
+						],
+					},
+					eos
+				);
+			};
+		}
+
+		// And now the tables.
+		for (const table of abi.tables) {
+			(this as any)[table.name] = function() {
+				return this.getTableRows(table.name, arguments[0]);
+			};
 		}
 	}
 
