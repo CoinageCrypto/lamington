@@ -166,6 +166,10 @@ export const runTests = async () => {
 		mocha.addFile(path.join(workingDirectory, testFile));
 	}
 
+	// Our tests are more like integration tests than unit tests. Taking two seconds is
+	// pretty reasonable in our case.
+	mocha.slow(2000);
+
 	// Run the tests.
 	await new Promise((resolve, reject) =>
 		mocha.run(failures => {
