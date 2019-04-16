@@ -23,17 +23,31 @@ import { EOSManager } from '../eosManager';
 import { sleep } from '../utils';
 import { generateTypes } from '../contracts';
 import { ConfigManager } from '../configManager';
-import { GitIgnoreManager } from '../gitignoreManager';
 
-const EOS_VERSION = '1.7.0';
-const CDT_VERSION = '1.6.1';
-// const CONTRACTS_VERSION = '1.6.0';
-// const DOCKER_IMAGE_NAME = `lamington:eos${EOS_VERSION}-cdt${CDT_VERSION}-contracts${CONTRACTS_VERSION}`;
-const DOCKER_IMAGE_NAME = `lamington:eos${EOS_VERSION}-cdt${CDT_VERSION}`;
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 
+const versionFromUrl = (url: string) => {
+	// Looks for strings in this format:
+	// '/v1.4.6/'
+	// Allows us to pull just the version part out with the group.
+	const pattern = /\/(v\d+\.\d+\.\d+)\//g;
+	const result = url.match(pattern);
+
+	if (!result) throw new Error(`Could not extract version number from url: '${url}'`);
+
+	return result[1];
+};
+
+const dockerImageName = async () => {
+	await ConfigManager.initWithDefaults();
+
+	return `lamington:eos.${versionFromUrl(ConfigManager.eos)}-cdt.${versionFromUrl(
+		ConfigManager.cdt
+	)}`;
+};
+
 export const imageExists = async () => {
-	const result = await docker.command(`images ${DOCKER_IMAGE_NAME}`);
+	const result = await docker.command(`images ${await dockerImageName()}`);
 
 	return result.images.length > 0;
 };
@@ -56,7 +70,7 @@ RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 `
 	);
 
-	await docker.command(`build -t ${DOCKER_IMAGE_NAME} "${TEMP_DOCKER_DIRECTORY}"`);
+	await docker.command(`build -t ${await dockerImageName()} "${TEMP_DOCKER_DIRECTORY}"`);
 
 	// Clean up after ourselves.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
@@ -64,7 +78,7 @@ RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 
 export const startContainer = async () => {
 	await docker.command(
-		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${workingDirectory}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${DOCKER_IMAGE_NAME} /bin/bash -c "./scripts/init_blockchain.sh"`
+		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${workingDirectory}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${await dockerImageName()} /bin/bash -c "./scripts/init_blockchain.sh"`
 	);
 };
 
