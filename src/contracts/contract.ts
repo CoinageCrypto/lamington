@@ -48,14 +48,19 @@ export class Contract implements EOSJSContract {
 				const data: { [key: string]: any } = {};
 
 				// Copy the params across for the call.
-				if (
-					arguments.length != action.fields.length &&
-					arguments.length + 1 != action.fields.length
-				) {
+				if (arguments.length < action.fields.length) {
 					throw new Error(
 						`Insufficient arguments supplied to ${action.name}. Expected ${
 							action.fields.length
 						} got ${arguments.length}.`
+					);
+				}
+
+				if (arguments.length > action.fields.length + 1) {
+					throw new Error(
+						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${
+							arguments.length
+						}.`
 					);
 				}
 
@@ -66,9 +71,10 @@ export class Contract implements EOSJSContract {
 				// Who are we acting as?
 				// We default to sending transactions from the contract account.
 				let authorization = account;
+				const options = arguments[action.fields.length];
 
-				if (arguments[action.fields.length] instanceof Account) {
-					authorization = arguments[action.fields.length];
+				if (options && options.from && options.from instanceof Account) {
+					authorization = options.from;
 				}
 
 				return EOSManager.transact(
