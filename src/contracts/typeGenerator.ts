@@ -16,11 +16,22 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
 // Everything is a string right now.
 const mapParameterType = (eosType: string) => {
-	switch (eosType) {
+	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
+	let type;
+
+	switch (eosType.replace('[]', '')) {
 		case 'bool':
-			return 'boolean';
+			type = 'boolean';
+			break;
 		default:
-			return 'string';
+			type = 'string';
+			break;
+	}
+
+	if (wrapper) {
+		return `${wrapper}<${type}>`;
+	} else {
+		return type;
 	}
 };
 
