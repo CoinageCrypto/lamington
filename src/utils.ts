@@ -1,6 +1,7 @@
+import * as assert from 'assert';
+
 import { EOSManager } from './eosManager';
 import { TableRowsResult } from './contracts';
-import assert = require('assert');
 
 export const untilBlockNumber = async (number: number) => {
 	let { head_block_num } = await EOSManager.rpc.get_info();

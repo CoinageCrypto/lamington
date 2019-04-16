@@ -22,6 +22,8 @@ const workingDirectory = process.cwd();
 import { EOSManager } from '../eosManager';
 import { sleep } from '../utils';
 import { generateTypes } from '../contracts';
+import { ConfigManager } from '../configManager';
+import { GitIgnoreManager } from '../gitignoreManager';
 
 const EOS_VERSION = '1.7.0';
 const CDT_VERSION = '1.6.1';
@@ -47,9 +49,9 @@ export const buildImage = async () => {
 		`
 FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y --no-install-recommends wget curl build-essential cmake ca-certificates
-RUN wget https://github.com/EOSIO/eosio.cdt/releases/download/v${CDT_VERSION}/eosio.cdt_${CDT_VERSION}-1_amd64.deb && apt install -y ./eosio.cdt_${CDT_VERSION}-1_amd64.deb && rm -f *.deb
-RUN wget https://github.com/EOSIO/eos/releases/download/v${EOS_VERSION}/eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb && apt install -y ./eosio_${EOS_VERSION}-1-ubuntu-18.04_amd64.deb && rm -f *.deb
+RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates
+RUN wget ${ConfigManager.cdt} && apt-get install -y ./*.deb && rm -f *.deb
+RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
 RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 `
 	);
@@ -165,9 +167,13 @@ export const runTests = async () => {
 	}
 
 	// Run the tests.
-	mocha.run(failures => {
-		process.exitCode = failures ? 1 : 0; // exit with non-zero status if there were failures
-	});
+	await new Promise((resolve, reject) =>
+		mocha.run(failures => {
+			if (failures) return reject(failures);
+
+			return resolve();
+		})
+	);
 };
 
 export const buildAll = async () => {

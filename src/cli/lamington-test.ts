@@ -1,10 +1,19 @@
 import { eosIsReady, startEos, runTests, stopContainer, buildAll } from './utils';
+import { GitIgnoreManager } from '../gitignoreManager';
+import { ConfigManager } from '../configManager';
 
 const run = async () => {
 	if (await eosIsReady()) {
 		console.log('EOS is running. Stopping...');
 		await stopContainer();
 	}
+
+	// This initialises the config
+	console.log('Getting configuration...');
+	await ConfigManager.initWithDefaults();
+
+	// This ensures we have our .gitignore inside the .lamington directory
+	await GitIgnoreManager.createIfMissing();
 
 	console.log('Starting EOS...');
 	await startEos();
@@ -15,8 +24,8 @@ const run = async () => {
 	console.log('Running tests...');
 	await runTests();
 
-	// console.log('Cleaning up...');
-	// await stopContainer();
+	console.log('Stopping EOS...');
+	await stopContainer();
 };
 
 run().catch(error => {
