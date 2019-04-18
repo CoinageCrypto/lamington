@@ -36,6 +36,7 @@
 		"lib/**/*"
 	],
 	"devDependencies": {
+		"@types/chai": "^4.1.7",
 		"@types/mkdirp": "0.5.2",
 		"@types/mocha": "5.2.6",
 		"@types/node": "^11.13.4",
@@ -48,7 +49,9 @@
 	},
 	"dependencies": {
 		"axios": "0.18.0",
+		"chai": "^4.2.0",
 		"commander": "2.20.0",
+		"deep-equal-in-any-order": "^1.0.13",
 		"docker-cli-js": "2.5.2",
 		"glob": "7.1.3",
 		"mkdirp": "0.5.1",
