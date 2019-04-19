@@ -46,6 +46,7 @@
 		"@types/text-encoding": "0.0.35",
 		"eosjs": "20.0.0",
 		"eosjs-ecc": "4.0.4",
+		"jsdoc": "^3.5.5",
 		"ts-node": "^8.1.0",
 		"typescript": "3.4.3"
 	},

@@ -62,3 +62,6 @@ typings/
 
 # Typescript build output
 lib/
+
+# JSDoc ouput
+out/
