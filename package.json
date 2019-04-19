@@ -12,7 +12,7 @@
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
 		"test": "jest --config jestconfig.json",
-		"test:mocha": "mocha --require ts-node/register test/**/*.ts"
+		"test:mocha": "mocha --require ts-node/register src/**/*.test.ts"
 	},
 	"repository": {
 		"type": "git",
