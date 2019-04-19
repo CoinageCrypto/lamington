@@ -12,7 +12,8 @@
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
 		"test": "jest --config jestconfig.json",
-		"test:mocha": "mocha --require ts-node/register src/**/*.test.ts"
+		"test:mocha": "mocha --require ts-node/register src/**/*.test.ts",
+		"doc":"jsdoc -c ./conf.json"
 	},
 	"repository": {
 		"type": "git",
