@@ -11,7 +11,8 @@
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
-		"test": "jest --config jestconfig.json"
+		"test": "jest --config jestconfig.json",
+		"test:mocha": "mocha --require ts-node/register test/**/*.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -45,6 +46,7 @@
 		"@types/text-encoding": "0.0.35",
 		"eosjs": "20.0.0",
 		"eosjs-ecc": "4.0.4",
+		"ts-node": "^8.1.0",
 		"typescript": "3.4.3"
 	},
 	"dependencies": {
