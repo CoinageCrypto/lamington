@@ -16,7 +16,7 @@ const encoding = 'utf8';
 export class GitIgnoreManager {
 
 	/**
-	 * Create Missing
+	 * Create if Missing
 	 * @desc Creates a base configuration `.gitignore` file when it doesn't exit
 	 */
 	public static async createIfMissing() {
