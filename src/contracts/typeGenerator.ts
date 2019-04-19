@@ -2,6 +2,7 @@ import * as globWithCallbacks from 'glob';
 import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
+import mapTypes from './typeMap';
 
 const glob = promisify(globWithCallbacks);
 
@@ -14,20 +15,15 @@ const pascalCase = (value: string) => {
 type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGeneratorLevel };
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
-// Everything is a string right now.
-const mapParameterType = (eosType: string) => {
+/**
+ * Map Paramater Type
+ * @desc Parses a C++ type definition into a Typescript definition
+ * @param eosType 
+ */
+export const mapParameterType = (eosType: string) => {
+	// Handle array types
 	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
-	let type;
-
-	switch (eosType.replace('[]', '')) {
-		case 'bool':
-			type = 'boolean';
-			break;
-		default:
-			type = 'string';
-			break;
-	}
-
+	const type = mapTypes[eosType.replace('[]','')] || 'string';
 	if (wrapper) {
 		return `${wrapper}<${type}>`;
 	} else {
