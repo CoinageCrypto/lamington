@@ -14,7 +14,7 @@ chai.use(deepEqualInAnyOrder);
  * @desc Pauses the current process until the specified EOS block number occurs
  * @note Assumes blocks will always be produced every 500ms
  * @param number Process sleep duration
- * @author Kevin Brown <github.com/thekevinbrown>
+ * @author [Kevin Brown](github.com/thekevinbrown)
  */
 export const untilBlockNumber = async (number: number) => {
 	// Loops until current head block number reaches desired
@@ -30,7 +30,7 @@ export const untilBlockNumber = async (number: number) => {
  * Sleep Process
  * @desc Pauses the current process for the specified duration
  * @param delayInMs Process sleep duration
- * @author Kevin Brown <github.com/thekevinbrown>
+ * @author [Kevin Brown](github.com/thekevinbrown)
  */
 export const sleep = async (delayInMs: number) =>
 	new Promise(resolve => setTimeout(resolve, delayInMs));
