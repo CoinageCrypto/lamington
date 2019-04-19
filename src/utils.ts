@@ -10,18 +10,18 @@ import { TableRowsResult } from './contracts';
 chai.use(deepEqualInAnyOrder);
 
 /**
- * Until Block
+ * Sleep Until Block
  * @desc Pauses the current process until the specified EOS block number occurs
+ * @note Assumes blocks will always be produced every 500ms
  * @param number Process sleep duration
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const untilBlockNumber = async (number: number) => {
+	// Loops until current head block number reaches desired
 	let { head_block_num } = await EOSManager.rpc.get_info();
-
 	while (head_block_num < number) {
-		// Assuming 500ms blocks
+		// Sleep for block and update current block number
 		await sleep((number - head_block_num) * 500);
-
 		({ head_block_num } = await EOSManager.rpc.get_info());
 	}
 };
@@ -36,8 +36,9 @@ export const sleep = async (delayInMs: number) =>
 	new Promise(resolve => setTimeout(resolve, delayInMs));
 
 /**
- * Next Block
+ * Sleep Block
  * @desc Pauses the current process for the 500ms EOS block time
+ * @note The process will wake during and not on the next block
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const nextBlock = () => sleep(500);
@@ -116,22 +117,23 @@ export const assertEOSError = async (
 	eosErrorName: string,
 	description: string
 ) => {
+	// Execute operation and handle exceptions
 	try {
 		await operation;
 	} catch (error) {
 		if (error.json && error.json.error && error.json.error.name) {
+			// Compare error and fail if the error doesn't match the expected
 			assert(
 				error.json.error.name === eosErrorName,
 				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
 			);
 			return;
 		} else {
-			assert.fail(
-				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
-			);
+			// Fail if error not thrown by EOS
+			assert.fail(`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`);
 		}
 	}
-
+	// Fail if no exception thrown
 	assert.fail(`Expected ${description} but operation completed successfully.`);
 };
 
