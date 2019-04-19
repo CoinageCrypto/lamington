@@ -12,9 +12,13 @@ const encoding = 'utf8';
 
 /**
  * @class GitIgnoreManager
- * @desc Automatically creates and configures a `.gitignore` file for generated files
  */
 export class GitIgnoreManager {
+
+	/**
+	 * Create Missing
+	 * @desc Creates a base configuration `.gitignore` file when it doesn't exit
+	 */
 	public static async createIfMissing() {
 		if (!(await exists(gitignoreFilePath))) {
 			await writeFile(

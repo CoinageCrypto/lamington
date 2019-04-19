@@ -18,6 +18,8 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 /**
  * Map Paramater Type
  * @desc Parses a C++ type definition into a Typescript definition
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
  * @param eosType 
  */
 export const mapParameterType = (eosType: string) => {
