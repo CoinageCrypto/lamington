@@ -3,9 +3,21 @@ import {
     mapParameterType
 } from './typeGenerator';
 
-const validTypes = ['string','bool','name']
+/**
+ * Big Number Types
+ * @desc Javascript only supports number, so CPP integer types need to be mapped accordingly
+ */
+const numberTypes = [
+    'int8','int16','int32','int64','int128','int256',
+    'uint8','uint16','uint32','uint64','uint128','uint256',
+    'uint8_t','uint16_t','uint32_t','uint64_t','uint128_t','uint256_t'
+];
 
-const numberTypes = ['uint8','uint16','uint32','uint64','uint128','uint256'];
+/**
+ * EOS Name Types
+ * @desc Name types are typically a string or uint64_t and typically represent an identity on the EOS blockchain
+ */
+const stringNumberTypes = ['name','action_name','scope_name','account_name','permission_name','table_name'];
 
 describe("type generator", () => {
 
@@ -20,8 +32,14 @@ describe("type generator", () => {
         });
 
         context('eos types', () => {
-            it(`should map 'name' to 'string|number'`, () => {
-                assert.equal(mapParameterType('name'), 'string|number', `'name' type should map to 'string' or 'number'`)
+
+            it(`should map name types to 'string|number'`, () => {
+                stringNumberTypes.map(type =>
+                    assert.equal(mapParameterType(type), 'string|number', `'${type}' type should map to 'string' or 'number'`))
+            });
+
+            it(`should map 'checksum' to 'string'`, () => {
+                assert.equal(mapParameterType('checksum'), 'string', `'checksum' type should map to 'string'`)
             });
         });
 
