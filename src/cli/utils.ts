@@ -17,14 +17,15 @@ const writeFile = promisify(writeFileCallback);
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
 
-const workingDirectory = process.cwd();
-
 import { EOSManager } from '../eosManager';
 import { sleep } from '../utils';
 import { generateTypes } from '../contracts';
 import { ConfigManager } from '../configManager';
+import * as spinner from './logIndicator';
 
+const WORKING_DIRECTORY = process.cwd();
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
+const TIMEOUT_DURATION = 2500;
 
 const versionFromUrl = (url: string) => {
 	// Looks for strings in this format:
@@ -78,11 +79,16 @@ RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 
 export const startContainer = async () => {
 	await docker.command(
-		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${workingDirectory}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${await dockerImageName()} /bin/bash -c "./scripts/init_blockchain.sh"`
+		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${await dockerImageName()} /bin/bash -c "./scripts/init_blockchain.sh"`
 	);
 };
 
-export const stopContainer = () => docker.command('stop lamington');
+export const stopContainer = () => {
+	spinner.create('Stopping EOS container');
+	return docker.command('stop lamington')
+	.then(() => spinner.end())
+	.catch(err => spinner.fail(err));
+}
 
 export const untilEosIsReady = async (attempts = 8) => {
 	let attempt = 0;
@@ -107,10 +113,15 @@ export const eosIsReady = async () => {
 	}
 };
 
+/**
+ * Start a new EOSIO docker image
+ * @author Kevin Brown <github.com/thekevinbrown>
+ */
 export const startEos = async () => {
-	await mkdirp(path.join(workingDirectory, '.lamington', 'compiled_contracts'));
-	await mkdirp(path.join(workingDirectory, '.lamington', 'data'));
-
+	// Create build result cache directories
+	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'compiled_contracts'));
+	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'data'));
+	// Ensure an EOSIO build image exists
 	if (!(await imageExists())) {
 		console.log('--------------------------------------------------------------');
 		console.log('Docker image does not yet exist. Building...');
@@ -121,15 +132,17 @@ export const startEos = async () => {
 		console.log(`We've prepared some hold music for you: https://youtu.be/6g4dkBF5anU`);
 		console.log();
 		qrcode.generate('https://youtu.be/6g4dkBF5anU');
-
+		// Build EOSIO image
 		await buildImage();
 	}
-
+	// Start EOSIO
 	try {
+		spinner.create('Starting EOS');
+		// Start the EOS docker container
 		await startContainer();
-
+		// Pause process until ready
 		await untilEosIsReady();
-
+		spinner.end();
 		console.log(
 			'                                        \n\
 ==================================================== \n\
@@ -139,7 +152,7 @@ export const startEos = async () => {
       RPC: http://localhost:8888                     \n\
 	  Docker Container: lamington                    \n\
                                                      \n\
-===================================================='
+==================================================== \n'
 		);
 	} catch (error) {
 		console.error('Could not start EOS blockchain. Error: ', error);
@@ -147,16 +160,19 @@ export const startEos = async () => {
 	}
 };
 
+/**
+ * Loads all test files and executes with Mocha
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @note This is where we should allow configuration over all files or specified files/folder
+ */
 export const runTests = async () => {
-	// Initialise Lamington with defaults.
-	// This creates EOSJS and initialises the admin account.
+	// Initialize the EOS connection manager
 	EOSManager.initWithDefaults();
-
-	// Only need to register ts-mocha if it's a typescript project.
-	if (await exists(path.join(workingDirectory, 'tsconfig.json'))) {
+	// Register ts-mocha if it's a Typescript project
+	if (await exists(path.join(WORKING_DIRECTORY, 'tsconfig.json'))) {
 		require('ts-mocha');
 	}
-
+	// Find all existing test file paths
 	const files = [
 		// All ts and js files under the test folder get added.
 		...(await glob('test/**/*.ts')),
@@ -172,64 +188,78 @@ export const runTests = async () => {
 		...(await glob('**/*.spec.ts')),
 		...(await glob('**/*.spec.js')),
 	];
-
 	// Instantiate a Mocha instance.
 	const mocha = new Mocha();
-
-	for (const testFile of files) {
-		mocha.addFile(path.join(workingDirectory, testFile));
-	}
-
-	// Our tests are more like integration tests than unit tests. Taking two seconds is
-	// pretty reasonable in our case.
-	mocha.slow(2000);
-
-	// Run the tests.
+	// Add each test file to mocha
+	for (const testFile of files) mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
+	// Configure expected test duration
+	mocha.slow(TIMEOUT_DURATION);
+	// Run tests
 	await new Promise((resolve, reject) =>
 		mocha.run(failures => {
 			if (failures) return reject(failures);
-
 			return resolve();
 		})
 	);
 };
 
-export const buildAll = async () => {
-	const contracts = await glob('./**/*.cpp');
+/**
+ * Finds and builds all C++ contracts
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @note Should be configurable with a RegExp or something to prevent all C++ files being compiled
+ * @param contracts Optional contract paths to build
+ */
+export const buildAll = async (contracts?:string[]) => {
+	// Start log output
+	spinner.create('Building smart contracts...');
+	// Find all contract files
+	contracts = await glob('./**/*.cpp');
 	const errors = [];
-
+	// Build each contract and handle errors
 	for (const contract of contracts) {
 		try {
 			await build(contract);
 		} catch (error) {
 			errors.push({
-				error: `Failed to compile contract ${contract}`,
-				underlyingError: error,
+				message: `Failed to compile contract ${contract}`,
+				error,
 			});
 		}
 	}
-
+	// Report any caught errors
 	if (errors.length > 0) {
-		for (const error of errors) {
-			console.error(error.error);
-			console.error(' -> ', error.underlyingError);
-		}
-
-		console.error();
-		console.error(`${errors.length} contract(s) failed to compile. Quitting.`);
-
+		// Print each error message and source
+		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
+		// Close error report
+		spinner.fail(`\n${errors.length} contract(s) failed to compile. Quitting.`);
+		// Terminate the current process
 		process.exit(1);
+	} else {
+		spinner.end();
 	}
 };
 
-export const pathToIdentifier = (contractPath: string) =>
-	contractPath.substr(0, contractPath.lastIndexOf('.'));
+/**
+ * Resolves the path to file identifier.
+ * This is the path without trailing file extension
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @note What happens when the input path contains no trailing extension?
+ * @param filePath Path to file
+ * @returns Identifier path
+ */
+export const pathToIdentifier = (filePath: string) =>
+	filePath.substr(0, filePath.lastIndexOf('.'));
 
+/**
+ * Compiles an EOSIO contract and generates Typescript definitions
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param contractPath Fullpath to the CPP contract file
+ */
 export const build = async (contractPath: string) => {
+	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
-
-	console.log(`- Compiling ${basename}:`);
-
+	spinner.create(`Compiling ${basename}`);
+	// Pull docker images
 	await docker.command(
 		// Arg 1 is filename, arg 2 is contract name. They're the same for us.
 		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
@@ -240,6 +270,9 @@ export const build = async (contractPath: string) => {
 			contractPath
 		)}" "${path.dirname(contractPath)}" "${basename}"`
 	);
-
+	spinner.end();
+	// Generate Typescript definitions for contract
 	await generateTypes(pathToIdentifier(contractPath));
+	// Notify build task completed
+	spinner.end(`Compiled ${basename}`)
 };
