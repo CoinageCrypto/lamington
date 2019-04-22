@@ -5,11 +5,7 @@
  * // JSON object type map?
  */
 
-interface TypeMapping {
-    [key:string]:string
-}
-
-const types:TypeMapping = {
+const types: { [key:string]:string } = {
     'string':'string',
     'bool':'boolean',
     'name':'string|number',
