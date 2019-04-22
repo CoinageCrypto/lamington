@@ -3,6 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import mapTypes from './typeMap';
+import * as spinner from './../cli/logIndicator';
 
 const glob = promisify(globWithCallbacks);
 
@@ -16,8 +17,7 @@ type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGenerator
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
 /**
- * Map Paramater Type
- * @desc Parses a C++ type definition into a Typescript definition
+ * Parses a C++ type definition into a Typescript definition
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param eosType 
@@ -33,21 +33,28 @@ export const mapParameterType = (eosType: string) => {
 	}
 };
 
+/**
+ * Loads all `.abi` files and generates types
+ * @author Kevin Brown <github.com/thekevinbrown>
+ */
 export const generateAllTypes = async () => {
-	// Make sure there are files to even generate from.
+	// Load all `.abi` files
 	const files = await glob('**/*.abi');
-
-	if (files.length === 0) {
-		throw new Error('No ABI files to generate from. Exiting.');
-	}
-
-	for (const file of files) {
-		await generateTypes(file);
-	}
+	// Handle no files found
+	if (files.length === 0) throw new Error('No ABI files to generate from. Exiting.');
+	// Generate types for each file
+	for (const file of files) await generateTypes(file);
 };
 
+/**
+ * Generates a Typescript definition file from a contract ABI file
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param contractIdentifier Path to file without extension
+ */
 export const generateTypes = async (contractIdentifier: string) => {
-	console.log(`Generating types for ${contractIdentifier}`);
+	// Notify generating has begun
+	spinner.create(`Generating types definitions`);
 
 	const contractName = path.basename(contractIdentifier);
 	const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
@@ -58,7 +65,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		{},
 		...abi.structs.map((struct: any) => ({ [struct['name']]: struct }))
 	);
-
+	// Prepend warning text
 	const result: GeneratorLevel = [
 		'// =====================================================',
 		'// WARNING: GENERATED FILE',
@@ -67,7 +74,6 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'// =====================================================',
 		'',
 	];
-
 	// Imports
 	const imports = ['Account', 'Contract'];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
@@ -86,7 +92,6 @@ export const generateTypes = async (contractIdentifier: string) => {
 		result.push(tableInterface);
 		result.push('');
 	}
-
 	// Generate contract type from ABI
 	const generatedContractActions = contractActions.map((action: any) => {
 		// With a function for each action
@@ -119,6 +124,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 	result.push('');
 
 	await saveInterface(contractIdentifier, result);
+	spinner.end('');
 };
 
 const saveInterface = async (
