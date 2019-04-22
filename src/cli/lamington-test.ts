@@ -3,29 +3,26 @@ import { GitIgnoreManager } from '../gitignoreManager';
 import { ConfigManager } from '../configManager';
 
 const run = async () => {
-	if (await eosIsReady()) {
-		console.log('EOS is running. Stopping...');
+	// Initialize the configuration
+	await ConfigManager.initWithDefaults();
+	// Stop running instances when keepAlive is false
+	if (!ConfigManager.keepAlive && await eosIsReady()) {
 		await stopContainer();
 	}
-
-	// This initialises the config
-	console.log('Getting configuration...');
-	await ConfigManager.initWithDefaults();
-
-	// This ensures we have our .gitignore inside the .lamington directory
+	// Ensures we have our .gitignore inside the .lamington directory
 	await GitIgnoreManager.createIfMissing();
-
-	console.log('Starting EOS...');
-	await startEos();
-
-	console.log('Building smart contracts...');
+	// Start an EOSIO instance if not running
+	if (!await eosIsReady()) {
+		await startEos();
+	}
+	// Start compiling smart contracts
 	await buildAll();
-
-	console.log('Running tests...');
+	// Begin running tests
 	await runTests();
-
-	console.log('Stopping EOS...');
-	await stopContainer();
+	// Stop EOSIO instance if keepAlive is false
+	if (!ConfigManager.keepAlive) {
+		await stopContainer();
+	}
 };
 
 run().catch(error => {
