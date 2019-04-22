@@ -11,13 +11,13 @@ const gitignoreFilePath = path.join(configDirectory, '.gitignore');
 const encoding = 'utf8';
 
 /**
- * @class GitIgnoreManager
+ * Manages the `.gitignore` file and configuration
  */
 export class GitIgnoreManager {
 
 	/**
-	 * Create if Missing
-	 * @desc Creates a base configuration `.gitignore` file when it doesn't exit
+	 * Creates a `.gitignore` file when it doesn't exist
+	 * and configures the base ignore files
 	 */
 	public static async createIfMissing() {
 		if (!(await exists(gitignoreFilePath))) {

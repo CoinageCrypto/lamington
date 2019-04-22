@@ -10,8 +10,7 @@ import { TableRowsResult } from './contracts';
 chai.use(deepEqualInAnyOrder);
 
 /**
- * Sleep Until Block
- * @desc Pauses the current process until the specified EOS block number occurs
+ * Pauses the current process until the specified EOS block number occurs
  * @note Assumes blocks will always be produced every 500ms
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param number Process sleep duration
@@ -20,15 +19,14 @@ export const untilBlocknumber = async (number: number) => {
 	// Loops until current head block number reaches desired
 	let { head_block_num } = await EOSManager.rpc.get_info();
 	while (head_block_num < number) {
-		// Sleep for block and update current block number
+		// Sleep for block duration and update current block number
 		await sleep((number - head_block_num) * 500);
 		({ head_block_num } = await EOSManager.rpc.get_info());
 	}
 };
 
 /**
- * Sleep Process
- * @desc Pauses the current process for the specified duration
+ * Pauses the current process for the specified duration
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param delayInMs Process sleep duration
  */
@@ -36,16 +34,14 @@ export const sleep = async (delayInMs: number) =>
 	new Promise(resolve => setTimeout(resolve, delayInMs));
 
 /**
- * Sleep Block
- * @desc Pauses the current process for the 500ms EOS block time
+ * Pauses the current process for the 500ms EOS block time
  * @note The process will wake during and not on the next block
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const nextBlock = () => sleep(500);
 
 /**
- * Assert table rows equal expected
- * @desc Compares table rows against expected rows
+ * Performs a comparison of table row query results against expected rows
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
@@ -63,8 +59,7 @@ export const assertRowsEqual = async <RowType>(
 };
 
 /**
- * Assert table rows eventually equal expected
- * @desc Compares table rows against expected rows irrespective of order
+ * Compares table rows against expected rows irrespective of order
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
@@ -83,8 +78,7 @@ export const assertRowsEqualLazy = async <RowType>(
 };
 
 /**
- * Assert table row result count
- * @desc Validates the number of rows returned is equal to the expected count
+ * Validates the number of rows returned is equal to the expected count
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param getTableRowsResult Get table rows result promise
  * @param expectedRowCount Expected number of table rows
@@ -105,8 +99,7 @@ export const assertRowCount = async (
 };
 
 /**
- * Assert EOS Error
- * @desc Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
+ * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  * @param eosErrorName Expected EOS error name
@@ -138,8 +131,7 @@ export const assertEOSError = async (
 };
 
 /**
- * Assert EOS Exception
- * @desc Asserts operation throws an `eosio_assert_message_exception` error
+ * Asserts operation throws an `eosio_assert_message_exception` error
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
@@ -147,8 +139,7 @@ export const assertEOSException = (operation: Promise<any>) =>
 	assertEOSError(operation, 'eosio_assert_message_exception', 'assert');
 
 /**
- * Assert Missing EOS Authority
- * @desc Asserts operation is missing the required authority by throwing a `missing_auth_exception` error
+ * Asserts operation is missing the required authority by throwing a `missing_auth_exception` error
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
