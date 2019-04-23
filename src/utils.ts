@@ -41,37 +41,45 @@ export const sleep = async (delayInMs: number) =>
 export const nextBlock = () => sleep(500);
 
 /**
- * Performs a comparison of table row query results against expected rows
+ * Compares table rows against expected rows irrespective of order
  * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
+ * @param strict Strict comparison flag
  */
 export const assertRowsEqual = async <RowType>(
 	getTableRowsResult: Promise<TableRowsResult<RowType>>,
-	expected: Array<RowType>
+	expected: Array<RowType>,
+	strict: boolean = false
 ) => {
-	// Call the table row query and assert results equal expected
+	// Pass-through strict comparison
+	if (strict) {
+		assertRowsEqualStrict(getTableRowsResult, expected);
+		return;
+	}
+	// Call table row query and assert results eventually equal expected
 	const result = await getTableRowsResult;
-	assert.deepEqual(result, {
+	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
+	chai.expect(result).to.deep.equalInAnyOrder({
 		rows: expected,
 		more: false,
 	});
 };
 
 /**
- * Compares table rows against expected rows irrespective of order
+ * Performs a strict comparison of queried table rows against expected rows
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
  */
-export const assertRowsEqualLazy = async <RowType>(
+export const assertRowsEqualStrict = async <RowType>(
 	getTableRowsResult: Promise<TableRowsResult<RowType>>,
 	expected: Array<RowType>
 ) => {
-	// Call table row query and assert results eventually equal expected
+	// Call the table row query and assert results equal expected
 	const result = await getTableRowsResult;
-	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
-	chai.expect(result).to.deep.equalInAnyOrder({
+	assert.deepEqual(result, {
 		rows: expected,
 		more: false,
 	});
