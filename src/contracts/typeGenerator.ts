@@ -76,6 +76,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
 	result.push('');
+	result.push('// Table row types');
 
 	// Generate table row types from ABI
 	for (const table of contractTables) {
@@ -111,8 +112,10 @@ export const generateTypes = async (contractIdentifier: string) => {
 
 	const contractInterface = {
 		[`export interface ${pascalCase(contractName)} extends Contract`]: [
+			'// Actions',
 			...generatedContractActions,
 			'',
+			'// Tables',
 			...generatedTables,
 		],
 	};
