@@ -25,7 +25,8 @@ import * as spinner from './logIndicator';
 
 const WORKING_DIRECTORY = process.cwd();
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
-const TIMEOUT_DURATION = 2500;
+const TEST_EXPECTED_DURATION = 2000;
+const TEST_TIMEOUT_DURATION = 10000;
 
 const versionFromUrl = (url: string) => {
 	// Looks for strings in this format:
@@ -134,6 +135,7 @@ export const startEos = async () => {
 		qrcode.generate('https://youtu.be/6g4dkBF5anU');
 		// Build EOSIO image
 		await buildImage();
+		
 	}
 	// Start EOSIO
 	try {
@@ -190,11 +192,17 @@ export const runTests = async () => {
 	];
 	// Instantiate a Mocha instance.
 	const mocha = new Mocha();
-	// Add each test file to mocha
-	for (const testFile of files) mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
-	// Configure expected test duration
-	mocha.slow(TIMEOUT_DURATION);
-	// Run tests
+
+	for (const testFile of files) {
+		mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
+	}
+
+	// Our tests are more like integration tests than unit tests. Taking two seconds is
+	// pretty reasonable in our case and it's possible a successful test would take 10 seconds.
+	mocha.slow(TEST_EXPECTED_DURATION);
+	mocha.timeout(TEST_TIMEOUT_DURATION);
+
+	// Run the tests.
 	await new Promise((resolve, reject) =>
 		mocha.run(failures => {
 			if (failures) return reject(failures);
@@ -261,7 +269,7 @@ export const build = async (contractPath: string) => {
 	spinner.create(`Compiling ${basename}`);
 	// Pull docker images
 	await docker.command(
-		// Arg 1 is filename, arg 2 is contract name. They're the same for us.
+		// Arg 1 is filename, arg 2 is contract name.
 		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
 			'opt',
 			'eosio',

@@ -79,7 +79,8 @@ export const assertRowsEqualStrict = async <RowType>(
 ) => {
 	// Call the table row query and assert results equal expected
 	const result = await getTableRowsResult;
-	assert.deepEqual(result, {
+
+	assert.deepStrictEqual(result, {
 		rows: expected,
 		more: false,
 	});

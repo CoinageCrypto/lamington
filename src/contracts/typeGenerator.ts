@@ -80,13 +80,14 @@ export const generateTypes = async (contractIdentifier: string) => {
 
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
 	result.push('');
+	result.push('// Table row types');
 
 	// Generate table row types from ABI
 	for (const table of contractTables) {
 		const tableInterface = {
 			[`export interface ${pascalCase(contractName)}${pascalCase(table.name)}`]: contractStructs[
 				table.type
-			].fields.map((field: any) => `${field.name}: ${mapParameterType(field.type)}`),
+			].fields.map((field: any) => `${field.name}: ${mapParameterType(field.type)};`),
 		};
 
 		result.push(tableInterface);
@@ -109,13 +110,15 @@ export const generateTypes = async (contractIdentifier: string) => {
 		(table: any) =>
 			`${table.name}(scope?: string): Promise<TableRowsResult<${pascalCase(
 				contractName
-			)}${pascalCase(table.name)}>>`
+			)}${pascalCase(table.name)}>>;`
 	);
 
 	const contractInterface = {
 		[`export interface ${pascalCase(contractName)} extends Contract`]: [
+			'// Actions',
 			...generatedContractActions,
 			'',
+			'// Tables',
 			...generatedTables,
 		],
 	};
