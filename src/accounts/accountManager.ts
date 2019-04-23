@@ -5,6 +5,7 @@ import * as ecc from 'eosjs-ecc';
 import { Account } from './account';
 import { accountNameFromPublicKey } from './utils';
 import { EOSManager } from '../eosManager';
+import { Contract } from '../contracts';
 
 interface AccountCreationOptions {
 	creator?: Account;
@@ -117,6 +118,49 @@ export class AccountManager {
 		}
 
 		return await EOSManager.transact({ actions }, eos);
+	};
+
+	static addCodePermission = async (account: Account, contract: Contract) => {
+		// We need to get their existing permissions, then add in a new eosio.code permission for this contract.
+		const { permissions } = await EOSManager.rpc.get_account(account.name);
+		const active = permissions.find((permission: any) => permission.perm_name == 'active');
+
+		const auth = active.required_auth;
+		const existingPermission = auth.accounts.find(
+			(account: any) =>
+				account.permission.actor === contract.account.name &&
+				account.permission.permission === 'eosio.code'
+		);
+
+		if (existingPermission) {
+			throw new Error(
+				`Code permission is already present on account ${account.name} for contract ${
+					contract.account.name
+				}`
+			);
+		}
+
+		// Add it in.
+		auth.accounts.push({
+			permission: { actor: contract.account.name, permission: 'eosio.code' },
+			weight: 1,
+		});
+
+		const actions: any = [
+			{
+				account: 'eosio',
+				name: 'updateauth',
+				authorization: account.owner,
+				data: {
+					account: account.name,
+					permission: 'active',
+					parent: 'owner',
+					auth,
+				},
+			},
+		];
+
+		await EOSManager.transact({ actions });
 	};
 
 	private static flattenOptions(options?: AccountCreationOptions) {
