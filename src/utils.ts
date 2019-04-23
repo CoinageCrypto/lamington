@@ -24,7 +24,8 @@ export const assertRowsEqual = async <RowType>(
 	expected: Array<RowType>
 ) => {
 	const result = await getTableRowsResult;
-	assert.deepEqual(result, {
+
+	assert.deepStrictEqual(result, {
 		rows: expected,
 		more: false,
 	});
