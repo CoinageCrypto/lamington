@@ -69,7 +69,7 @@ export const assertEOSError = async (
 	assert.fail(`Expected ${description} but operation completed successfully.`);
 };
 
-export const assertEOSAssert = (operation: Promise<any>) =>
+export const assertEOSException = (operation: Promise<any>) =>
 	assertEOSError(operation, 'eosio_assert_message_exception', 'assert');
 
 export const assertMissingAuthority = (operation: Promise<any>) =>
