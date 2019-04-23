@@ -232,7 +232,7 @@ export const build = async (contractPath: string) => {
 	console.log(`- Compiling ${basename}:`);
 
 	await docker.command(
-		// Arg 1 is filename, arg 2 is contract name. They're the same for us.
+		// Arg 1 is filename, arg 2 is contract name.
 		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
 			'opt',
 			'eosio',
