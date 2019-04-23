@@ -181,8 +181,9 @@ export const runTests = async () => {
 	}
 
 	// Our tests are more like integration tests than unit tests. Taking two seconds is
-	// pretty reasonable in our case.
+	// pretty reasonable in our case and it's possible a successful test would take 10 seconds.
 	mocha.slow(2000);
+	mocha.timeout(10000);
 
 	// Run the tests.
 	await new Promise((resolve, reject) =>
