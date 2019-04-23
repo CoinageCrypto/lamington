@@ -82,7 +82,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		const tableInterface = {
 			[`export interface ${pascalCase(contractName)}${pascalCase(table.name)}`]: contractStructs[
 				table.type
-			].fields.map((field: any) => `${field.name}: ${mapParameterType(field.type)}`),
+			].fields.map((field: any) => `${field.name}: ${mapParameterType(field.type)};`),
 		};
 
 		result.push(tableInterface);
@@ -106,7 +106,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		(table: any) =>
 			`${table.name}(scope?: string): Promise<TableRowsResult<${pascalCase(
 				contractName
-			)}${pascalCase(table.name)}>>`
+			)}${pascalCase(table.name)}>>;`
 	);
 
 	const contractInterface = {
