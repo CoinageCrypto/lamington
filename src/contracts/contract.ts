@@ -17,6 +17,7 @@ export class Contract implements EOSJSContract {
 	private _eos: Api;
 	private _account: Account;
 	private _identifier: string;
+	private _abi: Abi;
 	public actions: Map<string, Type> = new Map();
 	public types: Map<string, Type> = new Map();
 
@@ -39,6 +40,7 @@ export class Contract implements EOSJSContract {
 		this._eos = eos;
 		this._identifier = identifier;
 		this._account = account;
+		this._abi = abi;
 		this.actions = actions;
 		this.types = types;
 
@@ -105,11 +107,49 @@ export class Contract implements EOSJSContract {
 		// Wait for the next block to appear before we query the values.
 		await nextBlock();
 
-		return await this._eos.rpc.get_table_rows({
+		const result = await this._eos.rpc.get_table_rows({
 			code: this.account.name,
 			scope: scope || this.account.name,
 			table,
 			json: true,
 		});
+
+		// EOSJS gives us values that don't match up with our Typescript types,
+		// for example, the ABI bool type gets returned as a number (0 or 1) instead
+		// of a boolean. This is confusing and weird when trying to deep equal
+		// and other types of comparisons, so we'll go ahead and use the ABI
+		// to map the types to what we consider to be more canonical types.
+		// This mapping will always be limited to just the types we do special
+		// things with in Lamington world, and will always match the generated
+		// types for table rows. Other values will pass through untouched.
+		const tableAbi = this._abi.tables.find(tableAbi => tableAbi.name === table);
+		if (!tableAbi) throw new Error(`Could not find ABI for table ${table}`);
+		const tableRowType = this.types.get(tableAbi.type);
+		if (!tableRowType) throw new Error(`Could not find table row type for table ${table}`);
+
+		// Bool is the only type we need to fiddle with at the moment, so only do this if
+		// there's a field with a bool type in it.
+		const booleanFields = tableRowType.fields.filter(field => field.typeName === 'bool');
+
+		if (booleanFields.length > 0) {
+			// Ok, we need to map.
+			for (const row of result.rows) {
+				for (const field of booleanFields) {
+					const currentValue = row[field.name];
+
+					if (currentValue !== 0 && currentValue !== 1) {
+						throw new Error(
+							`Invalid value while casting to boolean for ${
+								field.name
+							} field on row. Got ${currentValue}, expected 0 or 1.`
+						);
+					}
+
+					row[field.name] = currentValue ? true : false;
+				}
+			}
+		}
+
+		return result;
 	};
 }
