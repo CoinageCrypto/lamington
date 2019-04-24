@@ -8,7 +8,7 @@
 		"build": "npm run clean && tsc && npm run copy:scripts",
 		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
 		"clean": "rm -rf ./lib",
-		"docs": "typedoc --out docs/api ./src",
+		"docs": "typedoc --out api-docs ./src",
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",

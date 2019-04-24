@@ -70,4 +70,4 @@ lib/
 .vscode
 
 # Generated API documentation
-docs/api/
+api-docs/
