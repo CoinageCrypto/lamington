@@ -13,18 +13,36 @@ export interface ContractActionOptions {
 	from?: Account;
 }
 
+/**
+ * Extends 
+ */
 export class Contract implements EOSJSContract {
+
+	/** @hidden EOSJS api reference */
 	private _eos: Api;
+	/** @hidden Current contract account */
 	private _account: Account;
+	/** @hidden Contract identifier. Typically the contract file name minus the extension */
 	private _identifier: string;
+	/** @hidden Current contract ABI */
 	private _abi: Abi;
+	/** Deployed contract actions */
 	public actions: Map<string, Type> = new Map();
+	/** Deployed contract types */
 	public types: Map<string, Type> = new Map();
 
+	/**
+	 * Gets the currently configured contract account
+	 * @returns Current contract account
+	 */
 	public get account(): Account {
 		return this._account;
 	}
 
+	/**
+	 * Gets the current contract identifier
+	 * @returns Contract identifier
+	 */
 	public get identifier(): string {
 		return this._identifier;
 	}
@@ -37,13 +55,13 @@ export class Contract implements EOSJSContract {
 		actions: Map<string, Type>,
 		types: Map<string, Type>
 	) {
+		// Store contract arguments
 		this._eos = eos;
 		this._identifier = identifier;
 		this._account = account;
 		this._abi = abi;
 		this.actions = actions;
 		this.types = types;
-
 		// Set up all the actions as methods on the contract.
 		for (const action of actions.values()) {
 			(this as any)[action.name] = function() {
@@ -57,7 +75,7 @@ export class Contract implements EOSJSContract {
 						} got ${arguments.length}.`
 					);
 				}
-
+				
 				if (arguments.length > action.fields.length + 1) {
 					throw new Error(
 						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${
@@ -94,7 +112,6 @@ export class Contract implements EOSJSContract {
 				);
 			};
 		}
-
 		// And now the tables.
 		for (const table of abi.tables) {
 			(this as any)[table.name] = function() {
@@ -103,6 +120,12 @@ export class Contract implements EOSJSContract {
 		}
 	}
 
+	/**
+	 * Retrieves table rows with the specified table name and optional scope
+	 * @note Implements a temporary patch for the EOSjs `bool` mapping error
+	 * @param table The table name
+	 * @param scope Optional table scope, defaults to the table name
+	 */
 	getTableRows = async (table: string, scope?: string) => {
 		// Wait for the next block to appear before we query the values.
 		await nextBlock();
@@ -132,7 +155,7 @@ export class Contract implements EOSJSContract {
 		const booleanFields = tableRowType.fields.filter(field => field.typeName === 'bool');
 
 		if (booleanFields.length > 0) {
-			// Ok, we need to map.
+			// Map all `bool` fields from numbers to booleans
 			for (const row of result.rows) {
 				for (const field of booleanFields) {
 					const currentValue = row[field.name];
