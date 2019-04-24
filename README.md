@@ -47,24 +47,27 @@ lamington build
 Lamington automatically searches for all files with the `.cpp` file extension before batch compiling within a docker container. Compiling within a docker container with locked configuration ensures contracts compile consistently and clean every time.
 
 #### Ignoring Files & Folders
-
-Fortunately we realized that not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
+Fortunately we realized that not every `.cpp` file is a build ready contract, so we added an additional ignore file for you to define what we shouldn't look at. The `.lamingtonignore` file allows you to configure directories, files and patterns want Lamington to disregard during your build and testing processes. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
 
 #### Specifying Build Contracts
-
 If you'd like to run builds on specific contracts, an additional contract `identifier` can be specified like so;
 
 ```
 lamington build [identifier]
 ```
 
-_Replacing the `[identifier]` with your contract name, filename or fullpath._
+*Replacing the `[identifier]` with your contract name, filename or fullpath.*
+
 
 ### Testing
+
+Lamington was built with testing in mind. We considered the most commonly used testing libraries like Mocha, Jest and Jade when developing the Lamington toolset. Running your test suit is as easy as;
 
 ```
 lamington test
 ```
+
+For a full list of available JavaScript utilities, please [visit the documentation here](https://docs.lamington.io/testing).
 
 ## Configuration
 
@@ -85,24 +88,30 @@ This creates a `.lamingtonrc` file in your current directory. The `.lamingtonrc`
 
 You can find more information about the Lamington tool-set and join our growing community of developers by visiting any of the following links;
 
-[API Documentation](https://docs.lamington.dev)
+[Examples](https://examples.lamington.io)
+
+[API Documentation](https://docs.lamington.io)
 
 [Slack Channel]()
 
-[Official Website](https://lamington.dev)
+[Official Website](https://lamington.io)
 
 ## Roadmap
 
 ### LamingtonJS
+Core Lamington front end toolset
 
 ### Lamington-React
+React context management for LamingtonJS
 
 ### Lamington-Angular
 
 ## Contributors
 
 _Contribution guide_
+
 [Kevin Brown](https://github.com/thekevinbrown), Creator & Developer
+
 [Mitch Pierias](https://github.com/MitchPierias), Developer
 
 ## Supporters
