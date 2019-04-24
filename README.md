@@ -5,6 +5,7 @@
 Inspired by the popular Truffle framework and developed in Typescript, Lamington makes smart contract development simple for any level of EOSIO developer.
 
 [![Build Status](https://travis-ci.org/CoinageCrypto/lamington.svg?branch=master)](https://travis-ci.org/CoinageCrypto/lamington)
+[![Supported by Coinage](https://coina.ge/assets/supported-by-coinage-badge.svg)](https://coina.ge)
 
 ## Features
 
@@ -20,37 +21,63 @@ The Lamington library includes CLI tools and JavaScript utilities to streamline 
 
 ## Installation
 
-Lamington includes command line tools and JavaScript utilities for EOSIO contract development. If you haven't installed Lamington as a global dependency already, we recommend doing so with;
+### Prerequisites
+
+Lamington requires Docker and NodeJS to be installed before it can be used.
+
+- Docker: We recommend [installing Docker with the standard installer for your platform](https://www.docker.com/get-started).
+- NodeJS: We recommend [installing NodeJS with NVM](https://github.com/creationix/nvm).
+
+### Installing Lamington
+
+Lamington includes command line tools and JavaScript utilities for EOSIO contract development. We recommend installing the framework as a development dependency within your project. This lets you run commands like `lamington test` in your project.
 
 ```
-npm install -g lamington
+$ npm install --save-dev lamington
 ```
 
-This provides CLI commands to build and test contracts, along with helpful commands like boilerplate generation and initialization.
-
-We recommend also installing the framework as a development dependency within your project, in order to take advantage of Lamington's utilities and helper methods.
+From there you just need to add node scripts to your `package.json` file that trigger `lamington` actions, for example:
 
 ```
-npm install --save-dev lamington
+{
+    ...
+	"scripts": {
+		"build": "lamington build",
+		"start": "lamington start eos",
+		"stop": "lamington stop eos",
+		"test": "lamington test"
+	},
+    ...
+}
+```
+
+### Global Installation
+
+If you'd like the convenience of using the `lamington` command without adding it as a project dependency, you can install it on your system globally, just be mindful that this can create trouble if you use `lamington` with multiple projects simultaneously and don't have them all ready for the same version.
+
+To install globally, run:
+
+```
+$ npm install -g lamington
 ```
 
 ## Usage
 
-Lamington is super simple! Whether you're migrating from Solidity, or a seasoned EOSIO developer deploying a complex Decentralized Application.
+Lamington is super simple! Whether you're migrating from Solidity, or a seasoned EOSIO developer deploying a complex decentralized application (dApp) you'll find yourself right at home in no time.
 
 ### Building
 
 Compiling your smart contracts with Lamington is as simple as;
 
 ```
-lamington build
+$ lamington build
 ```
 
 Lamington automatically searches for all files with the `.cpp` file extension before batch compiling within a docker container. Compiling within a docker container with locked configuration ensures contracts compile consistently and clean every time.
 
 #### Ignoring Files & Folders
 
-Fortunately we realized that not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
+Not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
 
 #### Specifying Build Contracts
 
@@ -60,7 +87,7 @@ If you'd like to run builds on specific contracts, an additional contract `ident
 lamington build [identifier]
 ```
 
-_Replacing the `[identifier]` with your contract name, filename or fullpath._
+_Replace the `[identifier]` with the relative path to the contract with or without the .cpp extension._
 
 ### Testing
 
@@ -68,15 +95,17 @@ _Replacing the `[identifier]` with your contract name, filename or fullpath._
 lamington test
 ```
 
+This command uses Mocha to run all your tests.
+
 ## Configuration
 
-Lamington ships with a default configuration to make getting started simple and setup free. However, as your project grows, so will the need for additional Lamington configuration. For example, deployment to a testnet or the live network will require environment setup. Additionally, you'll need customize your configuration if you'd like to control Lamington's fine grain settings. Fortunately we've made it easy to get started with a simple boilerplate generation method;
+Lamington ships with a default configuration to make getting started simple and setup free. However, as your project grows, so will your need for additional Lamington configuration. For example, deployment to a testnet or the live network will require environment setup. Additionally, you'll need customize your configuration if you'd like to control Lamington's fine grained settings. Fortunately we've made it easy to get started with a simple boilerplate generation method;
 
 ```
 lamington init
 ```
 
-This creates a `.lamingtonrc` file in your current directory. The `.lamingtonrc` file allows you to configure additional settings using JSON syntax.
+This creates a `.lamingtonrc` file in your current directory which defaults to the latest available versions of EOS and EOS.CDT. The `.lamingtonrc` file allows you to configure additional settings using JSON syntax.
 
 ### Using a Configuration File
 
@@ -103,8 +132,14 @@ You can find more information about the Lamington tool-set and join our growing 
 
 ## Contributors
 
-_Contribution guide_
-[Kevin Brown](https://github.com/thekevinbrown), Creator & Developer
-[Mitch Pierias](https://github.com/MitchPierias), Developer
+- [Kevin Brown](https://github.com/thekevinbrown), Creator & Developer
+- [Mitch Pierias](https://github.com/MitchPierias), Developer
 
 ## Supporters
+
+<p align="center">
+    <a href="https://coina.ge"><img src="https://coina.ge/assets/coinage-logo-light.png" alt="Supported by Coinage" width="100"/></a>
+</p>
+<p align="center">
+    This project is proudly supported by <a href="https://coina.ge">Coinage</a>.<br/>
+</p>
