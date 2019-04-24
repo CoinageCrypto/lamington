@@ -119,30 +119,38 @@ export class AccountManager {
 
 		return await EOSManager.transact({ actions }, eos);
 	};
-
-	static addCodePermission = async (account: Account, contract: Contract) => {
+	
+	/**
+	 * Grants `eosio.code` permission to the specified account's `active` key
+	 * @note Should be moved to the `contracts/contract.ts` I think?
+	 * @note Actually it is `account` based and not specific to contracts...
+	 * @author Kevin Brown
+	 * @author Mitch Pierias
+	 * @param account Account without `eosio.code` permissions
+	 */
+	static addCodePermission = async (account: Account) => {
 		// We need to get their existing permissions, then add in a new eosio.code permission for this contract.
 		const { permissions } = await EOSManager.rpc.get_account(account.name);
 		const active = permissions.find((permission: any) => permission.perm_name == 'active');
-
+		
 		const auth = active.required_auth;
 		const existingPermission = auth.accounts.find(
 			(account: any) =>
-				account.permission.actor === contract.account.name &&
+				account.permission.actor === account.name &&
 				account.permission.permission === 'eosio.code'
 		);
 
 		if (existingPermission) {
 			throw new Error(
 				`Code permission is already present on account ${account.name} for contract ${
-					contract.account.name
+					account.name
 				}`
 			);
 		}
 
 		// Add it in.
 		auth.accounts.push({
-			permission: { actor: contract.account.name, permission: 'eosio.code' },
+			permission: { actor: account.name, permission: 'eosio.code' },
 			weight: 1,
 		});
 
@@ -159,6 +167,8 @@ export class AccountManager {
 				},
 			},
 		];
+
+		//console.log(JSON.stringify(actions, null, '\t'))
 
 		await EOSManager.transact({ actions });
 	};

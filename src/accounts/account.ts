@@ -4,6 +4,7 @@ import { Contract } from '../contracts';
 import { AccountManager } from './accountManager';
 
 export class Account {
+
 	public name: string;
 	public publicKey: string;
 	public privateKey: string;
@@ -45,6 +46,6 @@ export class Account {
 	}
 
 	public addCodePermission = async (contract: Contract) => {
-		await AccountManager.addCodePermission(this, contract);
+		await AccountManager.addCodePermission(this);
 	};
 }
