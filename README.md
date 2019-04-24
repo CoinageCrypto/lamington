@@ -85,11 +85,11 @@ This creates a `.lamingtonrc` file in your current directory. The `.lamingtonrc`
 
 You can find more information about the Lamington tool-set and join our growing community of developers by visiting any of the following links;
 
-[API Documentation](https://docs.lamington.dev)
+[API Documentation](https://api.lamington.io)
 
-[Slack Channel]()
+[Slack Channel](https://forms.gle/yTjNA46oKywaD7FR6)
 
-[Official Website](https://lamington.dev)
+[Official Website](https://lamington.io)
 
 ## Roadmap
 
