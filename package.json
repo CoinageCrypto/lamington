@@ -8,12 +8,12 @@
 		"build": "npm run clean && tsc && npm run copy:scripts",
 		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
 		"clean": "rm -rf ./lib",
+		"docs": "typedoc --out docs/api ./src",
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
 		"test": "jest --config jestconfig.json",
-		"test:mocha": "mocha --require ts-node/register src/**/*.test.ts",
-		"doc": "typedoc --out docs ./src"
+		"test:mocha": "mocha --require ts-node/register src/**/*.test.ts"
 	},
 	"repository": {
 		"type": "git",
