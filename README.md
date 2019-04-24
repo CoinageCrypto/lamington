@@ -4,6 +4,8 @@
 
 Inspired by the popular Truffle framework and developed in Typescript, Lamington makes smart contract development simple for any level of EOSIO developer.
 
+[![Build Status](https://travis-ci.org/CoinageCrypto/lamington.svg?branch=master)](https://travis-ci.org/CoinageCrypto/lamington)
+
 ## Features
 
 The Lamington library includes CLI tools and JavaScript utilities to streamline the smart contract building, testing and deployment pipeline.
