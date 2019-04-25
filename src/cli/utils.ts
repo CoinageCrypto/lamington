@@ -75,8 +75,11 @@ export const imageExists = async () => {
 /**
  * Configures and builds the docker image
  * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
  */
 export const buildImage = async () => {
+	// Log notification
+	spinner.create('Building docker image');
 	// Clear the docker directory if it exists.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
 	await mkdirp(TEMP_DOCKER_DIRECTORY);
@@ -96,6 +99,7 @@ RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 	await docker.command(`build -t ${await dockerImageName()} "${TEMP_DOCKER_DIRECTORY}"`);
 	// Clean up after ourselves.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
+	spinner.end('Built docker image');
 };
 
 /**
@@ -115,9 +119,9 @@ export const startContainer = async () => {
  * @returns Docker command promise
  */
 export const stopContainer = () => {
-	spinner.create('Stopping EOS container');
+	spinner.create('Stopping Lamington');
 	return docker.command('stop lamington')
-	.then(() => spinner.end())
+	.then(() => spinner.end('Stopped Lamington'))
 	.catch(err => spinner.fail(err));
 }
 
@@ -128,6 +132,7 @@ export const stopContainer = () => {
  * @returns Connection success or throws error
  */
 export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS) => {
+	// Begin logging
 	spinner.create('Waiting for EOS');
 	// Repeat attempts every second until threshold reached
 	let attempt = 0;
@@ -135,14 +140,14 @@ export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS
 		attempt++;
 		// Check EOS status
 		if (await eosIsReady()) {
-			spinner.end();
+			spinner.end('EOS is ready');
 			return true;
 		}
 		// Wait one second
 		await sleep(1000);
 	}
 	// Failed to connect within attempt threshold
-	spinner.fail(`Failed to connect to an EOS instance`);
+	spinner.fail(`Failed to connect with an EOS instance`);
 	throw new Error(`Could not contact EOS after trying for ${attempts} second(s).`);
 };
 
@@ -163,9 +168,9 @@ export const eosIsReady = async () => {
 /**
  * Starts a new EOSIO docker image
  * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
  */
 export const startEos = async () => {
-	spinner.create('Starting EOS')
 	// Create build result cache directories
 	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'compiled_contracts'));
 	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'data'));
@@ -182,7 +187,6 @@ export const startEos = async () => {
 		qrcode.generate('https://youtu.be/6g4dkBF5anU');
 		// Build EOSIO image
 		await buildImage();
-		
 	}
 	// Start EOSIO
 	try {
@@ -190,7 +194,6 @@ export const startEos = async () => {
 		await startContainer();
 		// Pause process until ready
 		await untilEosIsReady();
-		spinner.end();
 		console.log(
 			'                                        \n\
 ==================================================== \n\
@@ -264,11 +267,11 @@ export const runTests = async () => {
  * @param contracts Optional contract paths to build
  */
 export const buildAll = async (contracts?:string[]) => {
-	// Start log output
-	spinner.create('Building smart contracts...');
 	// Find all contract files
 	contracts = await glob('./**/*.cpp');
 	const errors = [];
+	// Start log output
+	console.log(`BUILDING ${contracts.length} SMART CONTRACTS`, '\n');
 	// Build each contract and handle errors
 	for (const contract of contracts) {
 		try {
@@ -285,11 +288,11 @@ export const buildAll = async (contracts?:string[]) => {
 		// Print each error message and source
 		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
 		// Close error report
-		spinner.fail(`\n${errors.length} contract(s) failed to compile. Quitting.`);
+		spinner.fail(`\n${errors.length} contract${(errors.length>0)?'s':''} failed to compile. Quitting.`);
 		// Terminate the current process
 		process.exit(1);
 	} else {
-		spinner.end();
+		spinner.end('Built smart contracts');
 	}
 };
 
@@ -307,12 +310,14 @@ export const pathToIdentifier = (filePath: string) =>
 /**
  * Compiles an EOSIO contract and generates Typescript definitions
  * @author Kevin Brown <github.com/thekevinbrown>
- * @param contractPath Fullpath to the CPP contract file
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param contractPath Fullpath to C++ contract file
  */
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
-	spinner.create(`Compiling ${basename}`);
+	console.log(basename);
+	spinner.create(`Compiling contract`);
 	// Pull docker images
 	await docker.command(
 		// Arg 1 is filename, arg 2 is contract name.
@@ -323,10 +328,15 @@ export const build = async (contractPath: string) => {
 			'project',
 			contractPath
 		)}" "${path.dirname(contractPath)}" "${basename}"`
-	);
-	spinner.end();
-	// Generate Typescript definitions for contract
-	await generateTypes(pathToIdentifier(contractPath));
+	).catch(err => {
+		spinner.fail("Failed to compile");
+		throw new Error(`Failed to compile ${basename}`)
+	});
 	// Notify build task completed
-	spinner.end(`Compiled ${basename}`)
+	spinner.end(`Compiled contract`);
+	// Generate Typescript definitions for contract
+	await generateTypes(pathToIdentifier(contractPath)).catch(err => {
+		spinner.fail("Failed to generate type definitions");
+		return new Error(`Failed to generate types for ${basename}`)
+	});
 };

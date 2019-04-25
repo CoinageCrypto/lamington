@@ -59,7 +59,7 @@ export const generateAllTypes = async () => {
  */
 export const generateTypes = async (contractIdentifier: string) => {
 	// Notify generating has begun
-	spinner.create(`Generating types definitions`);
+	spinner.create(`Generating type definitions`);
 	// Create contract details
 	const contractName = path.basename(contractIdentifier);
 	const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
@@ -130,7 +130,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 	result.push('');
 	// Save generated contract
 	await saveInterface(contractIdentifier, result);
-	spinner.end('');
+	spinner.end(`Generated type definitions`);
 };
 
 /**
