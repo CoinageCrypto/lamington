@@ -7,6 +7,11 @@ import * as spinner from './../cli/logIndicator';
 
 const glob = promisify(globWithCallbacks);
 
+/**
+ * Transforms a string into the pascal-case format
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param value String for case transformation
+ */
 const pascalCase = (value: string) => {
 	const snakePattern = /[_.]+./g;
 	const upperFirst = value[0].toUpperCase() + value.slice(1);
@@ -55,7 +60,7 @@ export const generateAllTypes = async () => {
 export const generateTypes = async (contractIdentifier: string) => {
 	// Notify generating has begun
 	spinner.create(`Generating types definitions`);
-
+	// Create contract details
 	const contractName = path.basename(contractIdentifier);
 	const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
 	const abi = JSON.parse(fs.readFileSync(path.resolve(abiPath), 'utf8'));
@@ -74,14 +79,13 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'// =====================================================',
 		'',
 	];
-	// Imports
+	// Define imports
 	const imports = ['Account', 'Contract'];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
-
+	// Generate import definitions
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
 	result.push('');
 	result.push('// Table row types');
-
 	// Generate table row types from ABI
 	for (const table of contractTables) {
 		const tableInterface = {
@@ -99,20 +103,19 @@ export const generateTypes = async (contractIdentifier: string) => {
 		const parameters = contractStructs[action.name].fields.map(
 			(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
 		);
-
 		// Optional parameter at the end on every contract method.
 		parameters.push('options?: { from?: Account }');
-
+		
 		return `${action.name}(${parameters.join(', ')}): Promise<any>;`;
 	});
-
+	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
 			`${table.name}(scope?: string): Promise<TableRowsResult<${pascalCase(
 				contractName
 			)}${pascalCase(table.name)}>>;`
 	);
-
+	// Generate the contract interface with actions and tables
 	const contractInterface = {
 		[`export interface ${pascalCase(contractName)} extends Contract`]: [
 			'// Actions',
@@ -122,20 +125,24 @@ export const generateTypes = async (contractIdentifier: string) => {
 			...generatedTables,
 		],
 	};
-
+	// Cache contract result
 	result.push(contractInterface);
 	result.push('');
-
+	// Save generated contract
 	await saveInterface(contractIdentifier, result);
 	spinner.end('');
 };
 
-const saveInterface = async (
-	contractIdentifier: string,
-	contract: GeneratorLevel | IndentedGeneratorLevel
-) => {
+/**
+ * Writes the contract interface to file
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param contractIdentifier Path to file without extension
+ * @param interfaceContent Generated contract interface
+ */
+const saveInterface = async (contractIdentifier: string, interfaceContent: GeneratorLevel | IndentedGeneratorLevel) => {
+	// Open a write stream to file
 	const file = fs.createWriteStream(`${contractIdentifier}.ts`);
-
+	// Write formatted blocks
 	let indentLevel = 0;
 	const write = (value: string) => file.write('\t'.repeat(indentLevel) + value + '\n');
 	const writeIndented = (level: IndentedGeneratorLevel) => {
@@ -149,6 +156,7 @@ const saveInterface = async (
 			write('}');
 		}
 	};
+	// Write block content or indent again
 	const writeLevel = (level: GeneratorLevel | IndentedGeneratorLevel) => {
 		if (Array.isArray(level)) {
 			for (const entry of level) {
@@ -162,8 +170,7 @@ const saveInterface = async (
 			writeIndented(level);
 		}
 	};
-
-	writeLevel(contract);
-
+	// Write interface to file and close
+	writeLevel(interfaceContent);
 	file.close();
 };

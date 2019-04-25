@@ -34,10 +34,7 @@ export interface LamingtonConfig {
  */
 export class ConfigManager {
 	
-	/**
-	 * EOSIO and EOSIO.CDT configuration settings
-	 * @author Kevin Brown <github.com/thekevinbrown>
-	 */
+	/** @hidden EOSIO and EOSIO.CDT configuration settings */
 	private static config: LamingtonConfig;
 
 	/**

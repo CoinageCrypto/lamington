@@ -5,16 +5,21 @@ import { AccountManager } from './accountManager';
 
 export class Account {
 
+	/** EOSIO account name */
 	public name: string;
+	/** EOSIO account public key */
 	public publicKey: string;
+	/** EOSIO account private key */
 	public privateKey: string;
+	/** EOSIO account permissions */
 	public permissions: Permissions;
 
 	constructor(name: string, privateKey: string, publicKey?: string) {
+		// Store references
 		this.name = name;
 		this.privateKey = privateKey;
 		this.publicKey = publicKey || ecc.privateToPublic(privateKey);
-
+		// Set default permissions
 		this.permissions = {
 			active: {
 				actor: name,
@@ -27,6 +32,11 @@ export class Account {
 		};
 	}
 
+	/**
+	 * Returns a configured active key permission
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @returns Valid active key
+	 */
 	public get active() {
 		return [
 			{
@@ -36,6 +46,11 @@ export class Account {
 		];
 	}
 
+	/**
+	 * Returns a configured owner key permission
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @returns Valid owner key
+	 */
 	public get owner() {
 		return [
 			{
@@ -45,7 +60,13 @@ export class Account {
 		];
 	}
 
-	public addCodePermission = async (contract: Contract) => {
+	/**
+	 * Adds the `eosio.code` permission to this account
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @returns Add permission transaction promise
+	 */
+	public addCodePermission = async () => {
 		await AccountManager.addCodePermission(this);
 	};
 }

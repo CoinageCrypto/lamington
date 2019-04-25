@@ -4,8 +4,7 @@ import {
 } from './typeGenerator';
 
 /**
- * Big Number Types
- * @desc Javascript only supports number, so CPP integer types need to be mapped accordingly
+ * Javascript only supports number, so CPP integer types need to be mapped accordingly
  */
 const numberTypes = [
     'int8','int16','int32','int64','int128','int256',
@@ -14,14 +13,13 @@ const numberTypes = [
 ];
 
 /**
- * EOS Name Types
- * @desc Name types are typically a string or uint64_t and typically represent an identity on the EOS blockchain
+ * Name types are typically a string or uint64_t and typically represent an identity on the EOS blockchain
  */
 const stringNumberTypes = ['name','action_name','scope_name','account_name','permission_name','table_name'];
 
 describe("type generator", () => {
 
-    context('map paramater types', () => {
+    context('map parameter types', () => {
 
         it(`should map 'string' to 'string'`, () => {
             assert.equal(mapParameterType('string'), 'string', `'string' types should map to 'string'`)

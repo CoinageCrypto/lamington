@@ -23,23 +23,36 @@ import { generateTypes } from '../contracts';
 import { ConfigManager } from '../configManager';
 import * as spinner from './logIndicator';
 
+/** @hidden Current working directory reference */
 const WORKING_DIRECTORY = process.cwd();
+/** @hidden Temporary docker resource directory */
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
+/** @hidden Slowest Expected test duration */
 const TEST_EXPECTED_DURATION = 2000;
+/** @hidden Maximum test duration */
 const TEST_TIMEOUT_DURATION = 10000;
+/** @hidden Maximum number of EOS connection attempts before fail */
+const MAX_CONNECTION_ATTEMPTS = 8;
 
+/**
+ * Extracts the version identifier from a string
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @returns Version identifier
+ */
 const versionFromUrl = (url: string) => {
-	// Looks for strings in this format:
-	// '/v1.4.6/'
-	// Allows us to pull just the version part out with the group.
+	// Looks for strings in this format: `/v1.4.6/`
 	const pattern = /\/(v\d+\.\d+\.\d+)\//g;
 	const result = url.match(pattern);
-
+	// Handle result
 	if (!result) throw new Error(`Could not extract version number from url: '${url}'`);
-
 	return result[1];
 };
 
+/**
+ * Constructs the name of the current Lamington Docker image
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @returns Docker image name
+ */
 const dockerImageName = async () => {
 	await ConfigManager.initWithDefaults();
 
@@ -48,18 +61,26 @@ const dockerImageName = async () => {
 	)}`;
 };
 
+/**
+ * Determines if the docker image exists
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @returns Result of search
+ */
 export const imageExists = async () => {
+	// Fetch image name and check existence
 	const result = await docker.command(`images ${await dockerImageName()}`);
-
 	return result.images.length > 0;
 };
 
+/**
+ * Configures and builds the docker image
+ * @author Kevin Brown <github.com/thekevinbrown>
+ */
 export const buildImage = async () => {
 	// Clear the docker directory if it exists.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
 	await mkdirp(TEMP_DOCKER_DIRECTORY);
-
-	// Write a Dockerfile so docker knows what to build.
+	// Write a Dockerfile so Docker knows what to build.
 	await writeFile(
 		path.join(TEMP_DOCKER_DIRECTORY, 'Dockerfile'),
 		`
@@ -71,19 +92,28 @@ RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
 RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 `
 	);
-
+	// Execute docker build process
 	await docker.command(`build -t ${await dockerImageName()} "${TEMP_DOCKER_DIRECTORY}"`);
-
 	// Clean up after ourselves.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
 };
 
+/**
+ * Starts the Lamington container
+ * @author Kevin Brown <github.com/thekevinbrown>
+ */
 export const startContainer = async () => {
 	await docker.command(
 		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${await dockerImageName()} /bin/bash -c "./scripts/init_blockchain.sh"`
 	);
 };
 
+/**
+ * Stops the current Lamington container
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @returns Docker command promise
+ */
 export const stopContainer = () => {
 	spinner.create('Stopping EOS container');
 	return docker.command('stop lamington')
@@ -91,20 +121,36 @@ export const stopContainer = () => {
 	.catch(err => spinner.fail(err));
 }
 
-export const untilEosIsReady = async (attempts = 8) => {
+/**
+ * Sleeps the process until the EOS instance is available
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @returns Connection success or throws error
+ */
+export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS) => {
+	spinner.create('Waiting for EOS');
+	// Repeat attempts every second until threshold reached
 	let attempt = 0;
-
 	while (attempt < attempts) {
 		attempt++;
-
-		if (await eosIsReady()) return true;
-
+		// Check EOS status
+		if (await eosIsReady()) {
+			spinner.end();
+			return true;
+		}
+		// Wait one second
 		await sleep(1000);
 	}
-
+	// Failed to connect within attempt threshold
+	spinner.fail(`Failed to connect to an EOS instance`);
 	throw new Error(`Could not contact EOS after trying for ${attempts} second(s).`);
 };
 
+/**
+ * Determines if EOS is available using the `get_info` query response
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @returns EOS instance availability
+ */
 export const eosIsReady = async () => {
 	try {
 		await axios.get('http://localhost:8888/v1/chain/get_info');
@@ -115,10 +161,11 @@ export const eosIsReady = async () => {
 };
 
 /**
- * Start a new EOSIO docker image
+ * Starts a new EOSIO docker image
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const startEos = async () => {
+	spinner.create('Starting EOS')
 	// Create build result cache directories
 	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'compiled_contracts'));
 	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'data'));
@@ -139,7 +186,6 @@ export const startEos = async () => {
 	}
 	// Start EOSIO
 	try {
-		spinner.create('Starting EOS');
 		// Start the EOS docker container
 		await startContainer();
 		// Pause process until ready
@@ -157,7 +203,7 @@ export const startEos = async () => {
 ==================================================== \n'
 		);
 	} catch (error) {
-		console.error('Could not start EOS blockchain. Error: ', error);
+		spinner.fail('Could not start EOS blockchain. Error: '+error);
 		process.exit(1);
 	}
 };
