@@ -7,7 +7,6 @@ import {
 	exists as existsCallback,
 } from 'fs';
 import { promisify } from 'util';
-import * as spinner from './cli/logIndicator';
 
 const exists = promisify(existsCallback);
 const mkdirp = promisify(mkdirpCallback);
@@ -71,8 +70,6 @@ export class ConfigManager {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	public static async initWithDefaults() {
-		// Begin log output
-		spinner.create('Loading configuration...');
 		// Check if configuration exists
 		if (!(await exists(CONFIG_FILE_PATH))) {
 			// Fetch the latest repository configuration
@@ -87,7 +84,6 @@ export class ConfigManager {
 		}
 		// Load existing configuration
 		await ConfigManager.loadConfigFromDisk();
-		spinner.end();
 	}
 
 	/**
