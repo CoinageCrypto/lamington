@@ -62,5 +62,4 @@ ${prefix} ${message}
  */
 export const fail = (message:string) => {
     end(message, true);
-    process.exit(1);
 }
