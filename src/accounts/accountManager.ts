@@ -178,7 +178,7 @@ export class AccountManager {
 					account: account.name,
 					permission: 'active',
 					parent: 'owner',
-					required_auth,
+					auth: required_auth,
 				},
 			},
 		];
