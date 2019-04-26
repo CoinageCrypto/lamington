@@ -31,6 +31,13 @@ const run = async () => {
 	}
 };
 
-run().catch(error => {
-	throw error;
+run().catch(async (error) => {
+	if (await eosIsReady()) {
+		stopContainer().then(() => {
+			//console.log(error)
+			process.exit(1);
+		});
+	} else {
+		console.log(error)
+	}
 });
