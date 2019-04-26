@@ -19,12 +19,18 @@ const CONFIG_DIRECTORY = '.lamington';
 const CONFIG_FILE_PATH = path.join(CONFIG_DIRECTORY, 'config.json');
 /** Default encoding */
 const ENCODING = 'utf8';
+/** Default build output directory */
+const DEFAULT_OUTPUT_DIR = '.lamington/compiled_contracts';
+/** Configuration file name */
+const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 
 /** EOSIO and EOSIO.CDT configuration file paths */
 export interface LamingtonConfig {
 	cdt: string;
 	eos: string;
-	keepAlive: boolean;
+	keepAlive?: boolean;
+	outDir?: string,
+	exclude?: string | RegExp | Array<string|RegExp>
 }
 
 /**
@@ -43,6 +49,7 @@ export class ConfigManager {
 	 * @param organization Asset's case-sensitive repository organization
 	 * @param repository Asset's case-sensitive repository name
 	 * @param filter Resource filter
+	 * @hidden
 	 */
 	private static async getAssetURL(organization: string, repository: string, filter: string) {
 		// Get the projects latest GitHub repository release
@@ -65,23 +72,29 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Fetches the latest EOS repository release and freezes version changes
+	 * Fetches the latest EOS repository and freezes version changes
 	 * in [[CONFIG_FILE_PATH]] to maintain a consistent development environment
 	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
+		// Load existing configuration
+		const userConfig = await ConfigManager.readConfigFromProject();
 		// Check if configuration exists
 		if (!(await exists(CONFIG_FILE_PATH))) {
-			// Fetch the latest repository configuration
-			const defaultConfig: LamingtonConfig = {
-				cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
-				eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
-				keepAlive:false
-			};
-			// Create and/or update configuration file
+			// Create the config directory
 			await mkdirp(CONFIG_DIRECTORY);
-			await writeFile(CONFIG_FILE_PATH, JSON.stringify(defaultConfig, null, 4), ENCODING);
 		}
+		// Fetch the latest repository configuration
+		const defaultConfig: LamingtonConfig = {
+			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
+			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04')
+		};
+		// Save cached configuration
+		await writeFile(CONFIG_FILE_PATH, JSON.stringify({
+			...defaultConfig,
+			...userConfig
+		}, null, 4), ENCODING);
 		// Load existing configuration
 		await ConfigManager.loadConfigFromDisk();
 	}
@@ -90,9 +103,21 @@ export class ConfigManager {
 	 * Loads the existing configuration file into [[ConfigManager.config]]
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
-	private static async loadConfigFromDisk() {
+	public static async loadConfigFromDisk() {
 		// Read existing configuration and store
 		ConfigManager.config = JSON.parse(await readFile(CONFIG_FILE_PATH, ENCODING));
+	}
+
+	/**
+	 * Reads the user defined config file if it exists
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @returns User defined configuration or object
+	 * @hidden
+	 */
+	private static async readConfigFromProject() {
+		return (await exists(CONFIGURATION_FILE_NAME))
+			? JSON.parse(await readFile(CONFIGURATION_FILE_NAME, ENCODING))
+			: {}
 	}
 
 	/**
@@ -112,10 +137,18 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the EOSIO keep alive setting or false
+	 * Returns the container keep alive setting or false
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get keepAlive() {
 		return ConfigManager.config.keepAlive || false;
+	}
+
+	/**
+	 * Returns the output build directory or [[DEFAULT_OUTPUT_DIR]]
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 */
+	static get outDir() {
+		return ConfigManager.config.outDir || DEFAULT_OUTPUT_DIR;
 	}
 }
