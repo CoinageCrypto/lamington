@@ -32,13 +32,13 @@ Lamington requires Docker and NodeJS to be installed before it can be used.
 
 Lamington includes command line tools and JavaScript utilities for EOSIO contract development. We recommend installing the framework as a development dependency within your project. This lets you run commands like `lamington test` in your project.
 
-```bash
+```
 $ npm install --save-dev lamington
 ```
 
 From there you just need to add node scripts to your `package.json` file that trigger `lamington` actions, for example:
 
-```json
+```
 {
     ...
 	"scripts": {
@@ -57,7 +57,7 @@ If you'd like the convenience of using the `lamington` command without adding it
 
 To install globally, run:
 
-```bash
+```
 $ npm install -g lamington
 ```
 
@@ -69,7 +69,7 @@ Lamington is super simple! Whether you're migrating from Solidity, or a seasoned
 
 Compiling your smart contracts with Lamington is as simple as;
 
-```bash
+```
 $ lamington build
 ```
 
@@ -82,7 +82,7 @@ Not every `.cpp` file is a build ready contract. So we added an additional ignor
 #### Specifying Build Contracts
 If you'd like to run builds on specific contracts, an additional contract `identifier` can be specified like so;
 
-```bash
+```
 lamington build [identifier]
 ```
 
@@ -92,7 +92,7 @@ _Replace the `[identifier]` with the relative path to the contract with or witho
 
 Lamington was built with testing in mind. We considered the most commonly used testing libraries like Mocha when developing the Lamington toolset. Running your test suit is as easy as;
 
-```bash
+```
 lamington test
 ```
 
@@ -102,7 +102,7 @@ For a full list of available JavaScript utilities, please [visit the documentati
 
 Lamington ships with a default configuration to make getting started simple and setup free. However, as your project grows, so will your need for additional Lamington configuration. For example, deployment to a testnet or the live network will require environment setup. Additionally, you'll need customize your configuration if you'd like to control Lamington's fine grained settings. Fortunately we've made it easy to get started with a simple boilerplate generation method;
 
-```bash
+```
 lamington init
 ```
 
@@ -112,7 +112,7 @@ This creates a `.lamingtonrc` file in your current directory which defaults to t
 
 The `.lamingtonrc` file provides custom configuration for your Lamington workspace. We're working on provide allot more settings, like defining multiple environments for each stage of your pipeline.
 
-```json
+```
 {
 	...
 	"keepAlive":true,
