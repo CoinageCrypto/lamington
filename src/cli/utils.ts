@@ -270,7 +270,7 @@ export const buildAll = async (contracts?:string[]) => {
 	// Find all contract files
 	contracts = await glob('./**/*.cpp');
 	const errors = [];
-	// Start log output
+	// Log the batch building process
 	console.log(`BUILDING ${contracts.length} SMART CONTRACTS`, '\n');
 	// Build each contract and handle errors
 	for (const contract of contracts) {
@@ -287,12 +287,8 @@ export const buildAll = async (contracts?:string[]) => {
 	if (errors.length > 0) {
 		// Print each error message and source
 		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
-		// Close error report
-		spinner.fail(`\n${errors.length} contract${(errors.length>0)?'s':''} failed to compile. Quitting.`);
 		// Terminate the current process
-		process.exit(1);
-	} else {
-		spinner.end('Built smart contracts');
+		throw new Error(`${errors.length} contract${(errors.length>0)?'s':''} failed to compile. Quitting.`)
 	}
 };
 
@@ -308,7 +304,7 @@ export const pathToIdentifier = (filePath: string) =>
 	filePath.substr(0, filePath.lastIndexOf('.'));
 
 /**
- * Compiles an EOSIO contract and generates Typescript definitions
+ * Builds contract resources for contract at path
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param contractPath Fullpath to C++ contract file
@@ -317,7 +313,23 @@ export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
 	console.log(basename);
+	// Compile contract at path
+	await compileContract(contractPath);
+	// Generate Typescript definitions for contract
+	await generateTypes(pathToIdentifier(contractPath));
+};
+
+/**
+ * Compiles a C++ EOSIO smart contract at path
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param contractPath Fullpath to C++ contract file
+ */
+export const compileContract = async (contractPath: string) => {
+	// Begin logs
 	spinner.create(`Compiling contract`);
+	// Get the base filename from path and log status
+	const basename = path.basename(contractPath, '.cpp');
 	// Pull docker images
 	await docker.command(
 		// Arg 1 is filename, arg 2 is contract name.
@@ -334,9 +346,4 @@ export const build = async (contractPath: string) => {
 	});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
-	// Generate Typescript definitions for contract
-	await generateTypes(pathToIdentifier(contractPath)).catch(err => {
-		spinner.fail("Failed to generate type definitions");
-		return new Error(`Failed to generate types for ${basename}`)
-	});
-};
+}
