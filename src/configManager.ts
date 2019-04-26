@@ -84,15 +84,19 @@ export class ConfigManager {
 		if (!(await exists(CONFIG_FILE_PATH))) {
 			// Create the config directory
 			await mkdirp(CONFIG_DIRECTORY);
+			// Fetch the latest repository configuration
+			const defaultConfig: LamingtonConfig = {
+				cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
+				eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04')
+			};
+			// Freeze repository image
+			await writeFile(CONFIG_FILE_PATH, JSON.stringify(defaultConfig, null, 4), ENCODING);
 		}
-		// Fetch the latest repository configuration
-		const defaultConfig: LamingtonConfig = {
-			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
-			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04')
-		};
+		// Load cached config
+		const existingConfig = JSON.parse(await readFile(CONFIG_FILE_PATH, ENCODING));
 		// Save cached configuration
 		await writeFile(CONFIG_FILE_PATH, JSON.stringify({
-			...defaultConfig,
+			...existingConfig,
 			...userConfig
 		}, null, 4), ENCODING);
 		// Load existing configuration
