@@ -1,5 +1,6 @@
 src/
 node_modules/
+api-docs/
 .gitignore
 .prettierrc
 .travis.yml
