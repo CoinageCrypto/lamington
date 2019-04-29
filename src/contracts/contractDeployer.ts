@@ -2,6 +2,7 @@ import * as path from 'path';
 import { readFile as readFileCallback } from 'fs';
 import { promisify } from 'util';
 import { Serialize } from 'eosjs';
+import * as ecc from 'eosjs-ecc';
 
 const readFile = promisify(readFileCallback);
 
@@ -9,35 +10,50 @@ import { Contract } from './contract';
 import { Account, AccountManager } from '../accounts';
 import { EOSManager } from '../eosManager';
 
+/**
+ * Provides a set of methods to manage contract deployment
+ */
 export class ContractDeployer {
-	public static async deployAtName<T extends Contract>(
-		account: Account,
-		contractIdentifier: string
-	) {
+
+	/**
+	 * Deploys contract files to a specified account
+	 * 
+	 * ```typescript
+	 * // Create a new account
+	 * const account = await AccountManager.createAccount();
+	 * // Deploy the contract `mycontract` to the account
+	 * ContractDeployer.deployToAccount<MyContractTypeDef>('mycontract', account);
+	 * ```
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
+	 * @param account Account to apply contract code
+	 * @returns Deployed contract instance
+	 */
+	public static async deployToAccount<T extends Contract>(contractIdentifier: string, account: Account) {
+		// Initialize the serialization buffer
 		const buffer = new Serialize.SerialBuffer({
 			textEncoder: EOSManager.api.textEncoder,
 			textDecoder: EOSManager.api.textDecoder,
 		});
-
+		// Construct resource paths
 		const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
 		const wasmPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.wasm`);
-
+		// Read resources files for paths
 		let abi = JSON.parse(await readFile(abiPath, 'utf8'));
 		const wasm = await readFile(wasmPath);
-
+		// Extract ABI types
 		const abiDefinition = EOSManager.api.abiTypes.get(`abi_def`);
-
-		// We need to make sure the abi has every field in abiDefinition.fields
-		// otherwise serialize throws
+		// Validate ABI definitions returned
 		if (!abiDefinition)
 			throw new Error('Could not retrieve abiDefinition from EOS API when flattening ABIs.');
-
+		// Ensure ABI contains all fields from `abiDefinition.fields`
 		abi = abiDefinition.fields.reduce(
 			(acc, { name: fieldName }) => Object.assign(acc, { [fieldName]: acc[fieldName] || [] }),
 			abi
 		);
+		// Serialize ABI type definitions
 		abiDefinition.serialize(buffer, abi);
-
+		// Set the contract code for the account
 		await EOSManager.transact({
 			actions: [
 				{
@@ -62,15 +78,51 @@ export class ContractDeployer {
 				},
 			],
 		});
-
+		// Fetch the contract actions and types
 		const { actions, types } = await EOSManager.api.getContract(account.name);
-
+		// Return our newly deployed contract instance
 		return new Contract(EOSManager.api, contractIdentifier, account, abi, actions, types) as T;
 	}
 
-	public static async deployClean<T extends Contract>(contractIdentifier: string) {
+	/**
+	 * Deploys contract files to a randomly generated account
+	 * 
+	 * ```typescript
+	 * // Deploy the contract with identifier
+	 * ContractDeployer.deploy<MyContractTypeDef>('mycontract');
+	 * ```
+	 * 
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
+	 * @returns Deployed contract instance
+	 */
+	public static async deploy<T extends Contract>(contractIdentifier: string) {
+		// Create a new account
 		const account = await AccountManager.createAccount();
+		// Call the deployToAccount method with the account
+		return await ContractDeployer.deployToAccount<T>(contractIdentifier, account);
+	}
 
-		return await ContractDeployer.deployAtName<T>(account, contractIdentifier);
+	/**
+	 * Deploys contract files to a specified account name
+	 * 
+	 * ```typescript
+	 * // Deploy the `mycontract` contract to the account with name `mycontractname`
+	 * ContractDeployer.deployToAccount<MyContractTypeDef>('mycontract', 'mycontractname');
+	 * ```
+	 * 
+	 * @note Generating a random private key is not safe
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
+	 * @param accountName Account name
+	 * @returns Deployed contract instance
+	 */
+	public static async deployWithName<T extends Contract>(contractIdentifier: string, accountName: string) {
+		// Generate a random private key
+		const privateKey = await ecc.unsafeRandomKey();
+		// Initialize account with name
+		const account = new Account(accountName, privateKey);
+		// Call the deployToAccount method with the account
+		return await ContractDeployer.deployToAccount<T>(contractIdentifier, account);
 	}
 }

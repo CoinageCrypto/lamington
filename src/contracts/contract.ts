@@ -14,7 +14,7 @@ export interface ContractActionOptions {
 }
 
 /**
- * Extends 
+ * Adds additional functionality to the EOSJS `Contract` class
  */
 export class Contract implements EOSJSContract {
 
@@ -33,6 +33,7 @@ export class Contract implements EOSJSContract {
 
 	/**
 	 * Gets the currently configured contract account
+	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @returns Current contract account
 	 */
 	public get account(): Account {
@@ -41,6 +42,7 @@ export class Contract implements EOSJSContract {
 
 	/**
 	 * Gets the current contract identifier
+	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @returns Contract identifier
 	 */
 	public get identifier(): string {
@@ -122,6 +124,7 @@ export class Contract implements EOSJSContract {
 
 	/**
 	 * Retrieves table rows with the specified table name and optional scope
+	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @note Implements a temporary patch for the EOSjs `bool` mapping error
 	 * @param table The table name
 	 * @param scope Optional table scope, defaults to the table name

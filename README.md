@@ -40,14 +40,14 @@ From there you just need to add node scripts to your `package.json` file that tr
 
 ```
 {
-    ...
-	"scripts": {
-		"build": "lamington build",
-		"start": "lamington start eos",
-		"stop": "lamington stop eos",
-		"test": "lamington test"
-	},
-    ...
+  ...
+  "scripts": {
+    "build": "lamington build",
+    "start": "lamington start eos",
+    "stop": "lamington stop eos",
+    "test": "lamington test"
+  },
+  ...
 }
 ```
 
@@ -80,41 +80,63 @@ Lamington automatically searches for all files with the `.cpp` file extension be
 Not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
 
 #### Specifying Build Contracts
-
 If you'd like to run builds on specific contracts, an additional contract `identifier` can be specified like so;
 
 ```
-lamington build [identifier]
+$ lamington build [identifier]
 ```
 
 _Replace the `[identifier]` with the relative path to the contract with or without the .cpp extension._
 
 ### Testing
 
+Lamington was built with testing in mind. We considered the most commonly used testing libraries like Mocha when developing the Lamington toolset. Running your test suit is as easy as;
+
 ```
-lamington test
+$ lamington test
 ```
 
-This command uses Mocha to run all your tests.
+For a full list of available JavaScript utilities, please [visit the documentation here](https://docs.lamington.io/testing).
+
+### Initialization
+
+Initially setting up a project can be tedious and repetitive, so we've created a simple CLI method to setup a boilerplate EOSIO project with Lamington integration.
+
+```
+$ lamington init
+```
+
+This creates a `.lamingtonrc` file in your current directory with default Lamington settings. 
+
+```
+$ lamington init [PROJECT_NAME]
+```
+
+Optionally you can provide and additional `PROJECT_NAME` to create a project directory and initialize a boilerplate project within.
 
 ## Configuration
 
-Lamington ships with a default configuration to make getting started simple and setup free. However, as your project grows, so will your need for additional Lamington configuration. For example, deployment to a testnet or the live network will require environment setup. Additionally, you'll need customize your configuration if you'd like to control Lamington's fine grained settings. Fortunately we've made it easy to get started with a simple boilerplate generation method;
-
-```
-lamington init
-```
-
-This creates a `.lamingtonrc` file in your current directory which defaults to the latest available versions of EOS and EOS.CDT. The `.lamingtonrc` file allows you to configure additional settings using JSON syntax.
+Lamington ships with a default configuration to make getting started simple and setup free. However, as your project grows, so will your need for additional Lamington configuration. For example, deployment to a testnet or the live network will require environment setup. Additionally, you'll need customize your configuration if you'd like to control Lamington's fine grained settings. Fortunately we've made a simple tool to get you started, simply run `lamington init` in your project directory to create a default `.lamingtonrc` configuration file.
 
 ### Using a Configuration File
 
-- Configuring environments
-- keepAlive
+The `.lamingtonrc` file allows you to configure additional settings using JSON syntax. We're working on provide allot more settings, like defining multiple environments for each stage of your pipeline.
+
+```
+{
+  ...
+  "keepAlive":true,
+  ...
+}
+```
+
+The `keepAlive` setting prevents Lamington from stopping the EOSIO container between each build, allowing you to develop faster and compile often.
 
 ## Resources
 
 You can find more information about the Lamington tool-set and join our growing community of developers by visiting any of the following links;
+
+[Examples](https://examples.lamington.io)
 
 [API Documentation](https://api.lamington.io)
 
@@ -125,8 +147,10 @@ You can find more information about the Lamington tool-set and join our growing 
 ## Roadmap
 
 ### LamingtonJS
+Core Lamington front end toolset
 
 ### Lamington-React
+React context management for LamingtonJS
 
 ### Lamington-Angular
 

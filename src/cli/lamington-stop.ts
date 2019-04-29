@@ -1,5 +1,9 @@
 import { stopContainer } from './utils';
 
+/**
+ * Stops the current Lamington docker container
+ * @author Kevin Brown <github.com/thekevinbrown>
+ */
 stopContainer()
 	.then(() => console.log('Lamington container stopped.'))
 	.catch(error => {

@@ -1,7 +1,9 @@
 import * as ecc from 'eosjs-ecc';
 
-export const accountNameFromPublicKey = (publicKey: string) => hashToEOSName(ecc.sha256(publicKey));
+/** Digit pattern expression */
+const digitPattern = /[06789]/g;
 
+/** Digit mapping lookup */
 const digitMapping: { [key: string]: string } = {
 	'0': '1',
 	'6': '2',
@@ -10,8 +12,19 @@ const digitMapping: { [key: string]: string } = {
 	'9': '5',
 };
 
-const digitPattern = /[06789]/g;
+/**
+ * Generates an account name from the specified public key
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param publicKey Valid EOSIO public key
+ * @returns EOSIO account name
+ */
+export const accountNameFromPublicKey = (publicKey: string) => hashToEOSName(ecc.sha256(publicKey));
 
+/**
+ * Generates an account name from a hashed public key
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @returns EOSIO account name
+ */
 export const hashToEOSName = (data: string) =>
 	`l${data
 		.substring(0, 11)
