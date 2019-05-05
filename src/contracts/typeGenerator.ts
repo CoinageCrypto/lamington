@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { promisify } from 'util';
 import mapTypes from './typeMap';
-import * as spinner from './../cli/logIndicator';
+import { ConfigManager } from '../configManager';
 
 const glob = promisify(globWithCallbacks);
 
@@ -58,11 +58,12 @@ export const generateAllTypes = async () => {
  * @param contractIdentifier Path to file without extension
  */
 export const generateTypes = async (contractIdentifier: string) => {
-	// Notify generating has begun
-	spinner.create(`Generating type definitions`);
 	// Create contract details
 	const contractName = path.basename(contractIdentifier);
-	const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
+	const abiPath = path.join(ConfigManager.outDir, `${contractIdentifier}.abi`);
+	// Handle ABI file loading
+	if (!fs.existsSync(path.resolve(abiPath)))
+		throw new Error(`Missing ABI file at path '${path.resolve(abiPath)}'`);
 	const abi = JSON.parse(fs.readFileSync(path.resolve(abiPath), 'utf8'));
 	let contractActions = abi.actions;
 	let contractTables = abi.tables;
@@ -130,7 +131,6 @@ export const generateTypes = async (contractIdentifier: string) => {
 	result.push('');
 	// Save generated contract
 	await saveInterface(contractIdentifier, result);
-	spinner.end(`Generated type definitions`);
 };
 
 /**
