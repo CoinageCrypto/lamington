@@ -220,8 +220,9 @@ export const startEos = async () => {
                                                      \n\
 ==================================================== \n'
 		);
+		spinner.end("Started EOS docker container")
 	} catch (error) {
-		spinner.fail('Could not start EOS container');
+		spinner.fail('Failed to start the EOS container');
 		console.log(` --> ${error}`);
 		process.exit(1);
 	}
