@@ -7,6 +7,7 @@ program
 	.allowUnknownOption(false)
 	.version(packageConfig.version)
 	.description(packageConfig.description)
+	.command('init', 'initialize a lamington project')
 	.command('build [contract_path]', 'build all smart contracts')
 	.command('start', 'start the eos blockchain in docker')
 	.command('stop', 'stop the eos blockchain in docker')
