@@ -20,7 +20,7 @@ const CONFIG_FILE_PATH = path.join(CONFIG_DIRECTORY, 'config.json');
 /** Default encoding */
 const ENCODING = 'utf8';
 /** Default build output directory */
-const DEFAULT_OUTPUT_DIR = '.lamington/compiled_contracts';
+const DEFAULT_OUTPUT_DIR = '.lamington';
 /** Configuration file name */
 const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 
@@ -79,9 +79,14 @@ export class ConfigManager {
 	 */
 	public static async initWithDefaults() {
 		// Load existing configuration
-		const userConfig = await ConfigManager.readConfigFromProject();
+		const userConfig = {
+			outDir:DEFAULT_OUTPUT_DIR,
+			keepAlive:false,
+			exclude:[],
+			...await ConfigManager.readConfigFromProject()
+		}
 		// Check if configuration exists
-		if (!(await exists(CONFIG_FILE_PATH))) {
+		if (!(await ConfigManager.configExists())) {
 			// Create the config directory
 			await mkdirp(CONFIG_DIRECTORY);
 			// Fetch the latest repository configuration
@@ -101,6 +106,16 @@ export class ConfigManager {
 		}, null, 4), ENCODING);
 		// Load existing configuration
 		await ConfigManager.loadConfigFromDisk();
+	}
+
+	/**
+	 * Checks the existence of the configuration
+	 * file at the default [[CONFIG_FILE_PATH]]
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @returns Config exists determiner
+	 */
+	public static async configExists() {
+		return await exists(CONFIG_FILE_PATH);
 	}
 
 	/**
