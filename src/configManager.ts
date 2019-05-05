@@ -168,12 +168,4 @@ export class ConfigManager {
 	static get outDir() {
 		return ConfigManager.config.outDir || CACHE_DIRECTORY;
 	}
-
-	/**
-	 * Returns Lamington's local cache directory name
-	 * @author Mitch Pierias <github.com/MitchPierias>
-	 */
-	static get cacheDir() {
-		return CACHE_DIRECTORY;
-	}
 }
