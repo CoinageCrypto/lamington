@@ -324,15 +324,14 @@ export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePat
  * Builds contract resources for contract at path
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
- * @param contractPath Fullpath to C++ contract file
+ * @param contractPath Local path to C++ contract file
  */
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
-	const fullPath = path.join('./', ConfigManager.outDir, contractPath);
 	console.log(basename);
 	// Compile contract at path
-	await compileContract(fullPath);
+	await compileContract(contractPath);
 	// Generate Typescript definitions for contract
 	spinner.create(`Generating type definitions`);
 	try {
@@ -355,6 +354,7 @@ export const compileContract = async (contractPath: string) => {
 	spinner.create(`Compiling contract`);
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
+	const fullPath = path.join(ConfigManager.outDir, path.dirname(contractPath));
 	// Pull docker images
 	await docker.command(
 		// Arg 1 is filename, arg 2 is contract name.
@@ -363,13 +363,12 @@ export const compileContract = async (contractPath: string) => {
 			'eosio',
 			'bin',
 			'project',
-			'contracts',
-			basename,
-			basename+'.cpp'
-		)}" "${path.dirname(contractPath)}" "${basename}"`
+			contractPath
+		)}" "${fullPath}" "${basename}"`
 	).catch(err => {
 		spinner.fail("Failed to compile");
-		console.log(` --> ${err.message}`);
+		console.log(` --> ${err}`);
+		throw err;
 	});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
