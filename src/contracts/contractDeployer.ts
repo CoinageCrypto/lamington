@@ -9,6 +9,7 @@ const readFile = promisify(readFileCallback);
 import { Contract } from './contract';
 import { Account, AccountManager } from '../accounts';
 import { EOSManager } from '../eosManager';
+import { ConfigManager } from '../configManager';
 
 /**
  * Provides a set of methods to manage contract deployment
@@ -36,8 +37,8 @@ export class ContractDeployer {
 			textDecoder: EOSManager.api.textDecoder,
 		});
 		// Construct resource paths
-		const abiPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.abi`);
-		const wasmPath = path.join('.lamington', 'compiled_contracts', `${contractIdentifier}.wasm`);
+		const abiPath = path.join(ConfigManager.outDir, `${contractIdentifier}.abi`);
+		const wasmPath = path.join(ConfigManager.outDir, `${contractIdentifier}.wasm`);
 		// Read resources files for paths
 		let abi = JSON.parse(await readFile(abiPath, 'utf8'));
 		const wasm = await readFile(wasmPath);
