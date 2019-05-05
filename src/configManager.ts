@@ -14,13 +14,11 @@ const writeFile = promisify(writeFileCallback);
 const readFile = promisify(readFileCallback);
 
 /** Root config directory path */
-const CONFIG_DIRECTORY = '.lamington';
+const CACHE_DIRECTORY = '.lamington';
 /** Config file fullpath */
-const CONFIG_FILE_PATH = path.join(CONFIG_DIRECTORY, 'config.json');
+const CONFIG_FILE_PATH = path.join(CACHE_DIRECTORY, 'config.json');
 /** Default encoding */
 const ENCODING = 'utf8';
-/** Default build output directory */
-const DEFAULT_OUTPUT_DIR = '.lamington';
 /** Configuration file name */
 const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 
@@ -80,7 +78,7 @@ export class ConfigManager {
 	public static async initWithDefaults() {
 		// Load existing configuration
 		const userConfig = {
-			outDir:DEFAULT_OUTPUT_DIR,
+			outDir:CACHE_DIRECTORY,
 			keepAlive:false,
 			exclude:[],
 			...await ConfigManager.readConfigFromProject()
@@ -88,7 +86,7 @@ export class ConfigManager {
 		// Check if configuration exists
 		if (!(await ConfigManager.configExists())) {
 			// Create the config directory
-			await mkdirp(CONFIG_DIRECTORY);
+			await mkdirp(CACHE_DIRECTORY);
 			// Fetch the latest repository configuration
 			const defaultConfig: LamingtonConfig = {
 				cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
@@ -164,10 +162,18 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the output build directory or [[DEFAULT_OUTPUT_DIR]]
+	 * Returns the output build directory or [[CACHE_DIRECTORY]]
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get outDir() {
-		return ConfigManager.config.outDir || DEFAULT_OUTPUT_DIR;
+		return ConfigManager.config.outDir || CACHE_DIRECTORY;
+	}
+
+	/**
+	 * Returns Lamington's local cache directory name
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 */
+	static get cacheDir() {
+		return CACHE_DIRECTORY;
 	}
 }
