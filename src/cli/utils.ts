@@ -166,14 +166,12 @@ export const eosIsReady = async () => {
 };
 
 /**
- * Starts a new EOSIO docker image
+ * Pulls the EOSIO docker image if it doesn't exist and starts
+ * a new EOSIO docker container
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 export const startEos = async () => {
-	// Create build result cache directories
-	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'compiled_contracts'));
-	await mkdirp(path.join(WORKING_DIRECTORY, '.lamington', 'data'));
 	// Ensure an EOSIO build image exists
 	if (!(await imageExists())) {
 		console.log('--------------------------------------------------------------');
@@ -312,11 +310,19 @@ export const pathToIdentifier = (filePath: string) =>
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
+	const fullPath = path.join('./', ConfigManager.outDir, contractPath);
 	console.log(basename);
 	// Compile contract at path
-	await compileContract(contractPath);
+	await compileContract(fullPath);
 	// Generate Typescript definitions for contract
-	await generateTypes(pathToIdentifier(contractPath));
+	spinner.create(`Generating type definitions`);
+	try {
+		await generateTypes(pathToIdentifier(contractPath));
+		spinner.end(`Generated type definitions`);
+	} catch (error) {
+		spinner.fail(`Failed to generate type definitions`);
+		console.log(` --> ${error.message}`);
+	}
 };
 
 /**
@@ -338,11 +344,13 @@ export const compileContract = async (contractPath: string) => {
 			'eosio',
 			'bin',
 			'project',
-			contractPath
+			'contracts',
+			basename,
+			basename+'.cpp'
 		)}" "${path.dirname(contractPath)}" "${basename}"`
 	).catch(err => {
 		spinner.fail("Failed to compile");
-		throw new Error(`Failed to compile ${basename}`)
+		console.log(` --> ${err.message}`);
 	});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
