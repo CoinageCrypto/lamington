@@ -17,7 +17,6 @@ export interface ContractActionOptions {
  * Adds additional functionality to the EOSJS `Contract` class
  */
 export class Contract implements EOSJSContract {
-
 	/** @hidden EOSJS api reference */
 	private _eos: Api;
 	/** @hidden Current contract account */
@@ -77,7 +76,7 @@ export class Contract implements EOSJSContract {
 						} got ${arguments.length}.`
 					);
 				}
-				
+
 				if (arguments.length > action.fields.length + 1) {
 					throw new Error(
 						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${

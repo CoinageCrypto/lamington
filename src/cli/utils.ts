@@ -87,13 +87,13 @@ export const buildImage = async () => {
 	await writeFile(
 		path.join(TEMP_DOCKER_DIRECTORY, 'Dockerfile'),
 		`
-FROM ubuntu:18.04
+		FROM ubuntu:18.04
 
-RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates
-RUN wget ${ConfigManager.cdt} && apt-get install -y ./*.deb && rm -f *.deb
-RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
-RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
-`
+		RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates
+		RUN wget ${ConfigManager.cdt} && apt-get install -y ./*.deb && rm -f *.deb
+		RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
+		RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
+		`.replace(/\t/gm, '')
 	);
 	// Execute docker build process
 	await docker.command(`build -t ${await dockerImageName()} "${TEMP_DOCKER_DIRECTORY}"`);
@@ -108,7 +108,19 @@ RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
  */
 export const startContainer = async () => {
 	await docker.command(
-		`run --rm --name lamington -d -p 8888:8888 -p 9876:9876 --mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project --mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts -w "/opt/eosio/bin/" ${await dockerImageName()} /bin/bash -c "./scripts/init_blockchain.sh"`
+		`run
+				--rm
+				--name lamington
+				-d
+				-p 8888:8888
+				-p 9876:9876
+				--mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project
+				--mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts
+				-w "/opt/eosio/bin/"
+				${await dockerImageName()}
+				/bin/bash -c "./scripts/init_blockchain.sh"`
+			.replace(/\n/gm, '')
+			.replace(/\t/gm, ' ')
 	);
 };
 
@@ -118,12 +130,16 @@ export const startContainer = async () => {
  * @author Mitch Pierias <github.com/MitchPierias>
  * @returns Docker command promise
  */
-export const stopContainer = () => {
+export const stopContainer = async () => {
 	spinner.create('Stopping Lamington');
-	return docker.command('stop lamington')
-	.then(() => spinner.end('Stopped Lamington'))
-	.catch(err => spinner.fail(err));
-}
+
+	try {
+		await docker.command('stop lamington');
+		spinner.end('Stopped Lamington');
+	} catch (err) {
+		spinner.fail(err);
+	}
+};
 
 /**
  * Sleeps the process until the EOS instance is available
@@ -172,6 +188,7 @@ export const eosIsReady = async () => {
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 export const startEos = async () => {
+	spinner.create('Starting EOS docker container');
 	// Ensure an EOSIO build image exists
 	if (!(await imageExists())) {
 		console.log('--------------------------------------------------------------');
@@ -204,7 +221,8 @@ export const startEos = async () => {
 ==================================================== \n'
 		);
 	} catch (error) {
-		spinner.fail('Could not start EOS blockchain. Error: '+error);
+		spinner.fail('Could not start EOS container');
+		console.log(` --> ${error}`);
 		process.exit(1);
 	}
 };
@@ -264,7 +282,7 @@ export const runTests = async () => {
  * @note Should be configurable with a RegExp or something to prevent all C++ files being compiled
  * @param contracts Optional contract paths to build
  */
-export const buildAll = async (contracts?:string[]) => {
+export const buildAll = async (contracts?: string[]) => {
 	// Find all contract files
 	contracts = await glob('./**/*.cpp');
 	const errors = [];
@@ -286,7 +304,9 @@ export const buildAll = async (contracts?:string[]) => {
 		// Print each error message and source
 		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
 		// Terminate the current process
-		throw new Error(`${errors.length} contract${(errors.length>0)?'s':''} failed to compile. Quitting.`)
+		throw new Error(
+			`${errors.length} contract${errors.length > 0 ? 's' : ''} failed to compile. Quitting.`
+		);
 	}
 };
 
@@ -298,8 +318,7 @@ export const buildAll = async (contracts?:string[]) => {
  * @param filePath Path to file
  * @returns Identifier path
  */
-export const pathToIdentifier = (filePath: string) =>
-	filePath.substr(0, filePath.lastIndexOf('.'));
+export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePath.lastIndexOf('.'));
 
 /**
  * Builds contract resources for contract at path
@@ -354,4 +373,4 @@ export const compileContract = async (contractPath: string) => {
 	});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
-}
+};
