@@ -19,6 +19,7 @@ const writeFile = promisify(writeFileCallback);
 // Source Map Support adds proper source map support so line numbers match up to the original TS code.
 import 'trace';
 import 'clarify';
+Error.stackTraceLimit = 20;
 
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
