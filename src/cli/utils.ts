@@ -220,7 +220,7 @@ export const startEos = async () => {
                                                      \n\
 ==================================================== \n'
 		);
-		spinner.end("Started EOS docker container")
+		spinner.end('Started EOS docker container');
 	} catch (error) {
 		spinner.fail('Failed to start the EOS container');
 		console.log(` --> ${error}`);
@@ -354,20 +354,22 @@ export const compileContract = async (contractPath: string) => {
 	const basename = path.basename(contractPath, '.cpp');
 	const fullPath = path.join(ConfigManager.outDir, path.dirname(contractPath));
 	// Pull docker images
-	await docker.command(
-		// Arg 1 is filename, arg 2 is contract name.
-		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
-			'opt',
-			'eosio',
-			'bin',
-			'project',
-			contractPath
-		)}" "${fullPath}" "${basename}"`
-	).catch(err => {
-		spinner.fail("Failed to compile");
-		console.log(` --> ${err}`);
-		throw err;
-	});
+	await docker
+		.command(
+			// Arg 1 is filename, arg 2 is contract name.
+			`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
+				'opt',
+				'eosio',
+				'bin',
+				'project',
+				contractPath
+			)}" "${fullPath}" "${basename}"`
+		)
+		.catch(err => {
+			spinner.fail('Failed to compile');
+			console.log(` --> ${err}`);
+			throw err;
+		});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
 };

@@ -27,8 +27,8 @@ export interface LamingtonConfig {
 	cdt: string;
 	eos: string;
 	keepAlive?: boolean;
-	outDir?: string,
-	exclude?: string | RegExp | Array<string|RegExp>
+	outDir?: string;
+	exclude?: string | RegExp | Array<string | RegExp>;
 }
 
 /**
@@ -36,7 +36,6 @@ export interface LamingtonConfig {
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export class ConfigManager {
-	
 	/** @hidden EOSIO and EOSIO.CDT configuration settings */
 	private static config: LamingtonConfig;
 
@@ -51,7 +50,9 @@ export class ConfigManager {
 	 */
 	private static async getAssetURL(organization: string, repository: string, filter: string) {
 		// Get the projects latest GitHub repository release
-		const result = await axios.get(`https://api.github.com/repos/${organization}/${repository}/releases/latest`);
+		const result = await axios.get(
+			`https://api.github.com/repos/${organization}/${repository}/releases/latest`
+		);
 		// Handle failed GitHub request
 		if (!result.data || !result.data.assets || !Array.isArray(result.data.assets)) {
 			console.error(result);
@@ -62,9 +63,10 @@ export class ConfigManager {
 			asset.browser_download_url.includes(filter)
 		);
 		// Handle no assets found
-		if (!asset) throw new Error (
-			`Could not locate asset with ${filter} in the download URL in the ${organization}/${repository} repository`
-		);
+		if (!asset)
+			throw new Error(
+				`Could not locate asset with ${filter} in the download URL in the ${organization}/${repository} repository`
+			);
 		// Return captured download url
 		return asset.browser_download_url as string;
 	}
@@ -78,11 +80,11 @@ export class ConfigManager {
 	public static async initWithDefaults() {
 		// Load existing configuration
 		const userConfig = {
-			outDir:CACHE_DIRECTORY,
-			keepAlive:false,
-			exclude:[],
-			...await ConfigManager.readConfigFromProject()
-		}
+			outDir: CACHE_DIRECTORY,
+			keepAlive: false,
+			exclude: [],
+			...(await ConfigManager.readConfigFromProject()),
+		};
 		// Check if configuration exists
 		if (!(await ConfigManager.configExists())) {
 			// Create the config directory
@@ -90,7 +92,7 @@ export class ConfigManager {
 			// Fetch the latest repository configuration
 			const defaultConfig: LamingtonConfig = {
 				cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
-				eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04')
+				eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
 			};
 			// Freeze repository image
 			await writeFile(CONFIG_FILE_PATH, JSON.stringify(defaultConfig, null, 4), ENCODING);
@@ -98,10 +100,18 @@ export class ConfigManager {
 		// Load cached config
 		const existingConfig = JSON.parse(await readFile(CONFIG_FILE_PATH, ENCODING));
 		// Save cached configuration
-		await writeFile(CONFIG_FILE_PATH, JSON.stringify({
-			...existingConfig,
-			...userConfig
-		}, null, 4), ENCODING);
+		await writeFile(
+			CONFIG_FILE_PATH,
+			JSON.stringify(
+				{
+					...existingConfig,
+					...userConfig,
+				},
+				null,
+				4
+			),
+			ENCODING
+		);
 		// Load existing configuration
 		await ConfigManager.loadConfigFromDisk();
 	}
@@ -134,7 +144,7 @@ export class ConfigManager {
 	private static async readConfigFromProject() {
 		return (await exists(CONFIGURATION_FILE_NAME))
 			? JSON.parse(await readFile(CONFIGURATION_FILE_NAME, ENCODING))
-			: {}
+			: {};
 	}
 
 	/**

@@ -12,7 +12,6 @@ interface AccountCreationOptions {
 }
 
 export class AccountManager {
-
 	/**
 	 * Generates a new random account
 	 * @note Shorthand method for [[AccountManager.createAccounts]]
@@ -136,7 +135,7 @@ export class AccountManager {
 		// Execute the transaction
 		return await EOSManager.transact({ actions }, eos);
 	};
-	
+
 	/**
 	 * Grants `eosio.code` permission to the specified account's `active` key
 	 * @note Should be moved to the `contracts/contract.ts` I think?
@@ -148,19 +147,18 @@ export class AccountManager {
 	static addCodePermission = async (account: Account) => {
 		// We need to get their existing permissions, then add in a new eosio.code permission for this contract.
 		const { permissions } = await EOSManager.rpc.get_account(account.name);
-		const { required_auth } = permissions.find((permission: any) => permission.perm_name == 'active');
+		const { required_auth } = permissions.find(
+			(permission: any) => permission.perm_name == 'active'
+		);
 		// Check if `eosio.code` has already been set
 		const existingPermission = required_auth.accounts.find(
 			(account: any) =>
-				account.permission.actor === account.name &&
-				account.permission.permission === 'eosio.code'
+				account.permission.actor === account.name && account.permission.permission === 'eosio.code'
 		);
 		// Throw if permission exists
 		if (existingPermission) {
 			throw new Error(
-				`Code permission is already present on account ${account.name} for contract ${
-					account.name
-				}`
+				`Code permission is already present on account ${account.name} for contract ${account.name}`
 			);
 		}
 		// Append the `eosio.code` permission to existing

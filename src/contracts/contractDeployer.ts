@@ -15,10 +15,9 @@ import { ConfigManager } from '../configManager';
  * Provides a set of methods to manage contract deployment
  */
 export class ContractDeployer {
-
 	/**
 	 * Deploys contract files to a specified account
-	 * 
+	 *
 	 * ```typescript
 	 * // Create a new account
 	 * const account = await AccountManager.createAccount();
@@ -30,7 +29,10 @@ export class ContractDeployer {
 	 * @param account Account to apply contract code
 	 * @returns Deployed contract instance
 	 */
-	public static async deployToAccount<T extends Contract>(contractIdentifier: string, account: Account) {
+	public static async deployToAccount<T extends Contract>(
+		contractIdentifier: string,
+		account: Account
+	) {
 		// Initialize the serialization buffer
 		const buffer = new Serialize.SerialBuffer({
 			textEncoder: EOSManager.api.textEncoder,
@@ -87,12 +89,12 @@ export class ContractDeployer {
 
 	/**
 	 * Deploys contract files to a randomly generated account
-	 * 
+	 *
 	 * ```typescript
 	 * // Deploy the contract with identifier
 	 * ContractDeployer.deploy<MyContractTypeDef>('mycontract');
 	 * ```
-	 * 
+	 *
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @returns Deployed contract instance
@@ -106,19 +108,22 @@ export class ContractDeployer {
 
 	/**
 	 * Deploys contract files to a specified account name
-	 * 
+	 *
 	 * ```typescript
 	 * // Deploy the `mycontract` contract to the account with name `mycontractname`
 	 * ContractDeployer.deployToAccount<MyContractTypeDef>('mycontract', 'mycontractname');
 	 * ```
-	 * 
+	 *
 	 * @note Generating a random private key is not safe
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @param accountName Account name
 	 * @returns Deployed contract instance
 	 */
-	public static async deployWithName<T extends Contract>(contractIdentifier: string, accountName: string) {
+	public static async deployWithName<T extends Contract>(
+		contractIdentifier: string,
+		accountName: string
+	) {
 		// Generate a random private key
 		const privateKey = await ecc.unsafeRandomKey();
 		// Initialize account with name

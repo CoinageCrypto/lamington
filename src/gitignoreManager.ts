@@ -14,7 +14,6 @@ const encoding = 'utf8';
  * Manages the `.gitignore` file and configuration
  */
 export class GitIgnoreManager {
-
 	/**
 	 * Creates a `.gitignore` file when it doesn't exist
 	 * and configures the base ignore files
