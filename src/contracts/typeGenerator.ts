@@ -18,6 +18,16 @@ const pascalCase = (value: string) => {
 	return upperFirst.replace(snakePattern, match => match[match.length - 1].toUpperCase());
 };
 
+/**
+ * Transforms a string into the camel-case format
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param value String for case transformation
+ */
+const camelCase = (value: string) => {
+	const snakePattern = /[_.]+./g;
+	return value.replace(snakePattern, match => match[match.length - 1].toUpperCase());
+};
+
 type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGeneratorLevel };
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
@@ -25,12 +35,12 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
  * Parses a C++ type definition into a Typescript definition
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
- * @param eosType 
+ * @param eosType
  */
 export const mapParameterType = (eosType: string) => {
 	// Handle array types
 	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
-	const type = mapTypes[eosType.replace('[]','')] || 'string';
+	const type = mapTypes[eosType.replace('[]', '')] || 'string';
 	if (wrapper) {
 		return `${wrapper}<${type}>`;
 	} else {
@@ -106,13 +116,13 @@ export const generateTypes = async (contractIdentifier: string) => {
 		);
 		// Optional parameter at the end on every contract method.
 		parameters.push('options?: { from?: Account }');
-		
+
 		return `${action.name}(${parameters.join(', ')}): Promise<any>;`;
 	});
 	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
-			`${table.name}(scope?: string): Promise<TableRowsResult<${pascalCase(
+			`${camelCase(table.name)}(scope?: string): Promise<TableRowsResult<${pascalCase(
 				contractName
 			)}${pascalCase(table.name)}>>;`
 	);
@@ -139,7 +149,10 @@ export const generateTypes = async (contractIdentifier: string) => {
  * @param contractIdentifier Path to file without extension
  * @param interfaceContent Generated contract interface
  */
-const saveInterface = async (contractIdentifier: string, interfaceContent: GeneratorLevel | IndentedGeneratorLevel) => {
+const saveInterface = async (
+	contractIdentifier: string,
+	interfaceContent: GeneratorLevel | IndentedGeneratorLevel
+) => {
 	// Open a write stream to file
 	const file = fs.createWriteStream(`${contractIdentifier}.ts`);
 	// Write formatted blocks
