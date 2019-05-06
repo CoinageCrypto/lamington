@@ -243,24 +243,21 @@ export const runTests = async () => {
 	// Find all existing test file paths
 	const files = [
 		// All ts and js files under the test folder get added.
-		...(await glob('test/**/*.ts')),
-		...(await glob('test/**/*.js')),
+		...(await glob('{test,tests}/**/*.{js,ts}')),
 
-		// Any .test.ts, .test.js files anywhere in the working tree
-		// get added.
-		...(await glob('**/*.test.ts')),
-		...(await glob('**/*.test.js')),
-
-		// Any .spec.ts, .spec.js files anywhere in the working tree
-		// get added.
-		...(await glob('**/*.spec.ts')),
-		...(await glob('**/*.spec.js')),
+		// Any .test.ts, .test.js, .spec.ts, .spec.js files anywhere in the working tree
+		// outside of node_modules get added.
+		// Note: This also adds files from node_modules. These will get filtered out in the loop below
+		...(await glob('**/*.{test,spec}.{js,ts}')),
 	];
+
 	// Instantiate a Mocha instance.
 	const mocha = new Mocha();
 
 	for (const testFile of files) {
-		mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
+		if (!testFile.startsWith('node_modules/')) {
+			mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
+		}
 	}
 
 	// Our tests are more like integration tests than unit tests. Taking two seconds is
