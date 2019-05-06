@@ -14,6 +14,12 @@ const mkdirp = promisify(mkdirpCallback);
 const rimraf = promisify(rimrafCallback);
 const writeFile = promisify(writeFileCallback);
 
+// It's nice to give people proper stack traces when they have a problem with their code.
+// Trace shows async traces, and Clarify removes internal Node entries.
+// Source Map Support adds proper source map support so line numbers match up to the original TS code.
+import 'trace';
+import 'clarify';
+
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
 
