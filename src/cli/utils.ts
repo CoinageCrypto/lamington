@@ -254,17 +254,14 @@ export const runTests = async () => {
 
 		// Any .test.ts, .test.js, .spec.ts, .spec.js files anywhere in the working tree
 		// outside of node_modules get added.
-		// Note: This also adds files from node_modules. These will get filtered out in the loop below
-		...(await glob('**/*.{test,spec}.{js,ts}')),
+		...(await glob('!(node_modules)/**/*.{test,spec}.{js,ts}')),
 	];
 
 	// Instantiate a Mocha instance.
 	const mocha = new Mocha();
 
 	for (const testFile of files) {
-		if (!testFile.startsWith('node_modules/')) {
-			mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
-		}
+		mocha.addFile(path.join(WORKING_DIRECTORY, testFile));
 	}
 
 	// Our tests are more like integration tests than unit tests. Taking two seconds is
@@ -289,7 +286,7 @@ export const runTests = async () => {
  */
 export const buildAll = async (contracts?: string[]) => {
 	// Find all contract files
-	contracts = await glob('./**/*.cpp');
+	contracts = await glob('!(node_modules)/**/*.cpp');
 	const errors = [];
 	// Log the batch building process
 	console.log(`BUILDING ${contracts.length} SMART CONTRACTS`, '\n');
