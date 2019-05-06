@@ -111,10 +111,10 @@ export class ContractDeployer {
 	 *
 	 * ```typescript
 	 * // Deploy the `mycontract` contract to the account with name `mycontractname`
-	 * ContractDeployer.deployToAccount<MyContractTypeDef>('mycontract', 'mycontractname');
+	 * ContractDeployer.deployWithName<MyContractTypeDef>('mycontract', 'mycontractname');
 	 * ```
 	 *
-	 * @note Generating a random private key is not safe
+	 * @note Generating a random private key is not safe in the cryptographic sense. It can be used for testing.
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @param accountName Account name
@@ -126,8 +126,11 @@ export class ContractDeployer {
 	) {
 		// Generate a random private key
 		const privateKey = await ecc.unsafeRandomKey();
+
 		// Initialize account with name
 		const account = new Account(accountName, privateKey);
+		await AccountManager.setupAccount(account);
+
 		// Call the deployToAccount method with the account
 		return await ContractDeployer.deployToAccount<T>(contractIdentifier, account);
 	}
