@@ -4,29 +4,9 @@ import * as path from 'path';
 import { promisify } from 'util';
 import mapTypes from './typeMap';
 import { ConfigManager } from '../configManager';
+import { pascalCase, camelCase } from './utils';
 
 const glob = promisify(globWithCallbacks);
-
-/**
- * Transforms a string into the pascal-case format
- * @author Kevin Brown <github.com/thekevinbrown>
- * @param value String for case transformation
- */
-const pascalCase = (value: string) => {
-	const snakePattern = /[_.]+./g;
-	const upperFirst = value[0].toUpperCase() + value.slice(1);
-	return upperFirst.replace(snakePattern, match => match[match.length - 1].toUpperCase());
-};
-
-/**
- * Transforms a string into the camel-case format
- * @author Kevin Brown <github.com/thekevinbrown>
- * @param value String for case transformation
- */
-const camelCase = (value: string) => {
-	const snakePattern = /[_.]+./g;
-	return value.replace(snakePattern, match => match[match.length - 1].toUpperCase());
-};
 
 type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGeneratorLevel };
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;

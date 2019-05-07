@@ -4,6 +4,7 @@ import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
+import { camelCase } from './utils';
 
 export interface ContractActionParameters {
 	[key: string]: any;
@@ -115,7 +116,7 @@ export class Contract implements EOSJSContract {
 		}
 		// And now the tables.
 		for (const table of abi.tables) {
-			(this as any)[table.name] = function() {
+			(this as any)[camelCase(table.name)] = function() {
 				return this.getTableRows(table.name, arguments[0]);
 			};
 		}
