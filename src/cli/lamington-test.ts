@@ -32,12 +32,10 @@ const run = async () => {
 };
 
 run().catch(async error => {
-	if (await eosIsReady()) {
-		stopContainer().then(() => {
-			//console.log(error)
-			process.exit(1);
-		});
-	} else {
-		console.log(error);
+	process.exitCode = 1;
+	console.log(error);
+
+	if (!ConfigManager.keepAlive && (await eosIsReady())) {
+		await stopContainer();
 	}
 });
