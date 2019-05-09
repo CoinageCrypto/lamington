@@ -16,7 +16,7 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/TechInSite/lamington.git"
+		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
 	"bin": {
 		"lamington": "./lib/cli/index.js"
@@ -35,9 +35,9 @@
 	"author": "Kevin Brown",
 	"license": "MIT",
 	"bugs": {
-		"url": "https://github.com/TechInSite/lamington/issues"
+		"url": "https://github.com/CoinageCrypto/lamington/issues"
 	},
-	"homepage": "https://github.com/TechInSite/lamington#readme",
+	"homepage": "https://github.com/CoinageCrypto/lamington#readme",
 	"files": [
 		"lib/**/*"
 	],
