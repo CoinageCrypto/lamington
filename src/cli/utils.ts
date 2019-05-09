@@ -346,17 +346,27 @@ export const build = async (contractPath: string) => {
 };
 
 /**
+ * Determines the output location for a contract based on the full path of its C++ file.
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param contractPath Full path to C++ contract file
+ * @returns Output path for contract compilation artefacts
+ */
+export const outputPathForContract = (contractPath: string) =>
+	path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
+
+/**
  * Compiles a C++ EOSIO smart contract at path
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
- * @param contractPath Fullpath to C++ contract file
+ * @param contractPath Full path to C++ contract file
  */
 export const compileContract = async (contractPath: string) => {
 	// Begin logs
 	spinner.create(`Compiling contract`);
-	// Get the base filename from path and log status
+
 	const basename = path.basename(contractPath, '.cpp');
-	const fullPath = path.join(ConfigManager.outDir, path.dirname(contractPath));
+	const outputPath = outputPathForContract(contractPath);
+
 	// Pull docker images
 	await docker
 		.command(
@@ -367,7 +377,7 @@ export const compileContract = async (contractPath: string) => {
 				'bin',
 				'project',
 				contractPath
-			)}" "${fullPath}" "${basename}"`
+			)}" "${outputPath}" "${basename}"`
 		)
 		.catch(err => {
 			spinner.fail('Failed to compile');

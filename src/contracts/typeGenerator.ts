@@ -50,7 +50,11 @@ export const generateAllTypes = async () => {
 export const generateTypes = async (contractIdentifier: string) => {
 	// Create contract details
 	const contractName = path.basename(contractIdentifier);
-	const abiPath = path.join(ConfigManager.outDir, `${contractIdentifier}.abi`);
+	const abiPath = path.join(
+		ConfigManager.outDir,
+		'compiled_contracts',
+		`${contractIdentifier}.abi`
+	);
 	// Handle ABI file loading
 	if (!fs.existsSync(path.resolve(abiPath)))
 		throw new Error(`Missing ABI file at path '${path.resolve(abiPath)}'`);

@@ -39,8 +39,16 @@ export class ContractDeployer {
 			textDecoder: EOSManager.api.textDecoder,
 		});
 		// Construct resource paths
-		const abiPath = path.join(ConfigManager.outDir, `${contractIdentifier}.abi`);
-		const wasmPath = path.join(ConfigManager.outDir, `${contractIdentifier}.wasm`);
+		const abiPath = path.join(
+			ConfigManager.outDir,
+			'compiled_contracts',
+			`${contractIdentifier}.abi`
+		);
+		const wasmPath = path.join(
+			ConfigManager.outDir,
+			'compiled_contracts',
+			`${contractIdentifier}.wasm`
+		);
 		// Read resources files for paths
 		let abi = JSON.parse(await readFile(abiPath, 'utf8'));
 		const wasm = await readFile(wasmPath);
