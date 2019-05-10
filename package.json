@@ -23,14 +23,17 @@
 	},
 	"keywords": [
 		"EOS",
+		"EOS.io",
 		"Smart Contract",
+		"C++",
+		"wasm",
 		"Typescript",
 		"Truffle",
+		"Compile",
 		"Deployment",
 		"Testing",
-		"Mocha",
-		"Jade",
-		"Jest"
+		"Unit Testing",
+		"Mocha"
 	],
 	"author": "Kevin Brown",
 	"license": "MIT",
