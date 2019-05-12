@@ -9,6 +9,7 @@ import { ConfigManager } from '../configManager';
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 const run = async () => {
+	const contract = process.argv[2];
 	// Initialize configuration
 	await ConfigManager.initWithDefaults();
 	// Stop container if running
@@ -22,7 +23,7 @@ const run = async () => {
 		await startEos();
 	}
 	// Build all smart contracts
-	await buildAll();
+	await buildAll([contract]);
 };
 
 run().catch(error => {
