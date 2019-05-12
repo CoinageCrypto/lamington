@@ -174,8 +174,8 @@ export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS
  */
 export const eosIsReady = async () => {
 	try {
-		await axios.get('http://localhost:8888/v1/chain/get_info');
-		return true;
+		const info = await axios.get('http://localhost:8888/v1/chain/get_info');
+		return info && info.status === 200;
 	} catch (error) {
 		return false;
 	}
@@ -280,15 +280,17 @@ export const runTests = async () => {
 /**
  * Finds and builds all C++ contracts
  * @author Kevin Brown <github.com/thekevinbrown>
- * @note Should be configurable with a RegExp or something to prevent all C++ files being compiled
- * @param contracts Optional contract paths to build
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param match Optional specific contract identifiers to build
  */
-export const buildAll = async (contracts?: string[]) => {
-	// Find all contract files
-	contracts = await glob('./**/*.cpp');
+export const buildAll = async (match?: string[]) => {
+	// Setup contract paths
 	const errors = [];
+	let contracts = await glob('./**/*.cpp');
+	// Cleanse ignored contracts
+	contracts = onlyMatches(contracts, match) || filterMatches(contracts);
 	// Log the batch building process
-	console.log(`BUILDING ${contracts.length} SMART CONTRACTS`, '\n');
+	console.log(`BUILDING ${contracts.length} SMART CONTRACT${contracts.length>0?'s':''}`, '\n');
 	// Build each contract and handle errors
 	for (const contract of contracts) {
 		try {
@@ -306,10 +308,32 @@ export const buildAll = async (contracts?: string[]) => {
 		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
 		// Terminate the current process
 		throw new Error(
-			`${errors.length} contract${errors.length > 0 ? 's' : ''} failed to compile. Quitting.`
+			`${errors.length} contract${errors.length>0?'s':''} failed to compile. Quitting.`
 		);
 	}
 };
+
+const onlyMatches = (paths:string[], matches:string[] = []) => {
+	return paths.filter(filePath => {
+		return matches.reduce<boolean>((result, str) => {
+			const pattern = new RegExp(str,'gi');
+			if (result || pattern.test(filePath))
+				result = true;
+			return result;
+		}, false)
+	});
+}
+
+const filterMatches = (paths:string[]) => {
+	return paths.filter(filePath => {
+		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
+			const pattern = new RegExp(match,'gi');
+			if (result || pattern.test(filePath))
+				result = true;
+			return result;
+		}, false);
+	});
+}
 
 /**
  * Resolves the path to file identifier.
