@@ -132,7 +132,9 @@ export const assertEOSError = async (
 			return;
 		} else {
 			// Fail if error not thrown by EOS
-			assert.fail(`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`);
+			assert.fail(
+				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
+			);
 		}
 	}
 	// Fail if no exception thrown

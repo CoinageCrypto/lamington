@@ -14,6 +14,13 @@ const mkdirp = promisify(mkdirpCallback);
 const rimraf = promisify(rimrafCallback);
 const writeFile = promisify(writeFileCallback);
 
+// It's nice to give people proper stack traces when they have a problem with their code.
+// Trace shows async traces, and Clarify removes internal Node entries.
+// Source Map Support adds proper source map support so line numbers match up to the original TS code.
+import 'trace';
+import 'clarify';
+Error.stackTraceLimit = 20;
+
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
 
@@ -131,11 +138,11 @@ export const startContainer = async () => {
  * @returns Docker command promise
  */
 export const stopContainer = async () => {
-	spinner.create('Stopping Lamington');
+	spinner.create('Stopping EOS Docker Container');
 
 	try {
 		await docker.command('stop lamington');
-		spinner.end('Stopped Lamington');
+		spinner.end('Stopped EOS Docker Container');
 	} catch (err) {
 		spinner.fail(err);
 	}
@@ -220,7 +227,7 @@ export const startEos = async () => {
                                                      \n\
 ==================================================== \n'
 		);
-		spinner.end("Started EOS docker container")
+		spinner.end('Started EOS docker container');
 	} catch (error) {
 		spinner.fail('Failed to start the EOS container');
 		console.log(` --> ${error}`);
@@ -243,19 +250,13 @@ export const runTests = async () => {
 	// Find all existing test file paths
 	const files = [
 		// All ts and js files under the test folder get added.
-		...(await glob('test/**/*.ts')),
-		...(await glob('test/**/*.js')),
+		...(await glob('{test,tests}/**/*.{js,ts}')),
 
-		// Any .test.ts, .test.js files anywhere in the working tree
-		// get added.
-		...(await glob('**/*.test.ts')),
-		...(await glob('**/*.test.js')),
-
-		// Any .spec.ts, .spec.js files anywhere in the working tree
-		// get added.
-		...(await glob('**/*.spec.ts')),
-		...(await glob('**/*.spec.js')),
+		// Any .test.ts, .test.js, .spec.ts, .spec.js files anywhere in the working tree
+		// outside of node_modules get added.
+		...(await glob('!(node_modules)/**/*.{test,spec}.{js,ts}')),
 	];
+
 	// Instantiate a Mocha instance.
 	const mocha = new Mocha();
 
@@ -284,9 +285,9 @@ export const runTests = async () => {
  * @param match Optional specific contract identifiers to build
  */
 export const buildAll = async (match?: string[]) => {
-	// Setup contract paths
+	// Find all contract files
 	const errors = [];
-	let contracts = await glob('./**/*.cpp');
+	let contracts = await glob('!(node_modules)/**/*.cpp');
 	// Cleanse ignored contracts
 	contracts = onlyMatches(contracts, match) || filterMatches(contracts);
 	// Log the batch building process
@@ -369,32 +370,44 @@ export const build = async (contractPath: string) => {
 };
 
 /**
+ * Determines the output location for a contract based on the full path of its C++ file.
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @param contractPath Full path to C++ contract file
+ * @returns Output path for contract compilation artefacts
+ */
+export const outputPathForContract = (contractPath: string) =>
+	path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
+
+/**
  * Compiles a C++ EOSIO smart contract at path
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
- * @param contractPath Fullpath to C++ contract file
+ * @param contractPath Full path to C++ contract file
  */
 export const compileContract = async (contractPath: string) => {
 	// Begin logs
 	spinner.create(`Compiling contract`);
-	// Get the base filename from path and log status
+
 	const basename = path.basename(contractPath, '.cpp');
-	const fullPath = path.join(ConfigManager.outDir, path.dirname(contractPath));
+	const outputPath = outputPathForContract(contractPath);
+
 	// Pull docker images
-	await docker.command(
-		// Arg 1 is filename, arg 2 is contract name.
-		`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
-			'opt',
-			'eosio',
-			'bin',
-			'project',
-			contractPath
-		)}" "${fullPath}" "${basename}"`
-	).catch(err => {
-		spinner.fail("Failed to compile");
-		console.log(` --> ${err}`);
-		throw err;
-	});
+	await docker
+		.command(
+			// Arg 1 is filename, arg 2 is contract name.
+			`exec lamington /opt/eosio/bin/scripts/compile_contract.sh "/${path.join(
+				'opt',
+				'eosio',
+				'bin',
+				'project',
+				contractPath
+			)}" "${outputPath}" "${basename}"`
+		)
+		.catch(err => {
+			spinner.fail('Failed to compile');
+			console.log(` --> ${err}`);
+			throw err;
+		});
 	// Notify build task completed
 	spinner.end(`Compiled contract`);
 };

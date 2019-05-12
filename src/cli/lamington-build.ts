@@ -13,13 +13,13 @@ const run = async () => {
 	// Initialize configuration
 	await ConfigManager.initWithDefaults();
 	// Stop container if running
-	if (!ConfigManager.keepAlive && await eosIsReady()) {
+	if (!ConfigManager.keepAlive && (await eosIsReady())) {
 		await stopContainer();
 	}
 	// This ensures we have our .gitignore inside the .lamington directory
 	await GitIgnoreManager.createIfMissing();
 	// Start the EOSIO container image
-	if (!await eosIsReady()) {
+	if (!(await eosIsReady())) {
 		await startEos();
 	}
 	// Build all smart contracts

@@ -8,7 +8,6 @@ import { Account } from './accounts';
  * Manages client connection and communication with a local EOSIO node
  */
 export class EOSManager {
-
 	/** Defaults to `eosio` administration account */
 	static adminAccount: Account;
 	/** Development signature provider */
