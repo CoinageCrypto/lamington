@@ -28,12 +28,11 @@ export interface LamingtonConfig {
 	eos: string;
 	keepAlive?: boolean;
 	outDir?: string,
-	exclude?: string | RegExp | Array<string|RegExp>
+	exclude?: Array<string>
 }
 
 /**
- * Fetches and stores the latest EOS configuration images
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Manages Lamington configuration setup and caching
  */
 export class ConfigManager {
 	
@@ -167,5 +166,13 @@ export class ConfigManager {
 	 */
 	static get outDir() {
 		return ConfigManager.config.outDir || CACHE_DIRECTORY;
+	}
+
+	/**
+	 * Returns the array of excluded strings or patterns
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 */
+	static get exclude() {
+		return ConfigManager.config.exclude || [];
 	}
 }
