@@ -289,7 +289,8 @@ export const buildAll = async (match?: string[]) => {
 	const errors = [];
 	let contracts = await glob('!(node_modules)/**/*.cpp');
 	// Cleanse ignored contracts
-	contracts = onlyMatches(contracts, match) || filterMatches(contracts);
+	contracts = filterMatches(onlyMatches(contracts, match || ['\\.cpp$']));
+
 	if (contracts.length === 0) {
 		console.error();
 		console.error('Could not find any smart contracts to build.');
