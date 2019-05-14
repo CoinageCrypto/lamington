@@ -3,6 +3,7 @@ import { TextEncoder, TextDecoder } from 'util';
 import { Api, JsonRpc } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { Account } from './accounts';
+import { ConfigManager } from './configManager';
 
 /**
  * Manages client connection and communication with a local EOSIO node
@@ -51,6 +52,14 @@ export class EOSManager {
 		eos = EOSManager.api,
 		options = { blocksBehind: 0, expireSeconds: 30 }
 	) => {
+		if (ConfigManager.debugTransactions) {
+			const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);
+			console.log(`========== Calling ${calls.join(', ')} ==========`);
+			console.log('Transaction: ', JSON.stringify(transaction, null, 4));
+			console.log('Options: ', options);
+			console.log();
+		}
+
 		return eos.transact(transaction, options);
 	};
 }

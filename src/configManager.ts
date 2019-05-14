@@ -29,6 +29,7 @@ export interface LamingtonConfig {
 	keepAlive?: boolean;
 	outDir?: string;
 	exclude?: Array<string>;
+	debugTransactions?: boolean;
 }
 
 /**
@@ -179,6 +180,14 @@ export class ConfigManager {
 	 */
 	static get keepAlive() {
 		return ConfigManager.config.keepAlive || false;
+	}
+
+	/**
+	 * Returns the container keep alive setting or false
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 */
+	static get debugTransactions() {
+		return ConfigManager.config.debugTransactions || false;
 	}
 
 	/**
