@@ -321,8 +321,7 @@ const onlyMatches = (paths: string[], matches: string[] = []) => {
 	return paths.filter(filePath => {
 		return matches.reduce<boolean>((result, str) => {
 			const pattern = new RegExp(str, 'gi');
-			if (result || pattern.test(filePath)) result = true;
-			return result;
+			return result || pattern.test(filePath);
 		}, false);
 	});
 };
@@ -331,8 +330,7 @@ const filterMatches = (paths: string[]) => {
 	return paths.filter(filePath => {
 		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
 			const pattern = new RegExp(match, 'gi');
-			if (result || pattern.test(filePath)) result = true;
-			return result;
+			return result || pattern.test(filePath);
 		}, false);
 	});
 };
