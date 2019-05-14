@@ -297,10 +297,8 @@ export const buildAll = async (match?: string[]) => {
 	}
 
 	// Log the batch building process
-	console.log(
-		`BUILDING ${contracts.length} SMART CONTRACT${contracts.length > 0 ? 's' : ''}`,
-		'\n'
-	);
+	console.log(`BUILDING ${contracts.length} SMART CONTRACT${contracts.length > 1 ? 'S' : ''}\n`);
+
 	// Build each contract and handle errors
 	for (const contract of contracts) {
 		try {
