@@ -8,12 +8,12 @@ import * as colors from 'colors';
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 const run = async () => {
+	await ProjectManager.initWithDefaults();
 
-    await ProjectManager.initWithDefaults();
-    
-    await ConfigManager.createConfigWhenMissing();
+	await ConfigManager.createConfigWhenMissing();
 
-    console.log(colors.white(`
+	console.log(
+		colors.white(`
 
     .                                       .                 
     /       ___  , _ , _   \` , __     ___. _/_     __.  , __  
@@ -22,9 +22,10 @@ const run = async () => {
     /---/ \`.__/| /   '   / / /    |  \`---|  \\__/  \`._.' /    |
                                      \___/                    
    
-   `))
+   `)
+	);
 };
 
 run().catch(error => {
-    throw error;
+	throw error;
 });

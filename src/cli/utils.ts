@@ -291,7 +291,10 @@ export const buildAll = async (match?: string[]) => {
 	// Cleanse ignored contracts
 	contracts = onlyMatches(contracts, match) || filterMatches(contracts);
 	// Log the batch building process
-	console.log(`BUILDING ${contracts.length} SMART CONTRACT${contracts.length>0?'s':''}`, '\n');
+	console.log(
+		`BUILDING ${contracts.length} SMART CONTRACT${contracts.length > 0 ? 's' : ''}`,
+		'\n'
+	);
 	// Build each contract and handle errors
 	for (const contract of contracts) {
 		try {
@@ -309,32 +312,30 @@ export const buildAll = async (match?: string[]) => {
 		for (const error of errors) console.error(error.message, '\n', ' -> ', error.error);
 		// Terminate the current process
 		throw new Error(
-			`${errors.length} contract${errors.length>0?'s':''} failed to compile. Quitting.`
+			`${errors.length} contract${errors.length > 0 ? 's' : ''} failed to compile. Quitting.`
 		);
 	}
 };
 
-const onlyMatches = (paths:string[], matches:string[] = []) => {
+const onlyMatches = (paths: string[], matches: string[] = []) => {
 	return paths.filter(filePath => {
 		return matches.reduce<boolean>((result, str) => {
-			const pattern = new RegExp(str,'gi');
-			if (result || pattern.test(filePath))
-				result = true;
-			return result;
-		}, false)
-	});
-}
-
-const filterMatches = (paths:string[]) => {
-	return paths.filter(filePath => {
-		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
-			const pattern = new RegExp(match,'gi');
-			if (result || pattern.test(filePath))
-				result = true;
+			const pattern = new RegExp(str, 'gi');
+			if (result || pattern.test(filePath)) result = true;
 			return result;
 		}, false);
 	});
-}
+};
+
+const filterMatches = (paths: string[]) => {
+	return paths.filter(filePath => {
+		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
+			const pattern = new RegExp(match, 'gi');
+			if (result || pattern.test(filePath)) result = true;
+			return result;
+		}, false);
+	});
+};
 
 /**
  * Resolves the path to file identifier.

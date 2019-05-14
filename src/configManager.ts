@@ -101,10 +101,13 @@ export class ConfigManager {
 		// Save cached configuration
 		await writeFile(
 			CONFIG_FILE_PATH,
-			JSON.stringify({
+			JSON.stringify(
+				{
 					...existingConfig,
 					...userConfig,
-				}, null, 4
+				},
+				null,
+				4
 			),
 			ENCODING
 		);
@@ -113,7 +116,7 @@ export class ConfigManager {
 	}
 
 	public static async createConfigWhenMissing() {
-		const atPath = path.join(process.cwd(),'.lamingtonrc');
+		const atPath = path.join(process.cwd(), '.lamingtonrc');
 		if (await ConfigManager.configExists(atPath)) return;
 		ConfigManager.initWithDefaults();
 		await writeFile(atPath, JSON.stringify(ConfigManager.config, null, 4), ENCODING);
@@ -127,7 +130,7 @@ export class ConfigManager {
 	 * @param atPath Optional file path for lookup
 	 * @returns Config exists determiner
 	 */
-	public static async configExists(atPath:string = CONFIG_FILE_PATH) {
+	public static async configExists(atPath: string = CONFIG_FILE_PATH) {
 		// Should filter out any trailing filename and concatonate
 		// the default filename
 		return await exists(atPath);
