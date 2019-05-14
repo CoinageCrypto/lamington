@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="https://lamington.io/logo.svg" alt="Lamington Logo" width="300"/>
+    <img src="https://lamington.io/img/logo.svg" alt="Lamington Logo" width="300"/>
 </p>
 
 Inspired by the popular Truffle framework and developed in Typescript, Lamington makes smart contract development simple for any level of EOSIO developer.
@@ -80,6 +80,7 @@ Lamington automatically searches for all files with the `.cpp` file extension be
 Not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
 
 #### Specifying Build Contracts
+
 If you'd like to run builds on specific contracts, an additional contract `identifier` can be specified like so;
 
 ```
@@ -106,7 +107,7 @@ Initially setting up a project can be tedious and repetitive, so we've created a
 $ lamington init
 ```
 
-This creates a `.lamingtonrc` file in your current directory with default Lamington settings. 
+This creates a `.lamingtonrc` file in your current directory with default Lamington settings.
 
 ```
 $ lamington init [PROJECT_NAME]
@@ -147,9 +148,11 @@ You can find more information about the Lamington tool-set and join our growing 
 ## Roadmap
 
 ### LamingtonJS
+
 Core Lamington front end toolset
 
 ### Lamington-React
+
 React context management for LamingtonJS
 
 ### Lamington-Angular
