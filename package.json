@@ -1,85 +1,88 @@
 {
-	"name": "lamington",
-	"version": "1.0.0-alpha.1",
-	"description": "A suite of tools to make building and testing EOS smart contracts easier. ",
-	"main": "lib/index.js",
-	"types": "lib/index.d.ts",
-	"scripts": {
-		"build": "npm run clean && tsc && npm run copy:scripts",
-		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
-		"clean": "rm -rf ./lib",
-		"docs": "typedoc --out api-docs ./src",
-		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-		"prepublishOnly": "npm test",
-		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/CoinageCrypto/lamington.git"
-	},
-	"bin": {
-		"lamington": "./lib/cli/index.js"
-	},
-	"keywords": [
-		"EOS",
-		"EOS.io",
-		"Smart Contract",
-		"C++",
-		"wasm",
-		"Typescript",
-		"Truffle",
-		"Compile",
-		"Deployment",
-		"Testing",
-		"Unit Testing",
-		"Mocha"
-	],
-	"author": "Kevin Brown",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/CoinageCrypto/lamington/issues"
-	},
-	"homepage": "https://github.com/CoinageCrypto/lamington#readme",
-	"files": [
-		"lib/**/*"
-	],
-	"devDependencies": {
-		"@types/chai": "4.1.7",
-		"@types/mkdirp": "0.5.2",
-		"@types/mocha": "5.2.6",
-		"@types/node": "11.13.7",
-		"@types/node-fetch": "2.3.2",
-		"@types/ora": "3.2.0",
-		"@types/rimraf": "2.0.2",
-		"@types/text-encoding": "0.0.35",
-		"eosjs": "20.0.0",
-		"eosjs-ecc": "4.0.4",
-		"prettier": "1.17.0",
-		"ts-node": "8.1.0",
-		"typedoc": "0.14.2",
-		"typescript": "3.4.5"
-	},
-	"dependencies": {
-		"axios": "0.18.0",
-		"chai": "4.2.0",
-		"clarify": "2.1.0",
-		"colors": "1.3.3",
-		"commander": "2.20.0",
-		"deep-equal-in-any-order": "1.0.13",
-		"docker-cli-js": "2.5.2",
-		"glob": "7.1.3",
-		"mkdirp": "0.5.1",
-		"mocha": "6.1.4",
-		"node-fetch": "2.3.0",
-		"ora": "3.4.0",
-		"qrcode-terminal": "0.12.0",
-		"rimraf": "2.6.3",
-		"trace": "3.1.1",
-		"ts-mocha": "6.0.0"
-	},
-	"peerDependencies": {
-		"eosjs": "^20.0.0",
-		"eosjs-ecc": "^4.0.4"
-	}
+  "name": "lamington",
+  "version": "1.0.0-alpha.1",
+  "description": "A suite of tools to make building and testing EOS smart contracts easier. ",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "npm run clean && tsc && npm run copy:scripts",
+    "copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
+    "clean": "rm -rf ./lib",
+    "docs": "typedoc --out api-docs ./src",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+    "prepublishOnly": "npm test",
+    "prepare": "npm run snyk-protect; npm run build",
+    "test": "mocha --require ts-node/register src/**/*.test.ts",
+    "snyk-protect": "snyk protect"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoinageCrypto/lamington.git"
+  },
+  "bin": {
+    "lamington": "./lib/cli/index.js"
+  },
+  "keywords": [
+    "EOS",
+    "EOS.io",
+    "Smart Contract",
+    "C++",
+    "wasm",
+    "Typescript",
+    "Truffle",
+    "Compile",
+    "Deployment",
+    "Testing",
+    "Unit Testing",
+    "Mocha"
+  ],
+  "author": "Kevin Brown",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/CoinageCrypto/lamington/issues"
+  },
+  "homepage": "https://github.com/CoinageCrypto/lamington#readme",
+  "files": [
+    "lib/**/*"
+  ],
+  "devDependencies": {
+    "@types/chai": "4.1.7",
+    "@types/mkdirp": "0.5.2",
+    "@types/mocha": "5.2.6",
+    "@types/node": "11.13.7",
+    "@types/node-fetch": "2.3.2",
+    "@types/ora": "3.2.0",
+    "@types/rimraf": "2.0.2",
+    "@types/text-encoding": "0.0.35",
+    "eosjs": "20.0.0",
+    "eosjs-ecc": "4.0.4",
+    "prettier": "1.17.0",
+    "ts-node": "8.1.0",
+    "typedoc": "0.14.2",
+    "typescript": "3.4.5"
+  },
+  "dependencies": {
+    "axios": "0.18.0",
+    "chai": "4.2.0",
+    "clarify": "2.1.0",
+    "colors": "1.3.3",
+    "commander": "2.20.0",
+    "deep-equal-in-any-order": "1.0.13",
+    "docker-cli-js": "2.5.2",
+    "glob": "7.1.3",
+    "mkdirp": "0.5.1",
+    "mocha": "6.1.4",
+    "node-fetch": "2.3.0",
+    "ora": "3.4.0",
+    "qrcode-terminal": "0.12.0",
+    "rimraf": "2.6.3",
+    "trace": "3.1.1",
+    "ts-mocha": "6.0.0",
+    "snyk": "^1.163.3"
+  },
+  "peerDependencies": {
+    "eosjs": "^20.0.0",
+    "eosjs-ecc": "^4.0.4"
+  },
+  "snyk": true
 }
