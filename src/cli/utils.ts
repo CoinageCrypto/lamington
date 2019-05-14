@@ -290,6 +290,12 @@ export const buildAll = async (match?: string[]) => {
 	let contracts = await glob('!(node_modules)/**/*.cpp');
 	// Cleanse ignored contracts
 	contracts = onlyMatches(contracts, match) || filterMatches(contracts);
+	if (contracts.length === 0) {
+		console.error();
+		console.error('Could not find any smart contracts to build.');
+		process.exit(1);
+	}
+
 	// Log the batch building process
 	console.log(
 		`BUILDING ${contracts.length} SMART CONTRACT${contracts.length > 0 ? 's' : ''}`,
