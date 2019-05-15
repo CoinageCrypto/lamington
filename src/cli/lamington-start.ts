@@ -1,10 +1,20 @@
-import { startEos } from './utils';
+import { startEos, eosIsReady, stopContainer } from './utils';
 
 /**
- * Starts EOS and throws caught errors
- * @note This should handle caught errors
+ * Stops EOS docker container if it's running, then starts it.
+ * @note Keep alive setup is incomplete
  * @author Kevin Brown <github.com/thekevinbrown>
  */
-startEos().catch(error => {
-	throw error;
+const run = async () => {
+	// Stop running instances for fresh test environment
+	if (await eosIsReady()) {
+		await stopContainer();
+	}
+
+	await startEos();
+};
+
+run().catch(async error => {
+	process.exitCode = 1;
+	console.log(error);
 });
