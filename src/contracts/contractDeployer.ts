@@ -1,9 +1,10 @@
 import * as path from 'path';
-import { readFile as readFileCallback } from 'fs';
+import { readFile as readFileCallback, exists as existsCallback } from 'fs';
 import { promisify } from 'util';
 import { Serialize } from 'eosjs';
 import * as ecc from 'eosjs-ecc';
 
+const exists = promisify(existsCallback);
 const readFile = promisify(readFileCallback);
 
 import { Contract } from './contract';
@@ -45,11 +46,25 @@ export class ContractDeployer {
 			'compiled_contracts',
 			`${contractIdentifier}.abi`
 		);
+
+		if (!(await exists(abiPath))) {
+			throw new Error(
+				`Couldn't find ABI at ${abiPath}. Are you sure you used the correct contract identifier?`
+			);
+		}
+
 		const wasmPath = path.join(
 			ConfigManager.outDir,
 			'compiled_contracts',
 			`${contractIdentifier}.wasm`
 		);
+
+		if (!(await exists(wasmPath))) {
+			throw new Error(
+				`Couldn't find WASM file at ${wasmPath}. Are you sure you used the correct contract identifier?`
+			);
+		}
+
 		// Read resources files for paths
 		let abi = JSON.parse(await readFile(abiPath, 'utf8'));
 		const wasm = await readFile(wasmPath);

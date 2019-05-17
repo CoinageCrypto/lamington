@@ -360,7 +360,6 @@ export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePat
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
-	console.log(basename);
 	// Compile contract at path
 	await compileContract(contractPath);
 	// Generate Typescript definitions for contract
@@ -394,9 +393,18 @@ export const compileContract = async (contractPath: string) => {
 	spinner.create(`Compiling contract`);
 
 	const basename = path.basename(contractPath, '.cpp');
+
+	if (!(await exists(contractPath))) {
+		spinner.fail(
+			`Couldn't locate contract at ${contractPath}. Are you sure used the correct contract identifier when trying to build the contract?`
+		);
+
+		throw new Error("Contract doesn't exist on disk.");
+	}
+
 	const outputPath = outputPathForContract(contractPath);
 
-	// Pull docker images
+	// Run the compile contract script inside our docker container.
 	await docker
 		.command(
 			// Arg 1 is filename, arg 2 is contract name.
