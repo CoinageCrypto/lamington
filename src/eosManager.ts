@@ -5,6 +5,12 @@ import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { Account } from './accounts';
 import { ConfigManager } from './configManager';
 
+interface InitArgs {
+	adminAccount: Account;
+	chainId?: string;
+	httpEndpoint: string;
+}
+
 /**
  * Manages client connection and communication with a local EOSIO node
  */
@@ -25,14 +31,36 @@ export class EOSManager {
 	 */
 	static initWithDefaults = () => {
 		// Create eosio account and configure signature provider
-		const adminPrivateKey = '5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3';
-		EOSManager.adminAccount = new Account('eosio', adminPrivateKey);
-		EOSManager.signatureProvider = new JsSignatureProvider([adminPrivateKey]);
+		// NOTE: This is a known EOS development key used in the EOS docs. It is
+		// UNSAFE to use this key on any public network.
+		const adminAccount = new Account(
+			'eosio',
+			'5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3'
+		);
+
+		EOSManager.init({ httpEndpoint: 'http://127.0.0.1:8888', adminAccount });
+	};
+	/**
+	 * Initializes a connection to any EOSIO node and sets the administration keys which
+	 * Lamington uses to deploy contracts, create accounts, etc.
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @example
+	 */
+	static init = ({ httpEndpoint, adminAccount, chainId }: InitArgs) => {
+		// Create eosio account and configure signature provider
+		EOSManager.adminAccount = adminAccount;
+
+		// If we have a key to sign with, go ahead and hook it up.
+		if (adminAccount.privateKey) {
+			EOSManager.signatureProvider = new JsSignatureProvider([adminAccount.privateKey]);
+		}
+
 		// Typecasting as any here to prevent a problem with the types disagreeing for fetch,
 		// when this is actually following the getting started docs on EOSJS.
-		EOSManager.rpc = new JsonRpc('http://127.0.0.1:8888', { fetch: fetch as any });
+		EOSManager.rpc = new JsonRpc(httpEndpoint, { fetch: fetch as any });
 		EOSManager.api = new Api({
 			rpc: EOSManager.rpc,
+			chainId,
 			signatureProvider: EOSManager.signatureProvider,
 			// Same deal here, type mismatch when there really shouldn't be.
 			textDecoder: new TextDecoder() as any,

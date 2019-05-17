@@ -10,6 +10,7 @@ import { Contract } from './contract';
 import { Account, AccountManager } from '../accounts';
 import { EOSManager } from '../eosManager';
 import { ConfigManager } from '../configManager';
+import { ContractLoader } from './contractLoader';
 
 /**
  * Provides a set of methods to manage contract deployment
@@ -89,10 +90,8 @@ export class ContractDeployer {
 				},
 			],
 		});
-		// Fetch the contract actions and types
-		const { actions, types } = await EOSManager.api.getContract(account.name);
-		// Return our newly deployed contract instance
-		return new Contract(EOSManager.api, contractIdentifier, account, abi, actions, types) as T;
+
+		return await ContractLoader.at<T>(account);
 	}
 
 	/**
@@ -122,7 +121,7 @@ export class ContractDeployer {
 	 * ContractDeployer.deployWithName<MyContractTypeDef>('mycontract', 'mycontractname');
 	 * ```
 	 *
-	 * @note Generating a random private key is not safe in the cryptographic sense. It can be used for testing.
+	 * @note Generating a pseudorandom private key is not safe in the cryptographic sense. It can be used for testing.
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @param accountName Account name
@@ -137,7 +136,15 @@ export class ContractDeployer {
 
 		// Initialize account with name
 		const account = new Account(accountName, privateKey);
+
+		console.log('Created account:');
+		console.log(`Name: ${accountName}`);
+		console.log(`Private Key: ${privateKey}`);
+
+		console.log('Setting up account');
 		await AccountManager.setupAccount(account);
+
+		console.log('Success');
 
 		// Call the deployToAccount method with the account
 		return await ContractDeployer.deployToAccount<T>(contractIdentifier, account);

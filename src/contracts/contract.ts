@@ -14,6 +14,15 @@ export interface ContractActionOptions {
 	from?: Account;
 }
 
+export interface ContractConstructorArgs {
+	eos: Api;
+	identifier?: string;
+	account: Account;
+	abi: Abi;
+	actions: Map<string, Type>;
+	types: Map<string, Type>;
+}
+
 /**
  * Adds additional functionality to the EOSJS `Contract` class
  */
@@ -22,8 +31,9 @@ export class Contract implements EOSJSContract {
 	private _eos: Api;
 	/** @hidden Current contract account */
 	private _account: Account;
-	/** @hidden Contract identifier. Typically the contract file name minus the extension */
-	private _identifier: string;
+	/** @hidden Contract identifier. Typically the contract file name minus the extension.
+	 * Can be undefined when the contract is loaded as already deployed and we're never given an indentifier to map it back to. */
+	private _identifier?: string;
 	/** @hidden Current contract ABI */
 	private _abi: Abi;
 	/** Deployed contract actions */
@@ -36,7 +46,7 @@ export class Contract implements EOSJSContract {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @returns Current contract account
 	 */
-	public get account(): Account {
+	public get account() {
 		return this._account;
 	}
 
@@ -45,18 +55,11 @@ export class Contract implements EOSJSContract {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @returns Contract identifier
 	 */
-	public get identifier(): string {
+	public get identifier() {
 		return this._identifier;
 	}
 
-	constructor(
-		eos: Api,
-		identifier: string,
-		account: Account,
-		abi: Abi,
-		actions: Map<string, Type>,
-		types: Map<string, Type>
-	) {
+	constructor({ eos, identifier, account, abi, actions, types }: ContractConstructorArgs) {
 		// Store contract arguments
 		this._eos = eos;
 		this._identifier = identifier;
