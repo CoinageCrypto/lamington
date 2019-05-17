@@ -15,8 +15,6 @@ const readFile = promisify(readFileCallback);
 
 /** Root config directory path */
 const CACHE_DIRECTORY = '.lamington';
-/** Config file fullpath */
-const CONFIG_FILE_PATH = path.join(CACHE_DIRECTORY, 'config.json');
 /** Default encoding */
 const ENCODING = 'utf8';
 /** Configuration file name */
@@ -31,6 +29,16 @@ export interface LamingtonConfig {
 	exclude?: Array<string>;
 	debugTransactions?: boolean;
 }
+
+/**
+ * Default configuration values which are merged in as the base layer config. Users can override these values by specifying them in their .lamingtonrc
+ */
+const DEFAULT_CONFIG = {
+	debugTransactions: false,
+	keepAlive: false,
+	outDir: CACHE_DIRECTORY,
+	exclude: [],
+};
 
 /**
  * Manages Lamington configuration setup and caching
@@ -56,7 +64,7 @@ export class ConfigManager {
 		// Handle failed GitHub request
 		if (!result.data || !result.data.assets || !Array.isArray(result.data.assets)) {
 			console.error(result);
-			throw new Error('Unexpected response from GitHub API.');
+			throw new Error('Unexpected response from GitHub API. Please try again later.');
 		}
 		// Capture the GitHub url from response
 		const asset = result.data.assets.find((asset: any) =>
@@ -72,90 +80,52 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Fetches the latest EOS repository and freezes version changes
-	 * in [[CONFIG_FILE_PATH]] to maintain a consistent development environment
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Creates a config file if it's not in the current working directory.
 	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param atPath The path to check for the config file. Defaults to '.lamingtonrc'.
 	 */
-	public static async initWithDefaults() {
-		// Load existing configuration
-		const userConfig = {
-			outDir: CACHE_DIRECTORY,
-			keepAlive: false,
-			exclude: [],
-			...(await ConfigManager.readConfigFromProject()),
-		};
-		// Check if configuration exists
-		if (!(await ConfigManager.configExists())) {
-			// Create the config directory
-			await mkdirp(CACHE_DIRECTORY);
-			// Fetch the latest repository configuration
-			const defaultConfig: LamingtonConfig = {
-				cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
-				eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
-			};
-			// Freeze repository image
-			await writeFile(CONFIG_FILE_PATH, JSON.stringify(defaultConfig, null, 4), ENCODING);
-		}
-		// Load cached config
-		const existingConfig = JSON.parse(await readFile(CONFIG_FILE_PATH, ENCODING));
-		// Save cached configuration
-		await writeFile(
-			CONFIG_FILE_PATH,
-			JSON.stringify(
-				{
-					...existingConfig,
-					...userConfig,
-				},
-				null,
-				4
-			),
-			ENCODING
-		);
-		// Load existing configuration
-		await ConfigManager.loadConfigFromDisk();
-	}
+	public static async createConfigIfMissing(atPath = CONFIGURATION_FILE_NAME) {
+		if (await ConfigManager.configExists()) return;
 
-	public static async createConfigWhenMissing() {
-		const atPath = path.join(process.cwd(), '.lamingtonrc');
-		if (await ConfigManager.configExists(atPath)) return;
-		ConfigManager.initWithDefaults();
-		await writeFile(atPath, JSON.stringify(ConfigManager.config, null, 4), ENCODING);
+		// Create the config directory
+		await mkdirp(CACHE_DIRECTORY);
+
+		// Fetch the latest repository configuration
+		const defaultConfig: LamingtonConfig = {
+			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
+			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
+		};
+
+		await writeFile(atPath, JSON.stringify(defaultConfig, null, 4), ENCODING);
 	}
 
 	/**
 	 * Checks the existence of the configuration
-	 * file at the default [[CONFIG_FILE_PATH]] or
+	 * file at the default [[CONFIGURATION_FILE_NAME]] or
 	 * optional path
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param atPath Optional file path for lookup
 	 * @returns Config exists determiner
 	 */
-	public static async configExists(atPath: string = CONFIG_FILE_PATH) {
+	public static configExists(atPath: string = CONFIGURATION_FILE_NAME) {
 		// Should filter out any trailing filename and concatonate
 		// the default filename
-		return await exists(atPath);
+		return exists(atPath);
 	}
 
 	/**
-	 * Loads the existing configuration file into [[ConfigManager.config]]
+	 * Loads an existing configuration file into [[ConfigManager.config]]
 	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param atPath Optional file path for lookup
 	 */
-	public static async loadConfigFromDisk() {
+	public static async loadConfigFromDisk(atPath = CONFIGURATION_FILE_NAME) {
 		// Read existing configuration and store
-		ConfigManager.config = JSON.parse(await readFile(CONFIG_FILE_PATH, ENCODING));
-	}
-
-	/**
-	 * Reads the user defined config file if it exists
-	 * @author Mitch Pierias <github.com/MitchPierias>
-	 * @returns User defined configuration or object
-	 * @hidden
-	 */
-	private static async readConfigFromProject() {
-		return (await exists(CONFIGURATION_FILE_NAME))
-			? JSON.parse(await readFile(CONFIGURATION_FILE_NAME, ENCODING))
-			: {};
+		ConfigManager.config = Object.assign(
+			{},
+			DEFAULT_CONFIG,
+			JSON.parse(await readFile(atPath, ENCODING))
+		);
 	}
 
 	/**
@@ -179,7 +149,7 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get keepAlive() {
-		return ConfigManager.config.keepAlive || false;
+		return ConfigManager.config.keepAlive || DEFAULT_CONFIG.keepAlive;
 	}
 
 	/**
@@ -187,7 +157,7 @@ export class ConfigManager {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static get debugTransactions() {
-		return ConfigManager.config.debugTransactions || false;
+		return ConfigManager.config.debugTransactions || DEFAULT_CONFIG.debugTransactions;
 	}
 
 	/**
@@ -195,7 +165,7 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get outDir() {
-		return ConfigManager.config.outDir || CACHE_DIRECTORY;
+		return ConfigManager.config.outDir || DEFAULT_CONFIG.outDir;
 	}
 
 	/**
@@ -203,6 +173,6 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get exclude() {
-		return ConfigManager.config.exclude || [];
+		return ConfigManager.config.exclude || DEFAULT_CONFIG.exclude;
 	}
 }

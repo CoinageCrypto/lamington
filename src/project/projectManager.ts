@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { ConfigManager, LamingtonConfig } from './../configManager';
 import * as spinner from './../cli/logIndicator';
 import { sleep } from '../utils';
+import { GitIgnoreManager } from '../gitignoreManager';
 
 const exists = promisify(existsCallback);
 const mkdirp = promisify(mkdirpCallback);
@@ -57,8 +58,6 @@ export class ProjectManager {
 		await ProjectManager.configureScripts();
 
 		await ProjectManager.configureDependencies();
-		// Load Configuration
-		await ConfigManager.initWithDefaults();
 
 		await ProjectManager.createProjectStructure();
 
@@ -69,6 +68,10 @@ export class ProjectManager {
 			JSON.stringify(ProjectManager.pkg, null, 4),
 			ENCODING
 		);
+
+		await ConfigManager.createConfigIfMissing();
+
+		await GitIgnoreManager.createIfMissing();
 	}
 
 	/**

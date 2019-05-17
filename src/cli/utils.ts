@@ -61,7 +61,7 @@ const versionFromUrl = (url: string) => {
  * @returns Docker image name
  */
 const dockerImageName = async () => {
-	await ConfigManager.initWithDefaults();
+	await ConfigManager.loadConfigFromDisk();
 
 	return `lamington:eos.${versionFromUrl(ConfigManager.eos)}-cdt.${versionFromUrl(
 		ConfigManager.cdt

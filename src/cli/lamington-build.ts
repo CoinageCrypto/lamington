@@ -10,24 +10,33 @@ import { ConfigManager } from '../configManager';
  */
 const run = async () => {
 	const contract = process.argv[2];
-	// Initialize configuration
-	await ConfigManager.initWithDefaults();
-	// Stop container if running
-	if (!ConfigManager.keepAlive && (await eosIsReady())) {
-		await stopContainer();
+
+	if (!(await ConfigManager.configExists())) {
+		console.log('Project has not yet been initialised.');
+		console.log('Please run lamington init before running this command.');
+
+		process.exit(1);
 	}
-	// This ensures we have our .gitignore inside the .lamington directory
-	await GitIgnoreManager.createIfMissing();
-	// Start the EOSIO container image
+
+	// Start the EOSIO container image if it's not running.
 	if (!(await eosIsReady())) {
 		await startEos();
 	}
+
 	// Build all smart contracts
 	await buildAll([contract]);
+
+	// And stop it if we don't have keepAlive set.
+	if (!ConfigManager.keepAlive) {
+		await stopContainer();
+	}
 };
 
-run().catch(error => {
-	stopContainer().then(() => {
-		throw error;
-	});
+run().catch(async error => {
+	process.exitCode = 1;
+	console.log(error);
+
+	if (!ConfigManager.keepAlive && (await eosIsReady())) {
+		await stopContainer();
+	}
 });

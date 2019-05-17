@@ -10,13 +10,13 @@ import { ConfigManager } from '../configManager';
  */
 const run = async () => {
 	// Initialize the configuration
-	await ConfigManager.initWithDefaults();
+	await ConfigManager.loadConfigFromDisk();
+
 	// Stop running instances for fresh test environment
 	if (await eosIsReady()) {
 		await stopContainer();
 	}
-	// Ensures we have our .gitignore inside the .lamington directory
-	await GitIgnoreManager.createIfMissing();
+
 	// Start an EOSIO instance if not running
 	if (!(await eosIsReady())) {
 		await startEos();
