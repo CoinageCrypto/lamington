@@ -59,12 +59,10 @@ export class AccountManager {
 		if (!account.name) throw new Error('Missing account name.');
 		if (!account.publicKey) throw new Error('Missing public key.');
 		if (!account.privateKey) throw new Error('Missing private key.');
+
 		// Configure the Signature Provider if available
-		if (EOSManager.signatureProvider) {
-			const nonLegacyPublicKey = convertLegacyPublicKey(account.publicKey);
-			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
-			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
-		}
+		EOSManager.addSigningAccountIfMissing(account);
+
 		// Get the system contract
 		const systemContract = await eos.getContract('eosio');
 		// Build account creation actions

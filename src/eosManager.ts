@@ -4,6 +4,7 @@ import { Api, JsonRpc } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { Account } from './accounts';
 import { ConfigManager } from './configManager';
+import { convertLegacyPublicKey } from 'eosjs/dist/eosjs-numeric';
 
 interface InitArgs {
 	adminAccount: Account;
@@ -69,6 +70,26 @@ export class EOSManager {
 	};
 
 	/**
+	 * Ensures our signature provider has the key in question, and if not, adds it.
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param account Account to be unioned into the signature list.
+	 */
+	static addSigningAccountIfMissing = (account: Account) => {
+		if (!account.publicKey || !account.privateKey) {
+			throw new Error(
+				`Provided account ${account.name} is missing a key and cannot be used for signing.`
+			);
+		}
+
+		// If the signature provider doesn't have it
+		if (!EOSManager.signatureProvider.keys.get(account.publicKey)) {
+			const nonLegacyPublicKey = convertLegacyPublicKey(account.publicKey);
+			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
+			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
+		}
+	};
+
+	/**
 	 * Executes a transaction against a connected EOSjs client
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @param transaction EOSIO transaction object
@@ -78,7 +99,7 @@ export class EOSManager {
 	static transact = (
 		transaction: any,
 		eos = EOSManager.api,
-		options = { blocksBehind: 3, expireSeconds: 30 }
+		options = { blocksBehind: 3, expireSeconds: 30, sign: true, broadcast: true }
 	) => {
 		if (ConfigManager.debugTransactions) {
 			const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);

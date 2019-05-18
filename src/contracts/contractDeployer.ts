@@ -35,6 +35,8 @@ export class ContractDeployer {
 		contractIdentifier: string,
 		account: Account
 	) {
+		EOSManager.addSigningAccountIfMissing(account);
+
 		// Initialize the serialization buffer
 		const buffer = new Serialize.SerialBuffer({
 			textEncoder: EOSManager.api.textEncoder,

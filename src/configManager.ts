@@ -133,7 +133,7 @@ export class ConfigManager {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static get eos() {
-		return ConfigManager.config.eos;
+		return (ConfigManager.config && ConfigManager.config.eos) || '';
 	}
 
 	/**
@@ -141,7 +141,7 @@ export class ConfigManager {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static get cdt() {
-		return ConfigManager.config.cdt;
+		return (ConfigManager.config && ConfigManager.config.cdt) || '';
 	}
 
 	/**
@@ -149,7 +149,7 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get keepAlive() {
-		return ConfigManager.config.keepAlive || DEFAULT_CONFIG.keepAlive;
+		return (ConfigManager.config && ConfigManager.config.keepAlive) || DEFAULT_CONFIG.keepAlive;
 	}
 
 	/**
@@ -157,7 +157,11 @@ export class ConfigManager {
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static get debugTransactions() {
-		return ConfigManager.config.debugTransactions || DEFAULT_CONFIG.debugTransactions;
+		return true;
+		return (
+			(ConfigManager.config && ConfigManager.config.debugTransactions) ||
+			DEFAULT_CONFIG.debugTransactions
+		);
 	}
 
 	/**
@@ -165,7 +169,7 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get outDir() {
-		return ConfigManager.config.outDir || DEFAULT_CONFIG.outDir;
+		return (ConfigManager.config && ConfigManager.config.outDir) || DEFAULT_CONFIG.outDir;
 	}
 
 	/**
@@ -173,6 +177,6 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	static get exclude() {
-		return ConfigManager.config.exclude || DEFAULT_CONFIG.exclude;
+		return (ConfigManager.config && ConfigManager.config.exclude) || DEFAULT_CONFIG.exclude;
 	}
 }
