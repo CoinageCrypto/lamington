@@ -7,13 +7,8 @@ import { ConfigManager } from '../configManager';
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 const run = async () => {
-	if (!(await ConfigManager.configExists())) {
-		console.log('Project has not yet been initialised.');
-		console.log('Please run lamington init before running this command.');
-
-		process.exit(1);
-	}
-
+	
+	await ConfigManager.initWithDefaults();
 	// Stop running instances for fresh test environment
 	if (await eosIsReady()) {
 		await stopContainer();

@@ -9,23 +9,16 @@ import { ConfigManager } from '../configManager';
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 const run = async () => {
+	// Capture CLI defined contract identifiers
 	const contract = process.argv[2];
-
-	if (!(await ConfigManager.configExists())) {
-		console.log('Project has not yet been initialised.');
-		console.log('Please run lamington init before running this command.');
-
-		process.exit(1);
-	}
-
+	// Initialize Lamington configuration
+	await ConfigManager.initWithDefaults()
 	// Start the EOSIO container image if it's not running.
 	if (!(await eosIsReady())) {
 		await startEos();
 	}
-
 	// Build all smart contracts
 	await buildAll([contract]);
-
 	// And stop it if we don't have keepAlive set.
 	if (!ConfigManager.keepAlive) {
 		await stopContainer();

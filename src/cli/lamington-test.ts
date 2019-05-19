@@ -10,7 +10,7 @@ import { ConfigManager } from '../configManager';
  */
 const run = async () => {
 	// Initialize the configuration
-	await ConfigManager.loadConfigFromDisk();
+	await ConfigManager.initWithDefaults()
 
 	// Stop running instances for fresh test environment
 	if (await eosIsReady()) {

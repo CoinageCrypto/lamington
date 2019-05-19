@@ -48,6 +48,24 @@ export class ConfigManager {
 	private static config: LamingtonConfig;
 
 	/**
+	 * Initialize application configuration using the user
+	 * defined configurations and defaults
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 */
+	public static async initWithDefaults() {
+
+		if (!(await ConfigManager.configExists())) {
+			console.log('Project has not yet been initialized.');
+			console.log('Please run lamington init before running this command.');
+	
+			process.exit(1);
+		}
+	
+		await ConfigManager.loadConfigFromDisk();
+	}
+
+	/**
 	 * Downloads the organization's latest repository release image and
 	 * returns the assets matching the specified filter
 	 * @author Kevin Brown <github.com/thekevinbrown>
@@ -153,15 +171,14 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the container keep alive setting or false
+	 * Returns the container's debug log output setting
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static get debugTransactions() {
-		return true;
 		return (
 			(ConfigManager.config && ConfigManager.config.debugTransactions) ||
 			DEFAULT_CONFIG.debugTransactions
-		);
+		)
 	}
 
 	/**
