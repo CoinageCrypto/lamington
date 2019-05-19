@@ -13,14 +13,14 @@ const mkdirp = promisify(mkdirpCallback);
 const writeFile = promisify(writeFileCallback);
 const readFile = promisify(readFileCallback);
 
-/** Root config directory path */
+/** @hidden Root config directory path */
 const CACHE_DIRECTORY = '.lamington';
-/** Default encoding */
+/** @hidden Default encoding */
 const ENCODING = 'utf8';
-/** Configuration file name */
+/** @hidden Configuration file name */
 const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 
-/** EOSIO and EOSIO.CDT configuration file paths */
+/** @hidden Configuration object structure */
 export interface LamingtonConfig {
 	cdt: string;
 	eos: string;
@@ -28,12 +28,23 @@ export interface LamingtonConfig {
 	outDir?: string;
 	exclude?: Array<string>;
 	debugTransactions?: boolean;
+	debug:LamingtonDebugLevel;
+}
+
+/** Level of debug output */
+export enum LamingtonDebugLevel {
+	NONE = 0,
+	TRANSACTIONS,
+	ALL
 }
 
 /**
- * Default configuration values which are merged in as the base layer config. Users can override these values by specifying them in their .lamingtonrc
+ * Default configuration values which are merged in
+ * as the base layer config. Users can override these
+ * values by specifying them in their `.lamingtonrc`
  */
 const DEFAULT_CONFIG = {
+	debug:LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
@@ -113,6 +124,7 @@ export class ConfigManager {
 		const defaultConfig: LamingtonConfig = {
 			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
 			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
+			...DEFAULT_CONFIG
 		};
 
 		await writeFile(atPath, JSON.stringify(defaultConfig, null, 4), ENCODING);
