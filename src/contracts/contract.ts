@@ -102,6 +102,9 @@ export class Contract implements EOSJSContract {
 					authorization = options.from;
 				}
 
+				// Ensure we have the key to sign with.
+				EOSManager.addSigningAccountIfMissing(authorization);
+
 				return EOSManager.transact(
 					{
 						actions: [
