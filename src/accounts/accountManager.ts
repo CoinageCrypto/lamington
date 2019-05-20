@@ -158,6 +158,10 @@ export class AccountManager {
 				`Code permission is already present on account ${account.name} for contract ${account.name}`
 			);
 		}
+
+		// Ensure we're good to sign this transaction.
+		EOSManager.addSigningAccountIfMissing(account);
+
 		// Append the `eosio.code` permission to existing
 		required_auth.accounts.push({
 			permission: { actor: account.name, permission: 'eosio.code' },
