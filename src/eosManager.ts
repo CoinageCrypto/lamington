@@ -99,7 +99,7 @@ export class EOSManager {
 	static transact = (
 		transaction: any,
 		eos = EOSManager.api,
-		options = { blocksBehind: 3, expireSeconds: 30, sign: true, broadcast: true }
+		options = { blocksBehind: 3, expireSeconds: 30 }
 	) => {
 		if (ConfigManager.debugTransactions) {
 			const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);
