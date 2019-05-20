@@ -1,4 +1,4 @@
-import { Account } from '../accounts';
+import { Account, AccountManager } from '../accounts';
 import { nextBlock } from '../utils';
 import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
@@ -135,7 +135,7 @@ export class Contract implements EOSJSContract {
 	 * @param table The table name
 	 * @param scope Optional table scope, defaults to the table name
 	 */
-	getTableRows = async (table: string, scope?: string) => {
+	public getTableRows = async (table: string, scope?: string) => {
 		// Wait for the next block to appear before we query the values.
 		await nextBlock();
 
@@ -184,4 +184,12 @@ export class Contract implements EOSJSContract {
 
 		return result;
 	};
+
+	/**
+	 * Grants `eosio.code` permission to the contract account's `active` key
+	 * @note Can also be called from AccountManager, as the action is technically an account based action.
+	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 */
+	public addCodePermission = () => AccountManager.addCodePermission(this._account);
 }

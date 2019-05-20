@@ -136,13 +136,12 @@ export class AccountManager {
 
 	/**
 	 * Grants `eosio.code` permission to the specified account's `active` key
-	 * @note Should be moved to the `contracts/contract.ts` I think?
-	 * @note Actually it is `account` based and not specific to contracts...
+	 * @note Can also be called directly on a contract.
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param account Account without `eosio.code` permissions
 	 */
-	static addCodePermission = async (account: Account) => {
+	public static addCodePermission = async (account: Account) => {
 		// We need to get their existing permissions, then add in a new eosio.code permission for this contract.
 		const { permissions } = await EOSManager.rpc.get_account(account.name);
 		const { required_auth } = permissions.find(
