@@ -75,14 +75,12 @@ export class EOSManager {
 	 * @param account Account to be unioned into the signature list.
 	 */
 	static addSigningAccountIfMissing = (account: Account) => {
-		if (!account.publicKey || !account.privateKey) {
-			throw new Error(
-				`Provided account ${account.name} is missing a key and cannot be used for signing.`
-			);
-		}
-
-		// If the signature provider doesn't have it
-		if (!EOSManager.signatureProvider.keys.get(account.publicKey)) {
+		// If there are keys and signature provider doesn't have it, add it on in.
+		if (
+			account.publicKey &&
+			account.privateKey &&
+			!EOSManager.signatureProvider.keys.get(account.publicKey)
+		) {
 			const nonLegacyPublicKey = convertLegacyPublicKey(account.publicKey);
 			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
 			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
