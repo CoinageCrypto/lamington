@@ -10,13 +10,19 @@ export class ContractLoader {
 	 * Loads a contract instance for a contract which is already deployed to the blockchain.
 	 *
 	 * ```typescript
-	 * ContractLoader.at<MyContractTypeDef>('mycontract');
+	 * ContractLoader.at<MyContractTypeDef>(myContractAccount);
+	 *
+	 * // or
+	 *
+	 * ContractLoader.at<MyContractTypeDef>('my.contract');
 	 * ```
 	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @param accountName The account name where the contract is already deployed.
+	 * @param accountOrName The account or account name where the contract is already deployed.
 	 * @returns Contract instance
 	 */
-	public static async at<T extends Contract>(account: Account) {
+	public static async at<T extends Contract>(accountOrName: Account | string) {
+		const account = accountOrName instanceof Account ? accountOrName : new Account(accountOrName);
+
 		// Load the ABI from the blockchain.
 		const { abi } = await EOSManager.rpc.get_abi(account.name);
 
