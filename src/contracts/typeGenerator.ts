@@ -75,7 +75,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'',
 	];
 	// Define imports
-	const imports = ['Account', 'Contract'];
+	const imports = ['Account', 'Contract', 'GetTableRowsOptions'];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
@@ -106,7 +106,9 @@ export const generateTypes = async (contractIdentifier: string) => {
 	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
-			`${camelCase(table.name)}(scope?: string): Promise<TableRowsResult<${pascalCase(
+			`${camelCase(
+				table.name
+			)}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(
 				contractName
 			)}${pascalCase(table.name)}>>;`
 	);

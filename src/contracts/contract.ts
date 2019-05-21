@@ -23,6 +23,18 @@ export interface ContractConstructorArgs {
 	types: Map<string, Type>;
 }
 
+export interface GetTableRowsOptions {
+	scope?: string;
+	tableKey?: string;
+	lowerBound?: any;
+	upperBound?: any;
+	indexPosition?: any;
+	keyType?: any;
+	limit?: number;
+	reverse?: boolean;
+	showPayer?: boolean;
+}
+
 /**
  * Adds additional functionality to the EOSJS `Contract` class
  */
@@ -134,14 +146,23 @@ export class Contract implements EOSJSContract {
 	 * @note Implements a temporary patch for the EOSjs `bool` mapping error
 	 * @param table The table name
 	 * @param scope Optional table scope, defaults to the table name
+	 * @note The original EOSJS typings for this are just `any`. I'd love to improve that.
 	 */
-	public getTableRows = async (table: string, scope?: string) => {
+	public getTableRows = async (table: string, options?: GetTableRowsOptions) => {
 		// Wait for the next block to appear before we query the values.
 		await nextBlock();
 
 		const result = await this._eos.rpc.get_table_rows({
 			code: this.account.name,
-			scope: scope || this.account.name,
+			scope: (options && options.scope) || this.account.name,
+			table_key: options && options.tableKey,
+			lower_bound: options && options.lowerBound,
+			upper_bound: options && options.upperBound,
+			index_position: options && options.indexPosition,
+			key_type: options && options.keyType,
+			limit: options && options.limit,
+			reverse: options && options.reverse,
+			show_payer: options && options.showPayer,
 			table,
 			json: true,
 		});
