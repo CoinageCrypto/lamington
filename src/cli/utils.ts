@@ -248,6 +248,12 @@ export const runTests = async () => {
 	if (await exists(path.join(WORKING_DIRECTORY, 'tsconfig.json'))) {
 		require('ts-mocha');
 	}
+
+	// Register their .env file variables if they have one.
+	if (await exists(path.join(WORKING_DIRECTORY, '.env'))) {
+		require('dotenv').config({ path: path.join(WORKING_DIRECTORY, '.env') });
+	}
+
 	// Find all existing test file paths
 	const files = [
 		// All ts and js files under the test folder get added.
