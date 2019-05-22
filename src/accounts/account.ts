@@ -1,7 +1,7 @@
-import { Permissions } from './permissions';
 import * as ecc from 'eosjs-ecc';
-import { Contract } from '../contracts';
+
 import { AccountManager } from './accountManager';
+import { Permissions } from './permissions';
 
 export class Account {
 	/** EOSIO account name */
@@ -18,6 +18,10 @@ export class Account {
 		this.name = name;
 
 		if (privateKey) {
+			if (!ecc.isValidPrivate(privateKey)) {
+				throw new Error('Private key is not valid.');
+			}
+
 			this.privateKey = privateKey;
 
 			this.publicKey = ecc.privateToPublic(privateKey);
