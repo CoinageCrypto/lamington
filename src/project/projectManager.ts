@@ -55,7 +55,7 @@ export class ProjectManager {
 
 		ProjectManager.pkg = JSON.parse(packageJson);
 
-		await ProjectManager.configureScripts();
+		await ProjectManager.injectScripts();
 
 		await ProjectManager.configureDependencies();
 
@@ -80,7 +80,7 @@ export class ProjectManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @hidden
 	 */
-	private static async configureScripts() {
+	private static async injectScripts() {
 		spinner.create('Adding scripts');
 		const { scripts } = ProjectManager.pkg;
 		const defaultScripts = {
@@ -133,9 +133,16 @@ export class ProjectManager {
 		spinner.end('Created directory structure');
 	}
 
+	/**
+	 * 
+	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * @param dirName Directory to create
+	 * @private
+	 */
 	private static async createDirectoryIfMissing(dirName: string) {
-		if (!(await exists(path.join(process.cwd(), dirName)))) {
-			await mkdirp(path.join(process.cwd(), dirName));
-		}
+		// Escape if the directory exists
+		if (await exists(path.join(process.cwd(), dirName))) return;
+		// Create the new directory
+		await mkdirp(path.join(process.cwd(), dirName));
 	}
 }
