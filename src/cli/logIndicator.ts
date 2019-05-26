@@ -16,11 +16,24 @@ export const create = (text: string) => {
 		delete cache.spinner;
 	}
 	// Create and cache spinner
-	cache.spinner = ora({
-		text: colors.white(text),
-		color: 'magenta',
-	}).start();
+	update(text);
 };
+
+/**
+ * Updates the text of the current spinner
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param text CLI output text to display
+ */
+export const update = (text:string) => {
+	// Create spinner when missing
+	if (!cache.spinner)
+		cache.spinner = ora({
+			text: colors.white(text),
+			color: 'magenta',
+		}).start();
+	// Update spinner text
+	cache.spinner.text = colors.white(text);
+}
 
 /**
  * Terminates the current spinner with the specified output message
