@@ -47,7 +47,7 @@
 	"devDependencies": {
 		"@types/chai": "4.1.7",
 		"@types/mkdirp": "0.5.2",
-		"@types/mocha": "5.2.6",
+		"@types/mocha": "5.2.7",
 		"@types/ncp": "^2.0.1",
 		"@types/node": "12.0.3",
 		"@types/node-fetch": "2.3.4",
