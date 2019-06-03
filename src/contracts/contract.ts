@@ -12,6 +12,7 @@ export interface ContractActionParameters {
 
 export interface ContractActionOptions {
 	from?: Account;
+	debug?: boolean;
 }
 
 export interface ContractConstructorArgs {
@@ -128,7 +129,8 @@ export class Contract implements EOSJSContract {
 							},
 						],
 					},
-					eos
+					eos,
+					{ debug: options && options.debug }
 				);
 			};
 		}

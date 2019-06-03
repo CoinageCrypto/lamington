@@ -97,9 +97,11 @@ export class EOSManager {
 	static transact = (
 		transaction: any,
 		eos = EOSManager.api,
-		options = { blocksBehind: 3, expireSeconds: 30 }
+		options?: { debug?: boolean; blocksBehind?: number; expireSeconds?: number }
 	) => {
-		if (ConfigManager.debugTransactions) {
+		const flattenedOptions = Object.assign({ blocksBehind: 1, expireSeconds: 30 }, options);
+
+		if (ConfigManager.debugTransactions || flattenedOptions.debug) {
 			const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);
 			console.log(`========== Calling ${calls.join(', ')} ==========`);
 			console.log('Transaction: ', JSON.stringify(transaction, null, 4));
@@ -107,6 +109,6 @@ export class EOSManager {
 			console.log();
 		}
 
-		return eos.transact(transaction, options);
+		return eos.transact(transaction, flattenedOptions);
 	};
 }
