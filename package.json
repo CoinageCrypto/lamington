@@ -57,7 +57,7 @@
 		"eosjs": "20.0.0",
 		"eosjs-ecc": "4.0.4",
 		"prettier": "1.18.2",
-		"ts-node": "8.2.0",
+		"ts-node": "8.3.0",
 		"typedoc": "0.14.2",
 		"typescript": "3.4.5"
 	},
