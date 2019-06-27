@@ -65,7 +65,7 @@ export class EOSManager {
 			signatureProvider: EOSManager.signatureProvider,
 			// Same deal here, type mismatch when there really shouldn't be.
 			textDecoder: new TextDecoder() as any,
-			textEncoder: new TextEncoder(),
+			textEncoder: new TextEncoder() as any,
 		});
 	};
 
@@ -76,14 +76,13 @@ export class EOSManager {
 	 */
 	static addSigningAccountIfMissing = (account: Account) => {
 		// If there are keys and signature provider doesn't have it, add it on in.
-		if (
-			account.publicKey &&
-			account.privateKey &&
-			!EOSManager.signatureProvider.keys.get(account.publicKey)
-		) {
+		if (account.publicKey && account.privateKey) {
 			const nonLegacyPublicKey = convertLegacyPublicKey(account.publicKey);
-			EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
-			EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
+
+			if (!EOSManager.signatureProvider.keys.get(nonLegacyPublicKey)) {
+				EOSManager.signatureProvider.keys.set(nonLegacyPublicKey, account.privateKey);
+				EOSManager.signatureProvider.availableKeys.push(nonLegacyPublicKey);
+			}
 		}
 	};
 
@@ -94,7 +93,7 @@ export class EOSManager {
 	 * @param eos Connected EOSjs client
 	 * @param options Additional transaction options
 	 */
-	static transact = (
+	static transact = async (
 		transaction: any,
 		eos = EOSManager.api,
 		options?: { debug?: boolean; blocksBehind?: number; expireSeconds?: number }
@@ -109,6 +108,15 @@ export class EOSManager {
 			console.log();
 		}
 
-		return eos.transact(transaction, flattenedOptions);
+		console.log('EOS signature provider', eos.signatureProvider);
+		const availableKeys = await eos.signatureProvider.getAvailableKeys();
+		console.log('Available keys: ', availableKeys);
+		const requiredKeys = await eos.authorityProvider.getRequiredKeys({
+			transaction,
+			availableKeys,
+		});
+		console.log('Required keys: ', requiredKeys);
+
+		return await eos.transact(transaction, flattenedOptions);
 	};
 }
