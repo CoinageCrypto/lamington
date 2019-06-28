@@ -142,6 +142,9 @@ export class AccountManager {
 	 * @param account Account without `eosio.code` permissions
 	 */
 	public static addCodePermission = async (account: Account) => {
+		// Ensure we have the private key to do this if they've passed one in.
+		EOSManager.addSigningAccountIfMissing(account);
+
 		// We need to get their existing permissions, then add in a new eosio.code permission for this contract.
 		const { permissions } = await EOSManager.rpc.get_account(account.name);
 		const { required_auth } = permissions.find(
