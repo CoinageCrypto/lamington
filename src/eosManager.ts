@@ -108,15 +108,6 @@ export class EOSManager {
 			console.log();
 		}
 
-		console.log('EOS signature provider', eos.signatureProvider);
-		const availableKeys = await eos.signatureProvider.getAvailableKeys();
-		console.log('Available keys: ', availableKeys);
-		const requiredKeys = await eos.authorityProvider.getRequiredKeys({
-			transaction,
-			availableKeys,
-		});
-		console.log('Required keys: ', requiredKeys);
-
 		return await eos.transact(transaction, flattenedOptions);
 	};
 }
