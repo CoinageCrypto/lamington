@@ -24,7 +24,7 @@ export const create = (text: string) => {
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param text CLI output text to display
  */
-export const update = (text:string) => {
+export const update = (text: string) => {
 	// Create spinner when missing
 	if (!cache.spinner)
 		cache.spinner = ora({
@@ -33,7 +33,7 @@ export const update = (text:string) => {
 		}).start();
 	// Update spinner text
 	cache.spinner.text = colors.white(text);
-}
+};
 
 /**
  * Terminates the current spinner with the specified output message

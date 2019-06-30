@@ -12,7 +12,7 @@ const run = async () => {
 	// Capture CLI defined contract identifiers
 	const contract = process.argv[2];
 	// Initialize Lamington configuration
-	await ConfigManager.initWithDefaults()
+	await ConfigManager.initWithDefaults();
 	// Start the EOSIO container image if it's not running.
 	if (!(await eosIsReady())) {
 		await startEos();

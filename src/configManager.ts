@@ -28,14 +28,14 @@ export interface LamingtonConfig {
 	outDir?: string;
 	exclude?: Array<string>;
 	debugTransactions?: boolean;
-	debug:LamingtonDebugLevel;
+	debug: LamingtonDebugLevel;
 }
 
 /** Level of debug output */
 export enum LamingtonDebugLevel {
 	NONE = 0,
 	TRANSACTIONS,
-	ALL
+	ALL,
 }
 
 /**
@@ -44,7 +44,7 @@ export enum LamingtonDebugLevel {
  * values by specifying them in their `.lamingtonrc`
  */
 const DEFAULT_CONFIG = {
-	debug:LamingtonDebugLevel.NONE,
+	debug: LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
@@ -65,14 +65,13 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
-
 		if (!(await ConfigManager.configExists())) {
 			console.log('Project has not yet been initialized.');
 			console.log('Please run lamington init before running this command.');
-	
+
 			process.exit(1);
 		}
-	
+
 		await ConfigManager.loadConfigFromDisk();
 	}
 
@@ -124,7 +123,7 @@ export class ConfigManager {
 		const defaultConfig: LamingtonConfig = {
 			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
 			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
-			...DEFAULT_CONFIG
+			...DEFAULT_CONFIG,
 		};
 
 		await writeFile(atPath, JSON.stringify(defaultConfig, null, 4), ENCODING);
@@ -190,7 +189,7 @@ export class ConfigManager {
 		return (
 			(ConfigManager.config && ConfigManager.config.debugTransactions) ||
 			DEFAULT_CONFIG.debugTransactions
-		)
+		);
 	}
 
 	/**

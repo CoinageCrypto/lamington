@@ -7,7 +7,6 @@ import { ConfigManager } from '../configManager';
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 const run = async () => {
-	
 	await ConfigManager.initWithDefaults();
 	// Stop running instances for fresh test environment
 	if (await eosIsReady()) {
