@@ -5,6 +5,7 @@ import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { camelCase } from './utils';
+import { ActionGroup } from './actionGroup';
 
 export interface ContractActionParameters {
 	[key: string]: any;
@@ -118,20 +119,24 @@ export class Contract implements EOSJSContract {
 				// Ensure we have the key to sign with.
 				EOSManager.addSigningAccountIfMissing(authorization);
 
-				return EOSManager.transact(
-					{
-						actions: [
-							{
-								account: account.name,
-								name: action.name,
-								authorization: authorization.active,
-								data,
-							},
-						],
-					},
-					eos,
-					{ debug: options && options.debug }
-				);
+				const actionToSend = {
+					account: account.name,
+					name: action.name,
+					authorization: authorization.active,
+					data,
+				};
+
+				if (ActionGroup.activeGroup) {
+					return ActionGroup.activeGroup.addAction(actionToSend);
+				} else {
+					return EOSManager.transact(
+						{
+							actions: [],
+						},
+						eos,
+						{ debug: options && options.debug }
+					);
+				}
 			};
 		}
 		// And now the tables.
