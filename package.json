@@ -12,7 +12,7 @@
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
+		"test": "TS_NODE_FILES=true mocha --require ts-node/register src/**/*.test.ts"
 	},
 	"repository": {
 		"type": "git",
