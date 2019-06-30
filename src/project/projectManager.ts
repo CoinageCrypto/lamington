@@ -1,19 +1,17 @@
 import * as colors from 'colors';
 import * as path from 'path';
 import * as mkdirpCallback from 'mkdirp';
-import axios from 'axios';
 import {
 	readFile as readFileCallback,
 	writeFile as writeFileCallback,
 	exists as existsCallback,
-	readdir as readdirCallback
+	readdir as readdirCallback,
 } from 'fs';
 import { ncp as ncpCallback } from 'ncp';
 import * as rimrafCallback from 'rimraf';
 import { promisify } from 'util';
-import { ConfigManager, LamingtonConfig } from './../configManager';
+import { ConfigManager } from './../configManager';
 import * as spinner from './../cli/logIndicator';
-import { sleep } from '../utils';
 import { GitIgnoreManager } from '../gitignoreManager';
 
 const exists = promisify(existsCallback);
@@ -31,7 +29,7 @@ const ENCODING = 'utf8';
 const DEFAULT_SCRIPTS = {
 	build: 'lamington build',
 	test: 'lamington test',
-}
+};
 
 /** Required project dependencies */
 const DEFAULT_DEV_DEPENDENCIES = {
@@ -43,7 +41,6 @@ const DEFAULT_DEV_DEPENDENCIES = {
  * @author Mitch Pierias <github.com/MitchPierias>
  */
 export class ProjectManager {
-
 	/** @hidden Reference to the local `package.json` file */
 	private static cache: {
 		scripts?: { [key: string]: string };
@@ -55,9 +52,8 @@ export class ProjectManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
-
 		await ProjectManager.cloneExampleProject();
-		
+
 		await ProjectManager.loadExistingProject();
 
 		await ProjectManager.injectScripts();
@@ -137,42 +133,45 @@ export class ProjectManager {
 		// Check for existing contract files
 		await ProjectManager.createDirectoryIfMissing('contracts');
 		const files = await readdir(path.join(process.cwd(), 'contracts'));
-		if (files.length > 0)
-			return spinner.end('Existing contracts found');
+		if (files.length > 0) return spinner.end('Existing contracts found');
 		// Attempt clone and merge of example project
 		try {
-
 			const got = require('got');
 			const tar = require('tar');
 			const cloneUrl = `https://codeload.github.com/MitchPierias/EOSIO-Lamington-Boilerplate/tar.gz/master`;
 
-			spinner.update('Cloning example project')
-			
+			spinner.update('Cloning example project');
+
 			return new Promise(async (resolve, reject) => {
 				// Ensure tmp directory exists and capture directory path
 				const tmpPath = await ProjectManager.createDirectoryIfMissing('__tmp__');
 				// Stream the repo clone and untar
-				got.stream(cloneUrl).pipe(tar.extract({
-					cwd: tmpPath,
-					strip:1
-				})).on('error', (error:Error) => {
-					reject(error);
-				}).on('end', async () => {
-					// Clone example repository into tmp
-					const clonedFiles = await readdir(tmpPath);
-					if (clonedFiles.length <= 0)
-						throw new Error(`No files cloned from repo ${cloneUrl}`);
-					// Merge example contracts into current project
-					await ncp(path.join(tmpPath, 'contracts'), path.join(process.cwd(), 'contracts'));
-					// Cleanup temporary directory
-					spinner.update('Cleaning temporary files');
-					await rimraf(tmpPath);
-					resolve(true);
-				});
+				got
+					.stream(cloneUrl)
+					.pipe(
+						tar.extract({
+							cwd: tmpPath,
+							strip: 1,
+						})
+					)
+					.on('error', (error: Error) => {
+						reject(error);
+					})
+					.on('end', async () => {
+						// Clone example repository into tmp
+						const clonedFiles = await readdir(tmpPath);
+						if (clonedFiles.length <= 0) throw new Error(`No files cloned from repo ${cloneUrl}`);
+						// Merge example contracts into current project
+						await ncp(path.join(tmpPath, 'contracts'), path.join(process.cwd(), 'contracts'));
+						// Cleanup temporary directory
+						spinner.update('Cleaning temporary files');
+						await rimraf(tmpPath);
+						resolve(true);
+					});
 			});
 		} catch (error) {
 			spinner.fail('Failed to clone repository');
-			console.log(error)
+			console.log(error);
 		}
 	}
 
@@ -187,8 +186,7 @@ export class ProjectManager {
 		// Construct directory path
 		const dirPath = path.join(process.cwd(), dirName);
 		// Create directory if missing
-		if (!await exists(dirPath))
-			await mkdirp(path.join(process.cwd(), dirName));
+		if (!(await exists(dirPath))) await mkdirp(path.join(process.cwd(), dirName));
 		// Return the directory name
 		return dirPath;
 	}
