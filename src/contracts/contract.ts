@@ -89,17 +89,13 @@ export class Contract implements EOSJSContract {
 				// Copy the params across for the call.
 				if (arguments.length < action.fields.length) {
 					throw new Error(
-						`Insufficient arguments supplied to ${action.name}. Expected ${
-							action.fields.length
-						} got ${arguments.length}.`
+						`Insufficient arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
 				if (arguments.length > action.fields.length + 1) {
 					throw new Error(
-						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${
-							arguments.length
-						}.`
+						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
@@ -131,7 +127,7 @@ export class Contract implements EOSJSContract {
 				} else {
 					return EOSManager.transact(
 						{
-							actions: [],
+							actions: [actionToSend],
 						},
 						eos,
 						{ debug: options && options.debug }
@@ -199,9 +195,7 @@ export class Contract implements EOSJSContract {
 
 					if (currentValue !== 0 && currentValue !== 1) {
 						throw new Error(
-							`Invalid value while casting to boolean for ${
-								field.name
-							} field on row. Got ${currentValue}, expected 0 or 1.`
+							`Invalid value while casting to boolean for ${field.name} field on row. Got ${currentValue}, expected 0 or 1.`
 						);
 					}
 
