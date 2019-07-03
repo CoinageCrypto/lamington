@@ -1,3 +1,4 @@
+export * from './actionGroup';
 export * from './contract';
 export * from './contractDeployer';
 export * from './contractLoader';
