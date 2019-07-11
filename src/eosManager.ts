@@ -45,7 +45,6 @@ export class EOSManager {
 	 * Initializes a connection to any EOSIO node and sets the administration keys which
 	 * Lamington uses to deploy contracts, create accounts, etc.
 	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @example
 	 */
 	static init = ({ httpEndpoint, adminAccount, chainId }: InitArgs) => {
 		// Create eosio account and configure signature provider
@@ -107,15 +106,6 @@ export class EOSManager {
 			console.log('Options: ', options);
 			console.log();
 		}
-
-		console.log('EOS signature provider', eos.signatureProvider);
-		const availableKeys = await eos.signatureProvider.getAvailableKeys();
-		console.log('Available keys: ', availableKeys);
-		const requiredKeys = await eos.authorityProvider.getRequiredKeys({
-			transaction,
-			availableKeys,
-		});
-		console.log('Required keys: ', requiredKeys);
 
 		return await eos.transact(transaction, flattenedOptions);
 	};

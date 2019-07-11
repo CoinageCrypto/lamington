@@ -6,7 +6,6 @@ import { ConfigManager } from '../configManager';
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 const run = async () => {
-	
 	await ConfigManager.initWithDefaults();
 
 	if (!(await eosIsReady())) {

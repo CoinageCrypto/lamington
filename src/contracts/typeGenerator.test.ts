@@ -1,4 +1,7 @@
 import { assert } from 'chai';
+
+import { ConfigManager } from '../configManager';
+import { eosIsReady, startEos, buildAll, stopContainer } from '../cli/utils';
 import { mapParameterType } from './typeGenerator';
 
 /**
@@ -37,18 +40,18 @@ const stringNumberTypes = [
 	'table_name',
 ];
 
-describe('type generator', () => {
-	context('map parameter types', () => {
-		it(`should map 'string' to 'string'`, () => {
+describe('type generator', function() {
+	context('map parameter types', function() {
+		it(`should map 'string' to 'string'`, function() {
 			assert.equal(mapParameterType('string'), 'string', `'string' types should map to 'string'`);
 		});
 
-		it(`should map 'bool' to 'boolean'`, () => {
+		it(`should map 'bool' to 'boolean'`, function() {
 			assert.equal(mapParameterType('bool'), 'boolean');
 		});
 
-		context('eos types', () => {
-			it(`should map name types to 'string|number'`, () => {
+		context('eos types', function() {
+			it(`should map name types to 'string|number'`, function() {
 				stringNumberTypes.map(type =>
 					assert.equal(
 						mapParameterType(type),
@@ -58,7 +61,7 @@ describe('type generator', () => {
 				);
 			});
 
-			it(`should map 'checksum' to 'string'`, () => {
+			it(`should map 'checksum' to 'string'`, function() {
 				assert.equal(
 					mapParameterType('checksum'),
 					'string',
@@ -67,9 +70,9 @@ describe('type generator', () => {
 			});
 		});
 
-		context('big numbers', () => {
+		context('big numbers', function() {
 			numberTypes.forEach(type => {
-				it(`should map '${type}' to 'number'`, () => {
+				it(`should map '${type}' to 'number'`, function() {
 					assert.equal(
 						mapParameterType(type),
 						'number',
@@ -79,14 +82,38 @@ describe('type generator', () => {
 			});
 		});
 
-		context('complex types', () => {
-			it(`should handle array types`, () => {
+		context('complex types', function() {
+			it(`should handle array types`, function() {
 				assert.equal(mapParameterType('bool[]'), 'Array<boolean>');
 			});
 
-			xit(`should handle vector types`, () => {
+			xit(`should handle vector types`, function() {
 				assert.equal(mapParameterType('vector<string>'), 'Array<string>');
 			});
+		});
+	});
+
+	context('type generation integration tests', function() {
+		before(async function() {
+			// This can take a long time.
+			this.timeout(400000);
+
+			await ConfigManager.initWithDefaults();
+			// Start the EOSIO container image if it's not running.
+			if (!(await eosIsReady())) {
+				await startEos();
+			}
+			// Build all smart contracts
+			await buildAll();
+
+			// And stop it if we don't have keepAlive set.
+			if (!ConfigManager.keepAlive) {
+				await stopContainer();
+			}
+		});
+
+		it('should generate an expected result from the eosio.token contract file', async function() {
+			console.log('yup');
 		});
 	});
 });
