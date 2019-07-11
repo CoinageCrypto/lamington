@@ -1,7 +1,6 @@
 import * as colors from 'colors';
 import * as path from 'path';
 import * as mkdirpCallback from 'mkdirp';
-import axios from 'axios';
 import {
 	readFile as readFileCallback,
 	writeFile as writeFileCallback,
@@ -11,9 +10,8 @@ import {
 import { ncp as ncpCallback } from 'ncp';
 import * as rimrafCallback from 'rimraf';
 import { promisify } from 'util';
-import { ConfigManager, LamingtonConfig } from './../configManager';
+import { ConfigManager } from './../configManager';
 import * as spinner from './../cli/logIndicator';
-import { sleep } from '../utils';
 import { GitIgnoreManager } from '../gitignoreManager';
 
 const exists = promisify(existsCallback);
@@ -35,7 +33,10 @@ const DEFAULT_SCRIPTS = {
 
 /** Required project dependencies */
 const DEFAULT_DEV_DEPENDENCIES = {
-	lamington: 'latest',
+	'lamington': 'latest',
+	'chai':'latest',
+	'@types/chai':'latest',
+	'@types/mocha':'latest'
 };
 
 /**
@@ -110,8 +111,8 @@ export class ProjectManager {
 	private static async injectScripts() {
 		spinner.create('Injecting recommended scripts');
 		const existingScripts = ProjectManager.cache.scripts || {};
-		ProjectManager.cache.scripts = { ...DEFAULT_SCRIPTS, ...existingScripts };
-		spinner.end('Added scripts');
+		ProjectManager.cache.scripts = { ...existingScripts, ...DEFAULT_SCRIPTS };
+		spinner.end('Added recommended scripts');
 	}
 
 	/**
@@ -165,8 +166,8 @@ export class ProjectManager {
 					// Merge example contracts into current project
 					await ncp(path.join(tmpPath, 'contracts'), path.join(process.cwd(), 'contracts'));
 					// Cleanup temporary directory
-					spinner.update('Cleaning temporary files');
 					await rimraf(tmpPath);
+					spinner.end('Created example contracts');
 					resolve(true);
 				});
 			});
