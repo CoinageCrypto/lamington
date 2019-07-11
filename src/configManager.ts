@@ -44,6 +44,8 @@ export enum LamingtonDebugLevel {
  * values by specifying them in their `.lamingtonrc`
  */
 const DEFAULT_CONFIG = {
+	eos:'',
+	cdt:'',
 	debug:LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
@@ -65,6 +67,9 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
+
+		DEFAULT_CONFIG.cdt = await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb');
+		DEFAULT_CONFIG.eos = await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04');
 
 		if (!(await ConfigManager.configExists())) {
 			console.log('Project has not yet been initialized.');
@@ -108,25 +113,28 @@ export class ConfigManager {
 		return asset.browser_download_url as string;
 	}
 
+	public static async isValidConfig(config:object) {
+		return true;
+	}
+
 	/**
-	 * Creates a config file if it's not in the current working directory.
+	 * Creates a default configuration file if it doesn't exist at the specified path.
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @param atPath The path to check for the config file. Defaults to '.lamingtonrc'.
+	 * @param atPath Optional configuration file path. Defaults to `.lamingtonrc`.
 	 */
 	public static async createConfigIfMissing(atPath = CONFIGURATION_FILE_NAME) {
-		if (await ConfigManager.configExists()) return;
-
+		// Prevent overwriting existing configuration when valid
+		if (await ConfigManager.configExists(atPath) && await ConfigManager.isValidConfig(ConfigManager.config)) return;
 		// Create the config directory
 		await mkdirp(CACHE_DIRECTORY);
-
 		// Fetch the latest repository configuration
 		const defaultConfig: LamingtonConfig = {
 			cdt: await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb'),
 			eos: await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04'),
 			...DEFAULT_CONFIG
 		};
-
+		// Cache the configuration file to disk
 		await writeFile(atPath, JSON.stringify(defaultConfig, null, 4), ENCODING);
 	}
 
@@ -151,11 +159,10 @@ export class ConfigManager {
 	 */
 	public static async loadConfigFromDisk(atPath = CONFIGURATION_FILE_NAME) {
 		// Read existing configuration and store
-		ConfigManager.config = Object.assign(
-			{},
-			DEFAULT_CONFIG,
-			JSON.parse(await readFile(atPath, ENCODING))
-		);
+		ConfigManager.config = {
+			...DEFAULT_CONFIG,
+			...JSON.parse(await readFile(atPath, ENCODING))
+		}
 	}
 
 	/**
