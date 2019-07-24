@@ -50,7 +50,6 @@ const versionFromUrl = (url: string) => {
 	// Looks for strings in this format: `/v1.4.6/`
 	const pattern = /\/(v\d+\.\d+\.\d+)\//g;
 	const result = pattern.exec(url);
-
 	// Handle result
 	if (!result) throw new Error(`Could not extract version number from url: '${url}'`);
 	return result[1];
@@ -70,9 +69,9 @@ const dockerImageName = async () => {
 };
 
 /**
- * Determines if the docker image exists
+ * Determines if a docker image exists for the current image name
  * @author Kevin Brown <github.com/thekevinbrown>
- * @returns Result of search
+ * @returns Image search result
  */
 export const imageExists = async () => {
 	// Fetch image name and check existence
@@ -340,7 +339,7 @@ const onlyMatches = (paths: string[], matches: string[] = []) => {
 
 const filterMatches = (paths: string[]) => {
 	return paths.filter(filePath => {
-		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
+		return (ConfigManager.exclude||[]).reduce<boolean>((result, match) => {
 			const pattern = new RegExp(match, 'gi');
 			return result || pattern.test(filePath);
 		}, false);
@@ -385,8 +384,10 @@ export const build = async (contractPath: string) => {
  * @param contractPath Full path to C++ contract file
  * @returns Output path for contract compilation artefacts
  */
-export const outputPathForContract = (contractPath: string) =>
-	path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
+export const outputPathForContract = (contractPath: string) => {
+	if (!ConfigManager.outDir) throw new Error(`Output directory is undefined or not configured`);
+	return path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
+}	
 
 /**
  * Compiles a C++ EOSIO smart contract at path
