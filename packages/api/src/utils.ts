@@ -3,8 +3,8 @@ import * as chai from 'chai';
 // @ts-ignore
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
-import { EOSManager } from '../../core/src/eosManager';
-import { TableRowsResult } from '../../core/src/contracts';
+import { EOSManager } from '@lamington/core/eosManager';
+import { TableRowsResult } from '@lamington/core/contracts';
 
 // Extend Chai's expect methods
 chai.use(deepEqualInAnyOrder);
