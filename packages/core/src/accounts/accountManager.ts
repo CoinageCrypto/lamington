@@ -1,5 +1,4 @@
 import { Api } from 'eosjs';
-import { convertLegacyPublicKey } from 'eosjs/dist/eosjs-numeric';
 import * as ecc from 'eosjs-ecc';
 
 import { Account } from './account';

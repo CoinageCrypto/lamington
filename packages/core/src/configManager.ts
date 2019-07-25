@@ -1,5 +1,4 @@
 import axios from 'axios';
-import * as path from 'path';
 import * as mkdirpCallback from 'mkdirp';
 import {
 	readFile as readFileCallback,
