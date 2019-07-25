@@ -19,13 +19,11 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
  */
 export const mapParameterType = (eosType: string) => {
 	// Handle array types
-	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
 	const type = mapTypes[eosType.replace('[]', '')] || 'string';
-	if (wrapper) {
-		return `${wrapper}<${type}>`;
-	} else {
-		return type;
-	}
+	// Handle array types
+	if (eosType.endsWith('[]'))
+		return `${type}[]`;
+	return type;
 };
 
 /**
