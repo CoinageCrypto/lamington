@@ -1,0 +1,38 @@
+{
+	"name": "@lamington/all",
+	"version": "1.0.0-alpha.3",
+	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"scripts": {
+		"build": "npm run clean && tsc",
+		"clean": "rm -rf ./lib",
+		"prepare": "npm run build"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CoinageCrypto/lamington.git"
+	},
+	"contributors": [{
+        "name": "Kevin Brown",
+        "email": "kevin.brown@coina.ge",
+        "url": "https://github.com/thekevinbrown"
+    }, {
+        "name": "Mitch Pierias",
+        "email": "mitch@pierias.com",
+        "url": "https://github.com/MitchPierias"
+    }],
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/CoinageCrypto/lamington/issues"
+	},
+	"homepage": "https://github.com/CoinageCrypto/lamington/packages/core#readme",
+	"files": [
+		"lib/**/*"
+	],
+	"devDependencies": {
+		"typescript": "3.5.2"
+	},
+	"dependencies": {},
+	"peerDependencies": {}
+}

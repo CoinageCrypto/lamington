@@ -18,7 +18,7 @@
 		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
 	"bin": {
-		"lamington": "./lib/cli/index.js"
+		"lamington": "./packages/all/lib/index.js"
 	},
 	"keywords": [
 		"EOS",
