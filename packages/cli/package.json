@@ -1,6 +1,7 @@
 {
 	"name": "@lamington/cli",
 	"version": "1.0.0-alpha.3",
+	"private": true,
 	"description": "A suite of tools to make building and testing EOS smart contracts easier. ",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
