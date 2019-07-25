@@ -1,5 +1,5 @@
 import { Account, AccountManager } from '../accounts';
-import { nextBlock } from '../utils';
+import { nextBlock } from '@lamington/api/src/utils';
 import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';

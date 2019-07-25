@@ -1,5 +1,5 @@
 import { stopContainer, eosIsReady } from './utils';
-import { ConfigManager } from '../configManager';
+import { ConfigManager } from '@Lamington/core/configManager';
 
 /**
  * Stops the current Lamington docker container

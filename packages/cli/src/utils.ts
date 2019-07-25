@@ -24,10 +24,10 @@ Error.stackTraceLimit = 20;
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
 
-import { EOSManager } from '../eosManager';
-import { sleep } from '../utils';
-import { generateTypes } from '../contracts';
-import { ConfigManager } from '../configManager';
+import { EOSManager } from '@lamington/core/eosManager';
+import { sleep } from '@lamington/api/utils';
+import { generateTypes } from '@lamington/core/contracts';
+import { ConfigManager } from '@lamington/core/configManager';
 import * as spinner from './logIndicator';
 
 /** @hidden Current working directory reference */

@@ -1,7 +1,7 @@
 import { assert } from 'chai';
 
 import { ConfigManager } from '../configManager';
-import { eosIsReady, startEos, buildAll, stopContainer } from '../cli/utils';
+import { eosIsReady, startEos, buildAll, stopContainer } from '@lamington/cli/src/utils';
 import { mapParameterType } from './typeGenerator';
 
 /**

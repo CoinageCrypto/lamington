@@ -1,7 +1,7 @@
 import * as colors from 'colors';
 
-import { ProjectManager } from './../project/projectManager';
-import { ConfigManager } from '../configManager';
+import { ProjectManager } from '@lamington/core/project/projectManager';
+import { ConfigManager } from '@lamington/core/configManager';
 import * as rimRafCallback from 'rimraf';
 import { promisify } from 'util';
 
