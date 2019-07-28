@@ -4,14 +4,10 @@
 	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
 	"private": true,
 	"scripts": {
-		"build": "npm run clean && lerna bootstrap",
-		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
-		"clean": "rm -rf ./lib",
-		"docs": "typedoc --out api-docs ./src",
-		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
-		"prepublishOnly": "npm test",
-		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
+		"build": "lerna run build",
+		"clean": "lerna run clean",
+		"docs": "lerna run docs",
+		"format": "lerna run prettier"
 	},
 	"repository": {
 		"type": "git",
