@@ -3,6 +3,7 @@
 	"version": "1.0.0-alpha.3",
 	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
 	"private": true,
+	"main": "packages/all/lib/index.js",
 	"scripts": {
 		"build": "lerna run build",
 		"clean": "lerna run clean",
