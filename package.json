@@ -31,7 +31,11 @@
 		"Unit Testing",
 		"Mocha"
 	],
-	"author": "Coinage",
+	"author": {
+		"name":"Coinage Crypto",
+		"url": "https://coina.ge/",
+		"email": "hello@coina.ge"
+	},
 	"contributors": [
 		{
 			"name": "Kevin Brown",
