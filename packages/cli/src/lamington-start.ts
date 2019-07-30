@@ -1,5 +1,6 @@
 import { startEos, eosIsReady, stopContainer } from './utils';
-import { ConfigManager } from '@lamington/core/configManager';
+// Core
+import { ConfigManager } from '@lamington/core';
 
 /**
  * Stops EOS docker container if it's running, then starts it.

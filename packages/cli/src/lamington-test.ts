@@ -1,6 +1,6 @@
 import { eosIsReady, startEos, runTests, stopContainer, buildAll } from './utils';
-import { GitIgnoreManager } from '@lamington/core/gitignoreManager';
-import { ConfigManager } from '@lamington/core/configManager';
+// Core
+import { ConfigManager } from '@lamington/core';
 
 /**
  * Executes a build and test procedure

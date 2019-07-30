@@ -1,12 +1,12 @@
 import * as assert from 'assert';
 import * as chai from 'chai';
-// @ts-ignore
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
-
-import { EOSManager } from '@lamington/core/eosManager';
-import { TableRowsResult } from '@lamington/core/contracts';
-
-// Extend Chai's expect methods
+// Lamington Core
+import {
+	EOSManager,
+	TableRowsResult
+} from '@lamington/core';
+// Extend Chai expect methods
 chai.use(deepEqualInAnyOrder);
 
 /**

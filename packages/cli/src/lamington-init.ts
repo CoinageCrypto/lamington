@@ -1,7 +1,8 @@
 import * as colors from 'colors';
-
-import { ProjectManager } from '@lamington/core/project/projectManager';
-import { ConfigManager } from '@lamington/core/configManager';
+// Core
+import {
+  ProjectManager
+} from '@lamington/core';
 
 /**
  * Executes a contract build procedure

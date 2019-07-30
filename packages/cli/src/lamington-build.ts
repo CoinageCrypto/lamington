@@ -1,6 +1,5 @@
 import { eosIsReady, startEos, stopContainer, buildAll } from './utils';
-import { GitIgnoreManager } from '@lamington/core/gitignoreManager';
-import { ConfigManager } from '@lamington/core/configManager';
+import { GitIgnoreManager, ConfigManager } from '@lamington/core';
 
 /**
  * Executes a contract build procedure
