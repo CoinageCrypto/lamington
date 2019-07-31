@@ -1,28 +1,20 @@
 {
 	"compilerOptions": {
-		"baseUrl": "packages",
-		"target": "es6",
+		"rootDir": "./packages",
+		"baseUrl": ".",
+		"target": "es2017",
+		"lib": ["es2017"],
 		"module": "commonjs",
 		"declaration": true,
 		"declarationMap": true,
 		"strict": true,
+		"paths": {
+			"*": ["./packages/@types/*"]
+		},
 		"noImplicitAny": true,
-		"lib": [
-			"es6",
-			"es2015",
-			"dom"
-		],
 		"typeRoots": [
 			"node_modules/@types",
 			"packages/@types"
 		]
-	},
-	"include": [
-        "packages"
-    ],
-	"exclude": [
-		"node_modules",
-		"**/__tests__/*",
-		"*/**/*.test.ts"
-	]
+	}
 }
