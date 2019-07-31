@@ -1,0 +1,48 @@
+{
+	"name": "@lamington/boilerplate",
+	"version": "1.0.0-alpha.4",
+	"private": true,
+	"description": "",
+	"main": "lib/index.js",
+	"types": "lib/index.d.ts",
+	"scripts": {
+		"build": "npm run clean && tsc",
+		"clean": "rm -rf ./lib",
+		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+		"prepublishOnly": "npm test",
+		"test": "mocha --require ts-node/register src/**/*.test.ts"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/CoinageCrypto/lamington.git"
+	},
+	"contributors": [{
+        "name": "Kevin Brown",
+        "email": "kevin.brown@coina.ge",
+        "url": "https://github.com/thekevinbrown"
+    }, {
+        "name": "Mitch Pierias",
+        "email": "mitch@pierias.com",
+        "url": "https://github.com/MitchPierias"
+    }],
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/CoinageCrypto/lamington/issues"
+	},
+	"homepage": "https://github.com/CoinageCrypto/lamington/packages/core#readme",
+	"files": [
+		"lib/**/*"
+	],
+	"devDependencies": {
+		"@types/chai": "4.1.7",
+		"@types/mocha": "5.2.7",
+		"@types/node": "12.0.10",
+		"typescript": "3.5.2"
+	},
+	"dependencies": {
+	},
+	"peerDependencies": {
+		"eosjs": "^20.0.0",
+		"eosjs-ecc": "^4.0.4"
+	}
+}
