@@ -71,3 +71,4 @@ lib/
 
 # Generated API documentation
 api-docs/
+*.tsbuildinfo
