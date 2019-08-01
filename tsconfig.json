@@ -1,20 +1,26 @@
 {
 	"compilerOptions": {
-		"rootDir": "./packages",
+		"rootDir": "packages",
 		"baseUrl": ".",
 		"target": "es2017",
 		"lib": ["es2017"],
 		"module": "commonjs",
+		"allowJs": false,
 		"declaration": true,
 		"declarationMap": true,
 		"strict": true,
+		"allowUnreachableCode": false,
 		"paths": {
 			"*": ["./packages/@types/*"]
 		},
 		"noImplicitAny": true,
 		"typeRoots": [
-			"node_modules/@types",
-			"packages/@types"
+			"./node_modules/@types",
+			"./packages/@types"
 		]
-	}
+	},
+	"exclude": [
+		"./node_modules/**/*",
+		"./lib/**/*"
+	]
 }
