@@ -3,7 +3,10 @@
 		"rootDir": "packages",
 		"baseUrl": ".",
 		"target": "es2017",
-		"lib": ["es2017"],
+		"lib": [
+			"es2017",
+			"dom"
+		],
 		"module": "commonjs",
 		"allowJs": false,
 		"declaration": true,
@@ -11,16 +14,12 @@
 		"strict": true,
 		"allowUnreachableCode": false,
 		"paths": {
-			"*": ["./packages/@types/*"]
+			"*": ["@types/*"]
 		},
 		"noImplicitAny": true,
 		"typeRoots": [
-			"./node_modules/@types",
-			"./packages/@types"
+			"node_modules/@types",
+			"@types"
 		]
-	},
-	"exclude": [
-		"./node_modules/**/*",
-		"./lib/**/*"
-	]
+	}
 }
