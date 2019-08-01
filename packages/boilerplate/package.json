@@ -6,7 +6,7 @@
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"scripts": {
-		"build": "npm run clean && tsc",
+		"build": "tsc",
 		"clean": "rm -rf ./lib",
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",

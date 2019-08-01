@@ -6,7 +6,7 @@
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"scripts": {
-		"build": "npm run clean && tsc && npm run copy:scripts",
+		"build": "tsc && npm run copy:scripts",
 		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
 		"clean": "rm -rf ./lib",
 		"docs": "typedoc --out api-docs ./src",
@@ -63,8 +63,6 @@
 		"@types/ora": "3.2.0",
 		"@types/rimraf": "2.0.2",
 		"@types/text-encoding": "0.0.35",
-		"eosjs": "20.0.0",
-		"eosjs-ecc": "4.0.4",
 		"prettier": "1.18.2",
 		"ts-node": "8.3.0",
 		"typedoc": "0.14.2",
@@ -92,8 +90,5 @@
 		"trace": "3.1.1",
 		"ts-mocha": "6.0.0"
 	},
-	"peerDependencies": {
-		"eosjs": "^20.0.0",
-		"eosjs-ecc": "^4.0.4"
-	}
+	"peerDependencies": {}
 }
