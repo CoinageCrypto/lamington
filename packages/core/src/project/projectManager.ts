@@ -11,7 +11,7 @@ import { ncp as ncpCallback } from 'ncp';
 import * as rimrafCallback from 'rimraf';
 import { promisify } from 'util';
 import { ConfigManager } from './../configManager';
-import * as spinner from '@lamington/cli/logIndicator';
+import * as spinner from '@lamington/cli';
 import { GitIgnoreManager } from '../gitignoreManager';
 
 const exists = promisify(existsCallback);

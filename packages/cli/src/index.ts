@@ -2,6 +2,7 @@
 
 import * as program from 'commander';
 import * as cliUtils from './utils';
+export * from './logIndicator';
 export const CLI = cliUtils;
 
 const packageConfig = require('../../package.json');
