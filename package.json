@@ -3,19 +3,21 @@
 	"version": "1.0.0-alpha.4",
 	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
 	"private": true,
-	"main": "packages/all/lib/index.js",
+	"main": "packages/core/lib/index.js",
+	"types": "packages/core/lib/index.d.ts",
 	"scripts": {
 		"build": "lerna run build",
 		"clean": "lerna run clean",
 		"docs": "lerna run docs",
-		"format": "lerna run prettier"
+		"format": "lerna run prettier",
+		"link": "yalc publish --private"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
 	"bin": {
-		"lamington": "./packages/all/lib/index.js"
+		"lamington": "./packages/core"
 	},
 	"keywords": [
 		"EOS",
@@ -59,7 +61,9 @@
 		"typescript": "3.5.2"
 	},
 	"dependencies": {},
-	"peerDependencies": {},
+	"peerDependencies": {
+		"yalc":"^1.0.0"
+	},
 	"useWorkspaces": true,
 	"workspaces": [
 		"packages/*"

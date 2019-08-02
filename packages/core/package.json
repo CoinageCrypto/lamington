@@ -12,7 +12,8 @@
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
+		"test": "mocha --require ts-node/register src/**/*.test.ts",
+		"link": "yarn link"
 	},
 	"repository": {
 		"type": "git",
@@ -33,7 +34,8 @@
 	},
 	"homepage": "https://github.com/CoinageCrypto/lamington/packages/core#readme",
 	"files": [
-		"lib/**/*"
+		"lib/**/*",
+		"README.md"
 	],
 	"devDependencies": {
 		"@types/chai": "4.1.7",

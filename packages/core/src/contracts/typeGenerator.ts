@@ -76,7 +76,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 	const imports = ['Account', 'Contract', 'GetTableRowsOptions'];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
-	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
+	result.push(`import { ${imports.join(', ')} } from '@lamington/core';`);
 	result.push('');
 	result.push('// Table row types');
 	// Generate table row types from ABI

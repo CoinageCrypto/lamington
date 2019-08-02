@@ -1,11 +1,12 @@
 {
 	"name": "@lamington/api",
 	"version": "1.0.0-alpha.4",
-	"description": "Library of application interface to extend interaction with EOSIO smart contracts and Lamington",
+	"description": "Library of application interfaces to extend interactions with EOSIO smart contracts and Lamington",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"files": [
-		"lib"
+		"lib/**/*",
+		"README.md"
 	],
 	"scripts": {
 		"build": "tsc",
@@ -14,21 +15,25 @@
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
+		"test": "mocha --require ts-node/register src/**/*.test.ts",
+		"link": "yarn link"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
-	"contributors": [{
-        "name": "Kevin Brown",
-        "email": "kevin.brown@coina.ge",
-        "url": "https://github.com/thekevinbrown"
-    }, {
-        "name": "Mitch Pierias",
-        "email": "mitch@pierias.com",
-        "url": "https://github.com/MitchPierias"
-    }],
+	"contributors": [
+		{
+			"name": "Kevin Brown",
+			"email": "kevin.brown@coina.ge",
+			"url": "https://github.com/thekevinbrown"
+		},
+		{
+			"name": "Mitch Pierias",
+			"email": "mitch@pierias.com",
+			"url": "https://github.com/MitchPierias"
+		}
+	],
 	"license": "MIT",
 	"bugs": {
 		"url": "https://github.com/CoinageCrypto/lamington/issues"
@@ -38,15 +43,18 @@
 		"@types/chai": "4.1.7",
 		"@types/mocha": "5.2.7",
 		"@types/node": "12.0.10",
-		"eosjs": "20.0.0",
-		"eosjs-ecc": "4.0.4",
 		"prettier": "1.18.2",
 		"typedoc": "0.14.2",
 		"typescript": "3.5.2"
 	},
 	"dependencies": {
 		"chai": "4.2.0",
-		"mocha": "6.1.4"
+		"mocha": "6.1.4",
+		"eosjs": "20.0.0",
+		"eosjs-ecc": "4.0.4"
 	},
-	"peerDependencies": {}
+	"peerDependencies": {
+		"eosjs": "20.0.0",
+		"eosjs-ecc": "4.0.4"
+	}
 }
