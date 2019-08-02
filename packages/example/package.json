@@ -1,5 +1,5 @@
 {
-	"name": "@lamington/boilerplate",
+	"name": "@lamington/example",
 	"version": "1.0.0-alpha.4",
 	"private": true,
 	"description": "",
@@ -31,7 +31,8 @@
 	},
 	"homepage": "https://github.com/CoinageCrypto/lamington/packages/core#readme",
 	"files": [
-		"lib/**/*"
+		"lib/**/*",
+		"README.md"
 	],
 	"devDependencies": {
 		"@types/chai": "4.1.7",
