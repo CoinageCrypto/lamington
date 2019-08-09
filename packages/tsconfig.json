@@ -4,6 +4,7 @@
     { "path": "./all"},
     { "path": "./api" },
     { "path": "./cli" },
-    { "path": "./core" }
+    { "path": "./core" },
+    { "path": "./docker" }
   ]
 }
