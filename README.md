@@ -137,7 +137,7 @@ The `keepAlive` setting prevents Lamington from stopping the EOSIO container bet
 
 You can find more information about the Lamington tool-set and join our growing community of developers by visiting any of the following links;
 
-[Examples](https://examples.lamington.io)
+[Example Project](https://github.com/MitchPierias/Advanced-EOS-Examples)
 
 [API Documentation](https://api.lamington.io)
 
