@@ -77,7 +77,7 @@ Lamington automatically searches for all files with the `.cpp` file extension be
 
 #### Ignoring Files & Folders
 
-Not every `.cpp` file is a build ready contract. So we added an additional ignore file, rightly named `.lamingtonignore`, to configure directories, files and patterns you don't want added to your build process. The `.lamingtonignore` follows the same syntax as a standard `.gitignore`, requiring a line separated list of ignore definitions. We've added the command line method `lamington ignore` to generate a `.lamingtonignore` file with default settings.
+Not every `.cpp` file is a contract, so we added an additional `exclude` to the configuration file `.lamingtonrc`. This `exclude` option takes an array of globular patterns as files and patterns you don't want added to your build process. We've added the command line method `lamington ignore` to generate a `.lamingtonrc` file with default settings.
 
 #### Specifying Build Contracts
 
