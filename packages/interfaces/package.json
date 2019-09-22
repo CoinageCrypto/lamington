@@ -1,0 +1,12 @@
+{
+	"name": "@lamington/interfaces",
+	"version": "1.0.0-alpha.4",
+	"private": true,
+	"license": "MIT",
+	"main": "index.ts",
+	"devDependencies": {
+		"prettier": "1.18.2",
+		"typescript": "3.5.2"
+	},
+	"dependencies": {}
+}

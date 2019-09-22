@@ -1,25 +1,24 @@
 {
 	"compilerOptions": {
-		"rootDir": "packages",
-		"baseUrl": ".",
+		"baseUrl": "./",
+		"outDir": "./out",
 		"target": "es2017",
-		"lib": [
-			"es2017",
-			"dom"
-		],
+		"lib": ["es2017", "dom"],
 		"module": "commonjs",
-		"allowJs": false,
+		"allowSyntheticDefaultImports": true,
+		"experimentalDecorators": true,
 		"declaration": true,
 		"declarationMap": true,
 		"strict": true,
-		"allowUnreachableCode": false,
+		"strictNullChecks": true,
+		"importHelpers": true,
 		"paths": {
 			"*": ["@types/*"]
 		},
 		"noImplicitAny": true,
-		"typeRoots": [
-			"node_modules/@types",
-			"@types"
-		]
-	}
+		"noUnusedLocals": true,
+		"typeRoots": ["node_modules/@types", "@types"]
+	},
+	"include": ["**/*", "./**/*.d.ts"],
+	"exclude": ["**/dist/**", "**/out/**", "**/lib/**"]
 }

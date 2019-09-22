@@ -24,11 +24,7 @@ Error.stackTraceLimit = 20;
 import { Docker } from 'docker-cli-js';
 export const docker = new Docker();
 // Core
-import {
-	EOSManager,
-	generateTypes,
-	ConfigManager
-} from '@lamington/core';
+import { EOSManager, generateTypes, ConfigManager } from '@lamington/core';
 // API
 import { sleep } from '@lamington/api';
 // Spinner
@@ -343,7 +339,7 @@ const onlyMatches = (paths: string[], matches: string[] = []) => {
 
 const filterMatches = (paths: string[]) => {
 	return paths.filter(filePath => {
-		return (ConfigManager.exclude||[]).reduce<boolean>((result, match) => {
+		return (ConfigManager.exclude || []).reduce<boolean>((result, match) => {
 			const pattern = new RegExp(match, 'gi');
 			return result || pattern.test(filePath);
 		}, false);
@@ -370,7 +366,7 @@ export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
 	const basename = path.basename(contractPath, '.cpp');
 	// Compile contract at path
-	await compileContract(contractPath);
+	await compileContract(basename);
 	// Generate Typescript definitions for contract
 	spinner.create(`Generating type definitions`);
 	try {
@@ -391,7 +387,7 @@ export const build = async (contractPath: string) => {
 export const outputPathForContract = (contractPath: string) => {
 	if (!ConfigManager.outDir) throw new Error(`Output directory is undefined or not configured`);
 	return path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
-}	
+};
 
 /**
  * Compiles a C++ EOSIO smart contract at path

@@ -1,23 +1,27 @@
 {
 	"name": "lamington",
-	"version": "1.0.0-alpha.4",
 	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
 	"private": true,
-	"main": "packages/core/lib/index.js",
-	"types": "packages/core/lib/index.d.ts",
+	"main": "out/index.js",
+	"types": "out/index.d.ts",
+	"files": [
+		"out/**"
+	],
 	"scripts": {
-		"build": "lerna run build",
-		"clean": "lerna run clean",
+		"build": "yarn clean; tsc",
+		"clean": "rm -rf ./out; lerna run clean",
+		"clean:link": "yarn unlink; rm -rf ~/.config/yarn/link/lamington",
 		"docs": "lerna run docs",
 		"format": "lerna run prettier",
-		"link": "yalc publish --private"
+		"lint": "",
+		"publish:dev": "yalc publish --private"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
 	"bin": {
-		"lamington": "./packages/core"
+		"lamington": "packages/all/lib"
 	},
 	"keywords": [
 		"EOS",
@@ -31,10 +35,11 @@
 		"Deployment",
 		"Testing",
 		"Unit Testing",
-		"Mocha"
+		"Mocha",
+		"Lerna"
 	],
 	"author": {
-		"name":"Coinage Crypto",
+		"name": "Coinage Crypto",
 		"url": "https://coina.ge/",
 		"email": "hello@coina.ge"
 	},
@@ -58,14 +63,14 @@
 	"devDependencies": {
 		"lerna": "^3.16.4",
 		"prettier": "1.18.2",
-		"typescript": "3.5.2"
+		"typescript": "3.5.2",
+		"yalc": "^1.0.0-pre.34"
 	},
-	"dependencies": {},
-	"peerDependencies": {
-		"yalc":"^1.0.0"
+	"dependencies": {
+		"chai": "^4.2.0"
 	},
 	"useWorkspaces": true,
 	"workspaces": [
-		"packages/*"
+		"packages/**"
 	]
 }

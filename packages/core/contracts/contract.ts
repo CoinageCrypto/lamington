@@ -1,5 +1,5 @@
 import { Account, AccountManager } from '../accounts';
-import { nextBlock } from '@lamington/api/src/utils';
+import { nextBlock } from '@lamington/api';
 import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';
@@ -88,17 +88,13 @@ export class Contract implements EOSJSContract {
 				// Copy the params across for the call.
 				if (arguments.length < action.fields.length) {
 					throw new Error(
-						`Insufficient arguments supplied to ${action.name}. Expected ${
-							action.fields.length
-						} got ${arguments.length}.`
+						`Insufficient arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
 				if (arguments.length > action.fields.length + 1) {
 					throw new Error(
-						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${
-							arguments.length
-						}.`
+						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
@@ -194,9 +190,7 @@ export class Contract implements EOSJSContract {
 
 					if (currentValue !== 0 && currentValue !== 1) {
 						throw new Error(
-							`Invalid value while casting to boolean for ${
-								field.name
-							} field on row. Got ${currentValue}, expected 0 or 1.`
+							`Invalid value while casting to boolean for ${field.name} field on row. Got ${currentValue}, expected 0 or 1.`
 						);
 					}
 

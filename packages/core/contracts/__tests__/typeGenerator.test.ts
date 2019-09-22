@@ -1,8 +1,5 @@
 import { assert } from 'chai';
-
-import { ConfigManager } from '../configManager';
-import { eosIsReady, startEos, buildAll, stopContainer } from '@lamington/cli/src/utils';
-import { mapParameterType } from './typeGenerator';
+import { mapParameterType } from '../typeGenerator';
 
 /**
  * Javascript only supports number, so CPP integer types need to be mapped accordingly
@@ -90,30 +87,6 @@ describe('type generator', function() {
 			xit(`should handle vector types`, function() {
 				assert.equal(mapParameterType('vector<string>'), 'Array<string>');
 			});
-		});
-	});
-
-	context('type generation integration tests', function() {
-		before(async function() {
-			// This can take a long time.
-			this.timeout(400000);
-
-			await ConfigManager.initWithDefaults();
-			// Start the EOSIO container image if it's not running.
-			if (!(await eosIsReady())) {
-				await startEos();
-			}
-			// Build all smart contracts
-			await buildAll();
-
-			// And stop it if we don't have keepAlive set.
-			if (!ConfigManager.keepAlive) {
-				await stopContainer();
-			}
-		});
-
-		it('should generate an expected result from the eosio.token contract file', async function() {
-			console.log('yup');
 		});
 	});
 });
