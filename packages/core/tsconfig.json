@@ -1,12 +1,10 @@
 {
-    "extends": "./../../tsconfig.json",
-    "compilerOptions": {
-        "declaration": false,
-        "declarationMap": false,
-        "rootDir": "./src",
-        "outDir": "./lib"
-    },
-    "include": [
-        "./src"
-    ]
+	"extends": "./../../tsconfig.json",
+	"compilerOptions": {
+		"declaration": false,
+		"declarationMap": false,
+		"rootDir": "./src",
+		"outDir": "./lib"
+	},
+	"include": ["./src"]
 }
