@@ -62,6 +62,8 @@ typings/
 
 # Typescript build output
 lib/
+out/
+dist/
 
 # Apple files
 .DS_Store
@@ -72,3 +74,7 @@ lib/
 # Generated API documentation
 api-docs/
 *.tsbuildinfo
+
+# Yalc files
+.yalc
+.yalc.lock
