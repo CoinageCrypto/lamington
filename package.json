@@ -55,7 +55,7 @@
 		"@types/rimraf": "2.0.2",
 		"@types/text-encoding": "0.0.35",
 		"eosjs": "20.0.0",
-		"eosjs-ecc": "4.0.4",
+		"eosjs-ecc": "4.0.7",
 		"prettier": "1.18.2",
 		"ts-node": "8.3.0",
 		"typedoc": "0.14.2",
