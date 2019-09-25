@@ -171,7 +171,7 @@ React context management for LamingtonJS
 ## Supporters
 
 <p align="center">
-    <a href="https://coina.ge"><img src="https://coina.ge/assets/coinage-logo-light.png" alt="Supported by Coinage" width="100"/></a>
+    <a href="https://coina.ge"><img src="https://coina.ge/assets/coinage-logo-light.svg" alt="Supported by Coinage" width="100"/></a>
 </p>
 <p align="center">
     This project is proudly supported by <a href="https://coina.ge">Coinage</a>.<br/>
