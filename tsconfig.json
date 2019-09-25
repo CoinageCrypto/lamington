@@ -1,9 +1,9 @@
 {
 	"compilerOptions": {
 		"baseUrl": "./",
-		"outDir": "./out",
-		"target": "es2017",
-		"lib": ["es2017", "dom"],
+		"outDir": "./lib",
+		"target": "es6",
+		"lib": ["es6", "es2015", "dom"],
 		"module": "commonjs",
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
@@ -20,5 +20,5 @@
 		"typeRoots": ["node_modules/@types", "@types"]
 	},
 	"include": ["**/*", "./**/*.d.ts"],
-	"exclude": ["**/dist/**", "**/out/**", "**/lib/**"]
+	"exclude": ["**/lib/**"]
 }
