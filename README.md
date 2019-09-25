@@ -133,6 +133,12 @@ The `.lamingtonrc` file allows you to configure additional settings using JSON s
 
 The `keepAlive` setting prevents Lamington from stopping the EOSIO container between each build, allowing you to develop faster and compile often.
 
+## Contributing to Lamington
+
+We welcome contributions of all types, even down to typo fixes. All help is very welcome!
+
+If you're not sure where to start, the best resource for you is our [Contributing to Lamington guide](https://lamington.io/guides/contributing-to-lamington/), and if you're still stuck, please [reach out to us on Slack](https://forms.gle/yTjNA46oKywaD7FR6).
+
 ## Resources
 
 You can find more information about the Lamington tool-set and join our growing community of developers by visiting any of the following links;
@@ -165,7 +171,7 @@ React context management for LamingtonJS
 ## Supporters
 
 <p align="center">
-    <a href="https://coina.ge"><img src="https://coina.ge/assets/coinage-logo-light.png" alt="Supported by Coinage" width="100"/></a>
+    <a href="https://coina.ge"><img src="https://coina.ge/assets/coinage-logo-light.svg" alt="Supported by Coinage" width="100"/></a>
 </p>
 <p align="center">
     This project is proudly supported by <a href="https://coina.ge">Coinage</a>.<br/>
