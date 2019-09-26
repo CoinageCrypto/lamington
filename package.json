@@ -47,8 +47,6 @@
 		"lib/**/*"
 	],
 	"devDependencies": {
-		"lamington": "latest",
-		"chai": "latest",
 		"@types/chai": "4.2.3",
 		"@types/mocha": "5.2.7",
 		"@types/mkdirp": "0.5.2",
