@@ -6,6 +6,7 @@
 	"types": "lib/index.d.ts",
 	"scripts": {
 		"build": "npm run clean && tsc && npm run copy:scripts",
+		"check:types": "tsc --noEmit",
 		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
 		"clean": "rm -rf ./lib",
 		"docs": "typedoc --out api-docs ./src",
