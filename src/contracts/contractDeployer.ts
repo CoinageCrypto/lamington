@@ -153,15 +153,7 @@ export class ContractDeployer {
 
 		// Initialize account with name
 		const account = new Account(accountName, privateKey);
-
-		console.log('Created account:');
-		console.log(`Name: ${accountName}`);
-		console.log(`Private Key: ${privateKey}`);
-
-		console.log('Setting up account');
 		await AccountManager.setupAccount(account);
-
-		console.log('Success');
 
 		// Call the deployToAccount method with the account
 		return await ContractDeployer.deployToAccount<T>(contractIdentifier, account);
