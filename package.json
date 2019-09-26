@@ -5,7 +5,7 @@
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
 	"scripts": {
-		"build": "lamington build",
+		"build": "npm run clean && tsc && npm run copy:scripts",
 		"check:types": "tsc --noEmit",
 		"copy:scripts": "cp -r ./src/scripts/ ./lib/scripts/",
 		"clean": "rm -rf ./lib",
