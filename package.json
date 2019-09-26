@@ -11,9 +11,10 @@
 		"clean": "rm -rf ./lib",
 		"docs": "typedoc --out api-docs ./src",
 		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+		"lamington:init": "lamington init",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
-		"test": "mocha --require ts-node/register src/**/*.test.ts"
+		"test": "TS_NODE_FILES=true mocha --require ts-node/register src/**/*.test.ts"
 	},
 	"repository": {
 		"type": "git",
@@ -47,8 +48,8 @@
 	],
 	"devDependencies": {
 		"@types/chai": "4.2.3",
-		"@types/mkdirp": "0.5.2",
 		"@types/mocha": "5.2.7",
+		"@types/mkdirp": "0.5.2",
 		"@types/ncp": "^2.0.1",
 		"@types/node": "12.7.7",
 		"@types/node-fetch": "2.5.2",
