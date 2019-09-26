@@ -97,7 +97,7 @@ export const buildImage = async () => {
 		`
 		FROM ubuntu:18.04
 
-		RUN apt-get update && apt-get install -y --no-install-recommends wget curl ca-certificates
+		RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends wget curl ca-certificates
 		RUN wget ${ConfigManager.cdt} && apt-get install -y ./*.deb && rm -f *.deb
 		RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
 		RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*

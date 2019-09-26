@@ -1,6 +1,9 @@
 src/
 node_modules/
 api-docs/
+.lamington/
+.lamingtonrc
+contracts/
 .gitignore
 .prettierrc
 .travis.yml

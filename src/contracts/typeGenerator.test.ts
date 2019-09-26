@@ -111,9 +111,5 @@ describe('type generator', function() {
 				await stopContainer();
 			}
 		});
-
-		it('should generate an expected result from the eosio.token contract file', async function() {
-			console.log('yup');
-		});
 	});
 });
