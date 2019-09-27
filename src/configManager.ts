@@ -24,6 +24,7 @@ const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 export interface LamingtonConfig {
 	cdt: string;
 	eos: string;
+	contracts: string;
 	keepAlive?: boolean;
 	outDir?: string;
 	exclude?: Array<string>;
@@ -46,6 +47,7 @@ export enum LamingtonDebugLevel {
 const DEFAULT_CONFIG = {
 	eos:'',
 	cdt:'',
+	contracts:'v1.8.0-rc1',
 	debug:LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
@@ -179,6 +181,14 @@ export class ConfigManager {
 	 */
 	static get cdt() {
 		return (ConfigManager.config && ConfigManager.config.cdt) || '';
+	}
+
+	/**
+	 * Returns the current eosio.contracts configuration
+	 * @author Johan Nordberg <github.com/jnordberg>
+	 */
+	static get contracts() {
+		return (ConfigManager.config && ConfigManager.config.contracts) || 'master';
 	}
 
 	/**
