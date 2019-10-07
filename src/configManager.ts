@@ -1,6 +1,7 @@
 import axios from 'axios';
 import * as path from 'path';
 import * as mkdirpCallback from 'mkdirp';
+import * as Mocha from 'mocha';
 import {
 	readFile as readFileCallback,
 	writeFile as writeFileCallback,
@@ -29,6 +30,8 @@ export interface LamingtonConfig {
 	exclude?: Array<string>;
 	debugTransactions?: boolean;
 	debug: LamingtonDebugLevel;
+	reporter?: string;
+	reporterOptions?: any;
 }
 
 /** Level of debug output */
@@ -44,9 +47,9 @@ export enum LamingtonDebugLevel {
  * values by specifying them in their `.lamingtonrc`
  */
 const DEFAULT_CONFIG = {
-	eos:'',
-	cdt:'',
-	debug:LamingtonDebugLevel.NONE,
+	eos: '',
+	cdt: '',
+	debug: LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
@@ -67,7 +70,6 @@ export class ConfigManager {
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
-
 		DEFAULT_CONFIG.cdt = await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb');
 		DEFAULT_CONFIG.eos = await ConfigManager.getAssetURL('EOSIO', 'eos', 'ubuntu-18.04');
 
@@ -113,7 +115,7 @@ export class ConfigManager {
 		return asset.browser_download_url as string;
 	}
 
-	public static async isValidConfig(config:object) {
+	public static async isValidConfig(config: object) {
 		return true;
 	}
 
@@ -125,7 +127,11 @@ export class ConfigManager {
 	 */
 	public static async createConfigIfMissing(atPath = CONFIGURATION_FILE_NAME) {
 		// Prevent overwriting existing configuration when valid
-		if (await ConfigManager.configExists(atPath) && await ConfigManager.isValidConfig(ConfigManager.config)) return;
+		if (
+			(await ConfigManager.configExists(atPath)) &&
+			(await ConfigManager.isValidConfig(ConfigManager.config))
+		)
+			return;
 		// Create the config directory
 		await mkdirp(CACHE_DIRECTORY);
 		// Fetch the latest repository configuration
@@ -161,8 +167,8 @@ export class ConfigManager {
 		// Read existing configuration and store
 		ConfigManager.config = {
 			...DEFAULT_CONFIG,
-			...JSON.parse(await readFile(atPath, ENCODING))
-		}
+			...JSON.parse(await readFile(atPath, ENCODING)),
+		};
 	}
 
 	/**
@@ -214,5 +220,13 @@ export class ConfigManager {
 	 */
 	static get exclude() {
 		return (ConfigManager.config && ConfigManager.config.exclude) || DEFAULT_CONFIG.exclude;
+	}
+
+	/**
+	 * Returns the array of excluded strings or patterns
+	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 */
+	static get testReporter() {
+		return (ConfigManager.config && ConfigManager.config.reporter) || Mocha.reporters.Min;
 	}
 }

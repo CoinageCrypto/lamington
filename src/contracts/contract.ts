@@ -36,6 +36,11 @@ export interface GetTableRowsOptions {
 	showPayer?: boolean;
 }
 
+export interface ActorPermission {
+	actor: string;
+	permission: string;
+}
+
 /**
  * Adds additional functionality to the EOSJS `Contract` class
  */
@@ -88,17 +93,13 @@ export class Contract implements EOSJSContract {
 				// Copy the params across for the call.
 				if (arguments.length < action.fields.length) {
 					throw new Error(
-						`Insufficient arguments supplied to ${action.name}. Expected ${
-							action.fields.length
-						} got ${arguments.length}.`
+						`Insufficient arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
 				if (arguments.length > action.fields.length + 1) {
 					throw new Error(
-						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${
-							arguments.length
-						}.`
+						`Too many arguments supplied to ${action.name}. Expected ${action.fields.length} got ${arguments.length}.`
 					);
 				}
 
@@ -108,15 +109,19 @@ export class Contract implements EOSJSContract {
 
 				// Who are we acting as?
 				// We default to sending transactions from the contract account.
-				let authorization = account;
+				let authorization: Array<ActorPermission> = account.active;
 				const options = arguments[action.fields.length];
 
-				if (options && options.from && options.from instanceof Account) {
-					authorization = options.from;
-				}
+				if (options) {
+					if (options.from && options.from instanceof Account) {
+						authorization = options.from.active;
 
-				// Ensure we have the key to sign with.
-				EOSManager.addSigningAccountIfMissing(authorization);
+						// Ensure we have the key to sign with.
+						EOSManager.addSigningAccountIfMissing(options.from);
+					} else if (options.auths && options.auths instanceof Array) {
+						authorization = options.auths;
+					}
+				}
 
 				return EOSManager.transact(
 					{
@@ -124,7 +129,7 @@ export class Contract implements EOSJSContract {
 							{
 								account: account.name,
 								name: action.name,
-								authorization: authorization.active,
+								authorization: authorization,
 								data,
 							},
 						],
@@ -136,7 +141,7 @@ export class Contract implements EOSJSContract {
 		}
 		// And now the tables.
 		for (const table of abi.tables) {
-			(this as any)[camelCase(table.name)] = function() {
+			(this as any)[camelCase(table.name) + 'Table'] = function() {
 				return this.getTableRows(table.name, arguments[0]);
 			};
 		}
@@ -194,13 +199,35 @@ export class Contract implements EOSJSContract {
 
 					if (currentValue !== 0 && currentValue !== 1) {
 						throw new Error(
-							`Invalid value while casting to boolean for ${
-								field.name
-							} field on row. Got ${currentValue}, expected 0 or 1.`
+							`Invalid value while casting to boolean for ${field.name} field on row. Got ${currentValue}, expected 0 or 1.`
 						);
 					}
 
 					row[field.name] = currentValue ? true : false;
+				}
+			}
+		}
+
+		// Bool is the only type we need to fiddle with at the moment, so only do this if
+		// there's a field with a bool type in it.
+		const dateFields = tableRowType.fields.filter(field => field.typeName === 'time_point_sec');
+
+		if (dateFields.length > 0) {
+			// Map all `time_point_sec` fields from numbers to Date
+			for (const row of result.rows) {
+				for (const field of dateFields) {
+					const currentValue = row[field.name];
+
+					let date = new Date(currentValue + 'Z');
+					console.log('trying to parse date: ' + date.toUTCString() + ' raw: ' + currentValue);
+
+					if (date === undefined) {
+						throw new Error(
+							`Invalid value while casting to Date for ${field.name} field on row. Got ${currentValue}, expected as ISO date string.`
+						);
+					}
+
+					row[field.name] = date;
 				}
 			}
 		}

@@ -5,6 +5,16 @@
  * // JSON object type map?
  */
 
+export interface ExtendedSymbol {
+	contract: string;
+	symbol: string;
+}
+
+export interface ExtendedAsset {
+	contract: string;
+	quantity: string;
+}
+
 const types: { [key: string]: string } = {
 	string: 'string',
 	bool: 'boolean',
@@ -16,6 +26,9 @@ const types: { [key: string]: string } = {
 	table_name: 'string|number',
 	checksum: 'string',
 	checksum256: 'string',
+	extended_symbol: 'ExtendedSymbol',
+	extended_asset: 'ExtendedAsset',
+	time_point_sec: 'Date',
 	int8: 'number',
 	int16: 'number',
 	int32: 'number',

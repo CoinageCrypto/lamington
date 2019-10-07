@@ -5,6 +5,7 @@ import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { EOSManager } from './eosManager';
 import { TableRowsResult } from './contracts';
+import { verbose_logging } from './cli/lamington-test';
 
 // Extend Chai's expect methods
 chai.use(deepEqualInAnyOrder);
@@ -39,6 +40,29 @@ export const sleep = async (delayInMs: number) =>
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const nextBlock = () => sleep(500);
+
+/**
+ * Compares table rows against expected rows irrespective of order
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @param getTableRowsResult Get table rows result promise
+ * @param expected Expected table row query results
+ */
+export const assertRowsContain = async <RowType>(
+	getTableRowsResult: Promise<TableRowsResult<RowType>>,
+	expected: RowType,
+	strict: boolean = false
+) => {
+	// Pass-through strict comparison
+
+	// Call table row query and assert results eventually equal expected
+	const result = await getTableRowsResult;
+	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
+	// let matching: RowType[] = result.rows.some(value => {
+	// 	return value == expected;
+	// });
+	// chai.expect(matching.length > 0).to.be.true;
+	chai.expect(result.rows).contain(expected);
+};
 
 /**
  * Compares table rows against expected rows irrespective of order
@@ -139,6 +163,44 @@ export const assertEOSError = async (
 	}
 	// Fail if no exception thrown
 	assert.fail(`Expected ${description} but operation completed successfully.`);
+};
+
+/**
+ * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @param operation Operation promise
+ * @param description Output message description
+ */
+export const assertEOSMessageError = async (operation: Promise<any>, message: string) => {
+	const eosErrorName = 'eosio_assert_message_exception';
+	// Execute operation and handle exceptions
+	try {
+		await operation;
+	} catch (error) {
+		let errorMessage = error.json.error.details[0].message;
+		if (verbose_logging) {
+			console.log('full error message: ' + JSON.stringify(error, null, 4));
+		}
+		if (error.json && error.json.error && error.json.error.name && errorMessage) {
+			// Compare error and fail if the error doesn't match the expected
+			assert(
+				error.json.error.name === eosErrorName,
+				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
+			);
+			assert(
+				errorMessage.includes(message),
+				`Expected to include ${message}, got ${errorMessage} instead.`
+			);
+			return;
+		} else {
+			// Fail if error not thrown by EOS
+			assert.fail(
+				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
+			);
+		}
+	}
+	// Fail if no exception thrown
+	assert.fail(`Expected ${eosErrorName} but operation completed successfully.`);
 };
 
 /**
