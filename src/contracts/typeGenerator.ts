@@ -75,7 +75,11 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'',
 	];
 	// Define imports
-	const imports = ['Account', 'Contract', 'GetTableRowsOptions'];
+	const imports = [
+		'Account',
+		'Contract',
+		'GetTableRowsOptions',
+	];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
@@ -99,7 +103,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 			(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
 		);
 		// Optional parameter at the end on every contract method.
-		parameters.push('options?: { from?: Account }');
+		parameters.push('options?: { from?: Account, auths?: ActorPermission[] }');
 
 		return `${action.name}(${parameters.join(', ')}): Promise<any>;`;
 	});
