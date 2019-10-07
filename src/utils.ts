@@ -166,12 +166,15 @@ export const assertEOSError = async (
 };
 
 /**
- * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
+
+ * Asserts EOS throws an error and validates the error output name matches the
+ * expected 'eosio_assert_message_exception' and the error message includes `description`
  * @author Dallas Johnson <github.com/dallasjohnson>
  * @param operation Operation promise
  * @param description Output message description
  */
-export const assertEOSMessageError = async (operation: Promise<any>, message: string) => {
+
+export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
 	const eosErrorName = 'eosio_assert_message_exception';
 	// Execute operation and handle exceptions
 	try {

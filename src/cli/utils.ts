@@ -35,9 +35,9 @@ const WORKING_DIRECTORY = process.cwd();
 /** @hidden Temporary docker resource directory */
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 /** @hidden Slowest Expected test duration */
-const TEST_EXPECTED_DURATION = 2000;
+const TEST_EXPECTED_DURATION = 5000;
 /** @hidden Maximum test duration */
-const TEST_TIMEOUT_DURATION = 10000;
+const TEST_TIMEOUT_DURATION = 30000;
 /** @hidden Maximum number of EOS connection attempts before fail */
 const MAX_CONNECTION_ATTEMPTS = 8;
 
