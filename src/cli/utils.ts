@@ -369,12 +369,12 @@ export const build = async (contractPath: string) => {
 	// Compile contract at path
 	await compileContract(contractPath);
 	// Generate Typescript definitions for contract
-	spinner.create(`Generating type definitions`);
+	spinner.create(`Generating type definitions:` + contractPath);
 	try {
 		await generateTypes(pathToIdentifier(contractPath));
-		spinner.end(`Generated type definitions`);
+		spinner.end(`Generated type definitions: ` + contractPath);
 	} catch (error) {
-		spinner.fail(`Failed to generate type definitions`);
+		spinner.fail(`Failed to generate type definitions: ` + contractPath);
 		console.log(` --> ${error.message}`);
 	}
 };
@@ -396,7 +396,7 @@ export const outputPathForContract = (contractPath: string) =>
  */
 export const compileContract = async (contractPath: string) => {
 	// Begin logs
-	spinner.create(`Compiling contract`);
+	spinner.create(`Compiling contract: ` + contractPath);
 
 	const basename = path.basename(contractPath, '.cpp');
 
@@ -428,5 +428,5 @@ export const compileContract = async (contractPath: string) => {
 			throw err;
 		});
 	// Notify build task completed
-	spinner.end(`Compiled contract`);
+	spinner.end(`Compiled contract output into folder: ` + outputPath);
 };
