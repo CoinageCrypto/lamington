@@ -75,7 +75,6 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'',
 	];
 	// Define imports
-
 	const imports = [
 		'Account',
 		'Contract',
@@ -106,7 +105,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 			(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
 		);
 		// Optional parameter at the end on every contract method.
-		parameters.push('options?: { from?: Account }');
+		parameters.push('options?: { from?: Account, auths?: ActorPermission[] }');
 
 		return `${action.name}(${parameters.join(', ')}): Promise<any>;`;
 	});

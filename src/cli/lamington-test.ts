@@ -11,6 +11,9 @@ import { ConfigManager } from '../configManager';
 const run = async () => {
 	// Initialize the configuration
 	await ConfigManager.initWithDefaults();
+	const args = process.argv;
+
+	console.log('args: ' + args);
 
 	// Stop running instances for fresh test environment
 	if (await eosIsReady()) {
@@ -22,7 +25,9 @@ const run = async () => {
 		await startEos();
 	}
 	// Start compiling smart contracts
+	if (!args.includes('skip-build')) {
 	await buildAll();
+	}
 	// Begin running tests
 	await runTests();
 	// Stop EOSIO instance if keepAlive is false

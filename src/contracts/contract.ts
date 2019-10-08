@@ -36,6 +36,11 @@ export interface GetTableRowsOptions {
 	showPayer?: boolean;
 }
 
+export interface ActorPermission {
+	actor: string;
+	permission: string;
+}
+
 /**
  * Adds additional functionality to the EOSJS `Contract` class
  */
@@ -104,15 +109,19 @@ export class Contract implements EOSJSContract {
 
 				// Who are we acting as?
 				// We default to sending transactions from the contract account.
-				let authorization = account;
+				let authorization: Array<ActorPermission> = account.active;
 				const options = arguments[action.fields.length];
 
-				if (options && options.from && options.from instanceof Account) {
-					authorization = options.from;
-				}
+				if (options) {
+					if (options.from && options.from instanceof Account) {
+						authorization = options.from.active;
 
 				// Ensure we have the key to sign with.
-				EOSManager.addSigningAccountIfMissing(authorization);
+						EOSManager.addSigningAccountIfMissing(options.from);
+					} else if (options.auths && options.auths instanceof Array) {
+						authorization = options.auths;
+					}
+				}
 
 				return EOSManager.transact(
 					{
@@ -120,7 +129,7 @@ export class Contract implements EOSJSContract {
 							{
 								account: account.name,
 								name: action.name,
-								authorization: authorization.active,
+								authorization: authorization,
 								data,
 							},
 						],

@@ -11,7 +11,7 @@ program
 	.command('build [contract_path]', 'build all smart contracts')
 	.command('start', 'start the eos blockchain in docker')
 	.command('stop', 'stop the eos blockchain in docker')
-	.command('test', 'run your unit / integration tests')
+	.command('test [skip-build]', 'run your unit / integration tests')
 	.on('*', () => {
 		console.log('Unknown Command: ' + program.args.join(' '));
 		program.help();
