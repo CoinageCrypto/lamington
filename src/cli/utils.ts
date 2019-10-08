@@ -275,6 +275,7 @@ export const runTests = async () => {
 	// pretty reasonable in our case and it's possible a successful test would take 10 seconds.
 	mocha.slow(TEST_EXPECTED_DURATION);
 	mocha.timeout(TEST_TIMEOUT_DURATION);
+	mocha.reporter(ConfigManager.testReporter);
 
 	// Run the tests.
 	await new Promise((resolve, reject) =>
