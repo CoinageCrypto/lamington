@@ -17,10 +17,13 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
  * @author Mitch Pierias <github.com/MitchPierias>
  * @param eosType
  */
-export const mapParameterType = (eosType: string) => {
+export const mapParameterType = (contractName: string, contractStructs: any, eosType: string) => {
 	// Handle array types
 	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
-	const type = mapTypes[eosType.replace('[]', '')] || 'string';
+	const parameterType = eosType.replace('[]', '');
+	const type = contractStructs[parameterType]
+		? pascalCase(contractName) + pascalCase(parameterType)
+		: mapTypes[parameterType] || 'string';
 	if (wrapper) {
 		return `${wrapper}<${type}>`;
 	} else {
@@ -87,22 +90,22 @@ export const generateTypes = async (contractIdentifier: string) => {
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
 	result.push('');
 	result.push('// Table row types');
-	// Generate table row types from ABI
-	for (const table of contractTables) {
-		const tableInterface = {
-			[`export interface ${pascalCase(contractName)}${pascalCase(table.name)}`]: contractStructs[
-				table.type
-			].fields.map((field: any) => `${field.name}: ${mapParameterType(field.type)};`),
+	// Generate structs from ABI
+	for (const key in contractStructs) {
+		const structInterface = {
+			[`export interface ${pascalCase(contractName)}${pascalCase(key)}`]: contractStructs[key].fields.map(
+				(field: any) => `${field.name}: ${mapParameterType(contractName, {}, field.type)};`
+			),
 		};
 
-		result.push(tableInterface);
+		result.push(structInterface);
 		result.push('');
 	}
 	// Generate contract type from ABI
 	const generatedContractActions = contractActions.map((action: any) => {
 		// With a function for each action
 		const parameters = contractStructs[action.name].fields.map(
-			(parameter: any) => `${parameter.name}: ${mapParameterType(parameter.type)}`
+			(parameter: any) => `${parameter.name}: ${mapParameterType(contractName, contractStructs, parameter.type)}`
 		);
 		// Optional parameter at the end on every contract method.
 		parameters.push('options?: { from?: Account, auths?: ActorPermission[] }');
@@ -112,11 +115,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
-			`${camelCase(
-				table.name
-			)}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(
-				contractName
-			)}${pascalCase(table.name)}>>;`
+			`${camelCase(table.name) + 'Table'}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(contractName)}${pascalCase(table.type)}>>;`
 	);
 	// Generate the contract interface with actions and tables
 	const contractInterface = {
