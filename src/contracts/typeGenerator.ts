@@ -79,6 +79,8 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'Account',
 		'Contract',
 		'GetTableRowsOptions',
+		'ExtendedAsset',
+		'ExtendedSymbol',
 	];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
