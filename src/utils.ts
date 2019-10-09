@@ -4,6 +4,7 @@ import * as chai from 'chai';
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { EOSManager } from './eosManager';
+import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
 
 // Extend Chai's expect methods
@@ -123,6 +124,9 @@ export const assertEOSError = async (
 	try {
 		await operation;
 	} catch (error) {
+		if (verbose_logging) {
+			console.log('Verbose error output: ' + JSON.stringify(error, null, 4));
+		}
 		if (error.json && error.json.error && error.json.error.name) {
 			// Compare error and fail if the error doesn't match the expected
 			assert(
