@@ -15,15 +15,26 @@ type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
  * Parses a C++ type definition into a Typescript definition
  * @author Kevin Brown <github.com/thekevinbrown>
  * @author Mitch Pierias <github.com/MitchPierias>
- * @param eosType
+ * @param eosType The type from the ABI we want to map over to a Typescript type
+ * @param contractName (optional) The name of the contract to prefix the mapped type with if this is a contract struct type
+ * @param contractStructs (optional) Structs in the contract used to match against, falling back to built in types if not found
  */
-export const mapParameterType = (contractName: string, contractStructs: any, eosType: string) => {
+export const mapParameterType = ({
+	eosType,
+	contractName,
+	contractStructs,
+}: {
+	eosType: string;
+	contractName?: string;
+	contractStructs?: any;
+}) => {
 	// Handle array types
 	const wrapper = eosType.endsWith('[]') ? 'Array' : undefined;
 	const parameterType = eosType.replace('[]', '');
-	const type = contractStructs[parameterType]
-		? pascalCase(contractName) + pascalCase(parameterType)
-		: mapTypes[parameterType] || 'string';
+	const type =
+		contractStructs && contractName && contractStructs[parameterType]
+			? pascalCase(contractName) + pascalCase(parameterType)
+			: mapTypes[parameterType] || 'string';
 	if (wrapper) {
 		return `${wrapper}<${type}>`;
 	} else {
@@ -93,8 +104,10 @@ export const generateTypes = async (contractIdentifier: string) => {
 	// Generate structs from ABI
 	for (const key in contractStructs) {
 		const structInterface = {
-			[`export interface ${pascalCase(contractName)}${pascalCase(key)}`]: contractStructs[key].fields.map(
-				(field: any) => `${field.name}: ${mapParameterType(contractName, {}, field.type)};`
+			[`export interface ${pascalCase(contractName)}${pascalCase(key)}`]: contractStructs[
+				key
+			].fields.map(
+				(field: any) => `${field.name}: ${mapParameterType({ contractName, eosType: field.type })};`
 			),
 		};
 
@@ -105,7 +118,12 @@ export const generateTypes = async (contractIdentifier: string) => {
 	const generatedContractActions = contractActions.map((action: any) => {
 		// With a function for each action
 		const parameters = contractStructs[action.name].fields.map(
-			(parameter: any) => `${parameter.name}: ${mapParameterType(contractName, contractStructs, parameter.type)}`
+			(parameter: any) =>
+				`${parameter.name}: ${mapParameterType({
+					contractName,
+					contractStructs,
+					eosType: parameter.type,
+				})}`
 		);
 		// Optional parameter at the end on every contract method.
 		parameters.push('options?: { from?: Account, auths?: ActorPermission[] }');
@@ -115,7 +133,10 @@ export const generateTypes = async (contractIdentifier: string) => {
 	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
-			`${camelCase(table.name) + 'Table'}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(contractName)}${pascalCase(table.type)}>>;`
+			`${camelCase(table.name) +
+				'Table'}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(
+				contractName
+			)}${pascalCase(table.type)}>>;`
 	);
 	// Generate the contract interface with actions and tables
 	const contractInterface = {
