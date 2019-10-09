@@ -18,6 +18,7 @@ nodeos -e -p eosio -d /mnt/dev/data \
   --max-transaction-time=1000 \
   --http-validate-host=false \
   --plugin eosio::producer_plugin \
+  --plugin eosio::producer_api_plugin \
   --plugin eosio::chain_api_plugin \
   --plugin eosio::http_plugin \
   --http-server-address=0.0.0.0:8888 \
@@ -34,10 +35,38 @@ do
   sleep 1s
 done
 
+syskey_pub=EOS6MRyAjQq8ud7hVNYcfnVPJqcVpscN5So8BhtHuGYqET5GDW5CV
+syskey_priv=5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+contracts_dir=/usr/opt/eosio.contracts/build/contracts
+
 echo "=== lamington: setup wallet: lamington ==="
 # First key import is for eosio system account
 cleos wallet create -n eosiomain --to-console | tail -1 | sed -e 's/^"//' -e 's/"$//' > eosiomain_wallet_password.txt
-cleos wallet import -n eosiomain --private-key 5KQwrPbwdL6PhXujxW37FSSQZ1JiwsST4cqQzDeyXtP79zkvFD3
+cleos wallet import -n eosiomain --private-key $syskey_priv
+
+echo "=== lamington: create system accounts ==="
+declare -a system_accounts=("bpay" "msig" "names" "ram" "ramfee" "saving" "stake" "token" "vpay" "rex")
+sleep 1s
+for account in "${system_accounts[@]}"; do
+    cleos create account eosio "eosio.$account" $syskey_pub
+done
+
+echo "=== lamington: activate protocol features ==="
+curl --silent --output /dev/null -X POST localhost:8888/v1/producer/schedule_protocol_feature_activations \
+  -d '{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}'
+sleep 2s
+
+echo "=== lamington: install system contracts ==="
+cleos set contract eosio "$contracts_dir/eosio.system" -p eosio@active
+cleos set contract eosio.token "$contracts_dir/eosio.token"
+cleos set contract eosio.msig "$contracts_dir/eosio.msig"
+
+echo "=== lamington: create tokens ==="
+cleos push action eosio.token create '[ "eosio", "1000000000.0000 EOS"]' -p eosio.token
+cleos push action eosio.token issue '["eosio", "100000000.0000 EOS", "memo"]\' -p eosio
+
+echo "=== lamington: init system contract ==="
+cleos push action eosio init '[0, "4,EOS"]' -p eosio@active
 
 # put the background nodeos job to foreground for docker run
 fg %1
