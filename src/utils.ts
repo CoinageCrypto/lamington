@@ -164,7 +164,7 @@ export const assertEOSError = async (
 	eosErrorName: string,
 	description: string
 ) => {
-	if (assertExpectedEOSError(operation, eosErrorName, _ => {})) {
+	if (assertExpectedEOSError(operation, eosErrorName)) {
 		// Execute operation and handle exceptions
 		assert.fail(`Expected ${description} but operation completed successfully.`);
 	}
@@ -180,12 +180,9 @@ export const assertEOSError = async (
 export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
 	const eosErrorName = 'eosio_assert_message_exception';
 	// Execute operation and handle exceptions
-	console.log('should get here for the error' + message);
-
 	if (
 		!(await assertExpectedEOSError(operation, eosErrorName, error => {
 			let errorMessage = error.json.error.details[0].message;
-			console.log('should get here before error meassge chack: ' + JSON.stringify(error));
 
 			if (!errorMessage) {
 				assert.fail(
@@ -196,7 +193,6 @@ export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, mes
 				errorMessage.includes(message),
 				`Expected to include ${message}, got ${errorMessage} instead.`
 			);
-			console.log('should not get here');
 		}))
 	) {
 		// Fail if no exception thrown
