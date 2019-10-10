@@ -89,13 +89,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'',
 	];
 	// Define imports
-	const imports = [
-		'Account',
-		'Contract',
-		'GetTableRowsOptions',
-		'ExtendedAsset',
-		'ExtendedSymbol',
-	];
+	const imports = ['Account', 'Contract', 'GetTableRowsOptions', 'ExtendedAsset', 'ExtendedSymbol'];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
