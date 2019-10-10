@@ -139,15 +139,15 @@ const assertExpectedEOSError = async (
 				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
 			);
 			if (furtherErrorCheck) {
-				furtherErrorCheck(error)
-			};
+				furtherErrorCheck(error);
+			}
 		} else {
 			// Fail if error not thrown by EOS
 			assert.fail(
 				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
 			);
 		}
-		return true
+		return true;
 	}
 	return false;
 };
@@ -164,7 +164,7 @@ export const assertEOSError = async (
 	eosErrorName: string,
 	description: string
 ) => {
-	if (assertExpectedEOSError(operation, eosErrorName, (_) => {})) {
+	if (assertExpectedEOSError(operation, eosErrorName, _ => {})) {
 		// Execute operation and handle exceptions
 		assert.fail(`Expected ${description} but operation completed successfully.`);
 	}
@@ -183,7 +183,7 @@ export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, mes
 	console.log('should get here for the error' + message);
 
 	if (
-		!(await assertExpectedEOSError(operation, eosErrorName, (error)  => {
+		!(await assertExpectedEOSError(operation, eosErrorName, error => {
 			let errorMessage = error.json.error.details[0].message;
 			console.log('should get here before error meassge chack: ' + JSON.stringify(error));
 
@@ -197,8 +197,8 @@ export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, mes
 				`Expected to include ${message}, got ${errorMessage} instead.`
 			);
 			console.log('should not get here');
-		})
-	)) {
+		}))
+	) {
 		// Fail if no exception thrown
 		assert.fail(
 			`Expected ${eosErrorName} with message to include ${message} but operation completed successfully.`
