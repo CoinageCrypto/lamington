@@ -94,24 +94,21 @@ export const buildImage = async () => {
 	await rimraf(TEMP_DOCKER_DIRECTORY);
 	await mkdirp(TEMP_DOCKER_DIRECTORY);
 	// Write a Dockerfile so Docker knows what to build.
-	const systemDeps = [
-		'build-essential',
-		'ca-certificates',
-		'cmake',
-		'curl',
-		'git',
-		'wget',
-	]
+	const systemDeps = ['build-essential', 'ca-certificates', 'cmake', 'curl', 'git', 'wget'];
 	await writeFile(
 		path.join(TEMP_DOCKER_DIRECTORY, 'Dockerfile'),
 		`
 		FROM ubuntu:18.04
 
-		RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends ${systemDeps.join(' ')}
+		RUN apt-get update --fix-missing && apt-get install -y --no-install-recommends ${systemDeps.join(
+			' '
+		)}
 		RUN wget ${ConfigManager.cdt} && apt-get install -y ./*.deb && rm -f *.deb
 		RUN wget ${ConfigManager.eos} && apt-get install -y ./*.deb && rm -f *.deb
 		RUN eos_ver=$(ls /usr/opt/eosio | head -n 1); \
-			git clone --depth 1 --branch ${ConfigManager.contracts} https://github.com/EOSIO/eosio.contracts.git /usr/opt/eosio.contracts &&\
+			git clone --depth 1 --branch ${
+				ConfigManager.contracts
+			} https://github.com/EOSIO/eosio.contracts.git /usr/opt/eosio.contracts &&\
 			cd /usr/opt/eosio.contracts && ./build.sh -e "/usr/opt/eosio/$eos_ver" -c /usr/opt/eosio.cdt
 		RUN apt-get clean && rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 		`.replace(/\t/gm, '')

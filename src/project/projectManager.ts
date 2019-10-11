@@ -33,10 +33,10 @@ const DEFAULT_SCRIPTS = {
 
 /** Required project dependencies */
 const DEFAULT_DEV_DEPENDENCIES = {
-	'lamington': 'latest',
-	'chai':'latest',
-	'@types/chai':'latest',
-	'@types/mocha':'latest'
+	lamington: 'latest',
+	chai: 'latest',
+	'@types/chai': 'latest',
+	'@types/mocha': 'latest',
 };
 
 /**
@@ -149,24 +149,29 @@ export class ProjectManager {
 				// Ensure tmp directory exists and capture directory path
 				const tmpPath = await ProjectManager.createDirectoryIfMissing('__tmp__');
 				// Stream the repo clone and untar
-				got.stream(cloneUrl).pipe(tar.extract({
-					cwd: tmpPath,
-					strip:1
-				})).on('error', (error:Error) => {
-					reject(error);
-				}).on('end', async () => {
-					// Clone example repository into tmp
-					const clonedFiles = await readdir(tmpPath);
-					if (clonedFiles.length <= 0)
-						throw new Error(`No files cloned from repo ${cloneUrl}`);
-					// Merge example contracts into current project
-					await ncp(path.join(tmpPath, 'contracts'), path.join(process.cwd(), 'contracts'));
-					// Cleanup temporary directory
-					spinner.update('Cleaning temporary files');
-					await rimraf(tmpPath);
-					spinner.end('Created example contracts');
-					resolve(true);
-				});
+				got
+					.stream(cloneUrl)
+					.pipe(
+						tar.extract({
+							cwd: tmpPath,
+							strip: 1,
+						})
+					)
+					.on('error', (error: Error) => {
+						reject(error);
+					})
+					.on('end', async () => {
+						// Clone example repository into tmp
+						const clonedFiles = await readdir(tmpPath);
+						if (clonedFiles.length <= 0) throw new Error(`No files cloned from repo ${cloneUrl}`);
+						// Merge example contracts into current project
+						await ncp(path.join(tmpPath, 'contracts'), path.join(process.cwd(), 'contracts'));
+						// Cleanup temporary directory
+						spinner.update('Cleaning temporary files');
+						await rimraf(tmpPath);
+						spinner.end('Created example contracts');
+						resolve(true);
+					});
 			});
 		} catch (error) {
 			spinner.fail('Failed to clone repository');

@@ -33,7 +33,7 @@ const run = async () => {
 	}
 	// Start compiling smart contracts
 	if (!args.includes('skip-build')) {
-	await buildAll();
+		await buildAll();
 	}
 	// Begin running tests
 	await runTests();

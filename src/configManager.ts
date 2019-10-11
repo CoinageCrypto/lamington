@@ -48,10 +48,10 @@ export enum LamingtonDebugLevel {
  * values by specifying them in their `.lamingtonrc`
  */
 const DEFAULT_CONFIG = {
-	eos:'',
-	cdt:'',
-	contracts:'v1.8.0-rc1',
-	debug:LamingtonDebugLevel.NONE,
+	eos: '',
+	cdt: '',
+	contracts: 'v1.8.0-rc1',
+	debug: LamingtonDebugLevel.NONE,
 	debugTransactions: false,
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
@@ -117,7 +117,7 @@ export class ConfigManager {
 		return asset.browser_download_url as string;
 	}
 
-	public static async isValidConfig(config:object) {
+	public static async isValidConfig(config: object) {
 		return true;
 	}
 
@@ -129,7 +129,11 @@ export class ConfigManager {
 	 */
 	public static async createConfigIfMissing(atPath = CONFIGURATION_FILE_NAME) {
 		// Prevent overwriting existing configuration when valid
-		if (await ConfigManager.configExists(atPath) && await ConfigManager.isValidConfig(ConfigManager.config)) return;
+		if (
+			(await ConfigManager.configExists(atPath)) &&
+			(await ConfigManager.isValidConfig(ConfigManager.config))
+		)
+			return;
 		// Create the config directory
 		await mkdirp(CACHE_DIRECTORY);
 		// Fetch the latest repository configuration
