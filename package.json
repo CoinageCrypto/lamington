@@ -57,7 +57,7 @@
 		"@types/ora": "3.2.0",
 		"@types/rimraf": "2.0.3",
 		"@types/text-encoding": "0.0.35",
-		"auto-changelog": "1.16.1",
+		"auto-changelog": "1.16.2",
 		"eosjs": "20.0.0",
 		"eosjs-ecc": "4.0.7",
 		"prettier": "1.18.2",
