@@ -70,7 +70,7 @@
 		"chai": "4.2.0",
 		"clarify": "2.1.0",
 		"colors": "1.4.0",
-		"commander": "3.0.2",
+		"commander": "4.0.0",
 		"deep-equal-in-any-order": "1.0.21",
 		"docker-cli-js": "2.5.2",
 		"dotenv": "8.2.0",
