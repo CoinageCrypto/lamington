@@ -74,7 +74,7 @@
 		"deep-equal-in-any-order": "1.0.21",
 		"docker-cli-js": "2.5.2",
 		"dotenv": "8.2.0",
-		"glob": "7.1.5",
+		"glob": "7.1.6",
 		"got": "^9.6.0",
 		"mkdirp": "0.5.1",
 		"mocha": "6.2.2",
