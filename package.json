@@ -60,7 +60,7 @@
 		"auto-changelog": "1.16.2",
 		"eosjs": "20.0.0",
 		"eosjs-ecc": "4.0.7",
-		"prettier": "1.18.2",
+		"prettier": "1.19.1",
 		"ts-node": "8.4.1",
 		"typedoc": "0.14.2",
 		"typescript": "3.6.4"
