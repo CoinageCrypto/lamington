@@ -219,7 +219,6 @@ export class Contract implements EOSJSContract {
 					const currentValue = row[field.name];
 
 					let date = new Date(currentValue + 'Z');
-					console.log('trying to parse date: ' + date.toUTCString() + ' raw: ' + currentValue);
 
 					if (date === undefined) {
 						throw new Error(
