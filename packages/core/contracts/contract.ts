@@ -1,40 +1,11 @@
 import { Account, AccountManager } from '../accounts';
 import { nextBlock } from '@lamington/api';
+import { ContractConstructorArgs, GetTableRowsOptions } from '@lamington/interfaces';
 import { Api } from 'eosjs';
 import { Contract as EOSJSContract, Type } from 'eosjs/dist/eosjs-serialize';
 import { EOSManager } from '../eosManager';
 import { Abi } from 'eosjs/dist/eosjs-rpc-interfaces';
 import { camelCase } from './utils';
-
-export interface ContractActionParameters {
-	[key: string]: any;
-}
-
-export interface ContractActionOptions {
-	from?: Account;
-	debug?: boolean;
-}
-
-export interface ContractConstructorArgs {
-	eos: Api;
-	identifier?: string;
-	account: Account;
-	abi: Abi;
-	actions: Map<string, Type>;
-	types: Map<string, Type>;
-}
-
-export interface GetTableRowsOptions {
-	scope?: string;
-	tableKey?: string;
-	lowerBound?: any;
-	upperBound?: any;
-	indexPosition?: any;
-	keyType?: any;
-	limit?: number;
-	reverse?: boolean;
-	showPayer?: boolean;
-}
 
 /**
  * Adds additional functionality to the EOSJS `Contract` class

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import * as program from 'commander';
 import * as cliUtils from './utils';
 export * from './logIndicator';

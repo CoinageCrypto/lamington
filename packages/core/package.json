@@ -4,6 +4,9 @@
 	"private": true,
 	"main": "index.ts",
 	"license": "MIT",
+	"scripts": {
+		"link": "yalc publish --private"
+	},
 	"devDependencies": {
 		"@types/chai": "4.1.7",
 		"@types/mkdirp": "0.5.2",

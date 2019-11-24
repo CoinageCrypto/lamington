@@ -8,6 +8,10 @@ import { pascalCase, camelCase } from './utils';
 
 const glob = promisify(globWithCallbacks);
 
+const IMPORTS: { [key: string]: string[] } = {
+	'@lamington/api': ['Account', 'Contract', 'GetTableRowsOptions'],
+};
+
 type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGeneratorLevel };
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
@@ -21,8 +25,7 @@ export const mapParameterType = (eosType: string) => {
 	// Handle array types
 	const type = mapTypes[eosType.replace('[]', '')] || 'string';
 	// Handle array types
-	if (eosType.endsWith('[]'))
-		return `${type}[]`;
+	if (eosType.endsWith('[]')) return `${type}[]`;
 	return type;
 };
 
@@ -72,11 +75,11 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'// =====================================================',
 		'',
 	];
-	// Define imports
-	const imports = ['Account', 'Contract', 'GetTableRowsOptions'];
-	if (contractTables.length > 0) imports.push('TableRowsResult');
+	if (contractTables.length > 0) IMPORTS['@lamington/api'].push('TableRowsResult');
 	// Generate import definitions
-	result.push(`import { ${imports.join(', ')} } from '@lamington/core';`);
+	for (let dependency in IMPORTS) {
+		result.push(`import { ${IMPORTS[dependency].join(', ')} } from '${dependency}'`);
+	}
 	result.push('');
 	result.push('// Table row types');
 	// Generate table row types from ABI

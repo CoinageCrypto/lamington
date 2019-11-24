@@ -40,6 +40,10 @@ export const assertEOSError = async (
 	assert.fail(`Expected ${withMessage || 'error'} but operation completed successfully.`);
 };
 
+export const assertEOSErrorMessage = async (operation: Promise<any>, message: string) => {
+	return assertEOSError(operation, 'eosio_assert_message_exception', message);
+};
+
 /**
  * Asserts operation throws an `eosio_assert_message_exception` error
  * @author Kevin Brown <github.com/thekevinbrown>

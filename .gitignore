@@ -62,8 +62,6 @@ typings/
 
 # Typescript build output
 lib/
-out/
-dist/
 
 # Apple files
 .DS_Store

@@ -1,10 +1,10 @@
 {
 	"compilerOptions": {
-		"baseUrl": "./",
-		"outDir": "./lib",
+		"baseUrl": "packages",
+		"outDir": "lib",
+		"module": "commonjs",
 		"target": "es6",
 		"lib": ["es6", "es2015", "dom"],
-		"module": "commonjs",
 		"allowSyntheticDefaultImports": true,
 		"experimentalDecorators": true,
 		"declaration": true,
@@ -12,13 +12,20 @@
 		"strict": true,
 		"strictNullChecks": true,
 		"importHelpers": true,
+		"downlevelIteration": true,
 		"paths": {
-			"*": ["@types/*"]
+			"*": ["@types/*"],
+			"@lamington/api": ["packages/api/*"],
+			"@lamington/cli": ["packages/cli/*"],
+			"@lamington/common": ["packages/common/*"],
+			"@lamington/core": ["packages/core/*"],
+			"@lamington/docker": ["packages/docker"],
+			"@lamington/interfaces": ["packages/interfaces/*"]
 		},
 		"noImplicitAny": true,
 		"noUnusedLocals": true,
 		"typeRoots": ["node_modules/@types", "@types"]
 	},
-	"include": ["**/*", "./**/*.d.ts"],
+	"include": ["**/*"],
 	"exclude": ["**/lib/**"]
 }

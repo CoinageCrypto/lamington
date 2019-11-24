@@ -1,39 +1,41 @@
 {
 	"name": "lamington",
-	"description": "A suite of tools to make building and testing EOS smart contracts easier.",
+	"version": "1.0.0-alpha.4",
+	"description": "Compile and test library for EOSIO Smart Contracts.",
+	"main": "lib/index.js",
 	"private": true,
-	"main": "out/index.js",
-	"types": "out/index.d.ts",
-	"files": [
-		"out/**"
-	],
 	"scripts": {
-		"build": "yarn clean; tsc",
-		"clean": "rm -rf ./out; lerna run clean",
-		"clean:link": "yarn unlink; rm -rf ~/.config/yarn/link/lamington",
+		"go": "node ./packages/common/runner/main.js",
+		"build": "yarn clean; yarn; tsc; yarn run copy:scripts",
+		"copy:scripts": "cp -r ./packages/cli/scripts/ ./lib/cli/scripts/",
+		"link": "lerna run link",
+		"clean": "rm -rf ./lib; lerna clean --yes",
+		"clean:link": "yarn unlink && yalc remove && rm -rf ~/.config/yarn/link/lamington",
 		"docs": "lerna run docs",
 		"format": "lerna run prettier",
 		"lint": "",
-		"publish:dev": "yalc publish --private"
+		"publish": "",
+		"publish:local": "yarn clean:link; yalc publish --private"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/CoinageCrypto/lamington.git"
 	},
 	"bin": {
-		"lamington": "packages/all/lib"
+		"lamington": "lib/cli/index.js"
 	},
+	"files": [
+		"lib/**/*"
+	],
 	"keywords": [
 		"EOS",
 		"EOS.io",
+		"EOSIO",
 		"Smart Contract",
 		"C++",
 		"wasm",
 		"Typescript",
 		"Truffle",
-		"Compile",
-		"Deployment",
-		"Testing",
 		"Unit Testing",
 		"Mocha",
 		"Lerna"
@@ -61,16 +63,18 @@
 	},
 	"homepage": "https://github.com/CoinageCrypto/lamington#readme",
 	"devDependencies": {
+		"awesome-typescript-loader": "^5.2.1",
 		"lerna": "^3.16.4",
+		"path": "^0.12.7",
 		"prettier": "1.18.2",
 		"typescript": "3.5.2",
+		"webpack": "^4.41.0",
 		"yalc": "^1.0.0-pre.34"
 	},
 	"dependencies": {
 		"chai": "^4.2.0"
 	},
-	"useWorkspaces": true,
 	"workspaces": [
-		"packages/**"
+		"packages/*"
 	]
 }

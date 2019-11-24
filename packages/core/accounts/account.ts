@@ -1,7 +1,6 @@
 import * as ecc from 'eosjs-ecc';
-
 import { AccountManager } from './accountManager';
-import { Permissions } from './permissions';
+import { Permissions } from '@lamington/interfaces';
 
 export class Account {
 	/** EOSIO account name */

@@ -6,6 +6,7 @@
 	"main": "index.ts",
 	"scripts": {
 		"prepare": "yarn copy:scripts",
+		"link": "yalc publish --private",
 		"copy:scripts": "cp -r ./scripts/ ../../out"
 	},
 	"license": "MIT",

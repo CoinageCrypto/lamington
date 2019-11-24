@@ -1,14 +1,8 @@
-import { Api } from 'eosjs';
+import { AccountCreationOptions } from '@lamington/interfaces';
 import * as ecc from 'eosjs-ecc';
-
 import { Account } from './account';
 import { accountNameFromPublicKey } from './utils';
 import { EOSManager } from '../eosManager';
-
-interface AccountCreationOptions {
-	creator?: Account;
-	eos?: Api;
-}
 
 export class AccountManager {
 	/**
@@ -41,7 +35,7 @@ export class AccountManager {
 			await AccountManager.setupAccount(account, options);
 			accounts.push(account);
 		}
-		// Return created acounts
+		// Return created accounts
 		return accounts;
 	};
 

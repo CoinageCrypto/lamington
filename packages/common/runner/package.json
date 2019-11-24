@@ -1,0 +1,23 @@
+{
+	"name": "@lamington/runner",
+	"version": "1.0.0",
+	"private": true,
+	"license": "MIT",
+	"main": "main.js",
+	"bin": {
+		"go": "./main.js"
+	},
+	"scripts": {
+		"link": "yalc publish --private"
+	},
+	"devDependencies": {
+		"@types/chalk": "^2.2.0",
+		"@types/figlet": "^1.2.0",
+		"@types/inquirer": "^6.0.1",
+		"@types/shelljs": "^0.8.5",
+		"chalk": "^2.4.2",
+		"figlet": "^1.2.1",
+		"inquirer": "^6.3.1",
+		"shelljs": "^0.8.3"
+	}
+}

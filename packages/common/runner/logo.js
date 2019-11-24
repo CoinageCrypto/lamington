@@ -1,0 +1,20 @@
+module.exports = `WWWWWWWWWWWWWWWWWWWWWWWWW*.:@WWWWWWWWWW
+WWWWWWWWWWWWWWWWWWWWWWW+-===+-@WWWWWWWW
+WWWWWWWWWWWWWWWWWWWWW+-=======+-@WWWWWW
+WWWWWWWWWWWWWWWWWWW+-===========+-@WWWW
+WWWWWWWWWWWWWWWWW+-===============+-@WW
+WWWWWWWWWWWWWWW+-=======*:--+=======+-@
+WWWWWWWWWWWWW+-========+.....-========+
+WWWWWWWWWWW+:*.+=======*.....:========-
+WWWWWWWWW+:====*.+=======*++========-+W
+WWWWWWW+:========*.+==============-+WWW
+WWWWW+:============*.+==========-+WWWWW
+WWW+:================*.+======-+WWWWWWW
+W+:===:...-====*...-===*.+==-+WWWWWWWWW
+.====+.....-==*......====*.+WWWWWWWWWWW
+@-*===-....*===:....+===:+WWWWWWWWWWWWW
+WW@-*=================:+WWWWWWWWWWWWWWW
+WWWW@-*=============:+WWWWWWWWWWWWWWWWW
+WWWWWW@-*=========:+WWWWWWWWWWWWWWWWWWW
+WWWWWWWW@-*=====:+WWWWWWWWWWWWWWWWWWWWW
+WWWWWWWWWW@-+=:+W@WWWWWWWWWWWWWWWWWWWWW`;
