@@ -48,7 +48,7 @@ const MAX_CONNECTION_ATTEMPTS = 8;
  */
 const versionFromUrl = (url: string) => {
 	// Looks for strings in this format: `/v1.4.6/`
-	const pattern = /\/(v\d+\.\d+\.\d+)\//g;
+	const pattern = /\/(v\d+\.\d+\.\d+.*)\//g;
 	const result = pattern.exec(url);
 
 	// Handle result
