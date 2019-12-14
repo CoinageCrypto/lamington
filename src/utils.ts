@@ -6,7 +6,6 @@ import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 import { EOSManager } from './eosManager';
 import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
-import { verbose_logging } from './cli/lamington-test';
 
 // Extend Chai's expect methods
 chai.use(deepEqualInAnyOrder);
@@ -201,8 +200,12 @@ export const assertEOSError = async (
  * @param operation Operation promise
  * @param message Output message expected to be included
  */
-export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
-	const eosErrorName = 'eosio_assert_message_exception';
+export const assertEOSErrorIncludesMessage = async (
+	operation: Promise<any>,
+	message: string,
+	errorName?: string
+) => {
+	const eosErrorName = errorName || 'eosio_assert_message_exception';
 	// Execute operation and handle exceptions
 	if (
 		!(await assertExpectedEOSError(operation, eosErrorName, error => {
@@ -227,52 +230,11 @@ export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, mes
 };
 
 /**
-
- * Asserts EOS throws an error and validates the error output name matches the
- * expected 'eosio_assert_message_exception' and the error message includes `description`
- * @author Dallas Johnson <github.com/dallasjohnson>
- * @param operation Operation promise
- * @param description Output message description
- */
-
-export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
-	const eosErrorName = 'eosio_assert_message_exception';
-	// Execute operation and handle exceptions
-	try {
-		await operation;
-	} catch (error) {
-		let errorMessage = error.json.error.details[0].message;
-		if (verbose_logging) {
-			console.log('full error message: ' + JSON.stringify(error, null, 4));
-		}
-		if (error.json && error.json.error && error.json.error.name && errorMessage) {
-			// Compare error and fail if the error doesn't match the expected
-			assert(
-				error.json.error.name === eosErrorName,
-				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
-			);
-			assert(
-				errorMessage.includes(message),
-				`Expected to include ${message}, got ${errorMessage} instead.`
-			);
-			return;
-		} else {
-			// Fail if error not thrown by EOS
-			assert.fail(
-				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
-			);
-		}
-	}
-	// Fail if no exception thrown
-	assert.fail(`Expected ${eosErrorName} but operation completed successfully.`);
-};
-
-/**
  * Asserts operation throws an `eosio_assert_message_exception` error
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
-export const assertEOSException = (operation: Promise<any>) =>
+export const assertEOSException = async (operation: Promise<any>) =>
 	assertEOSError(operation, 'eosio_assert_message_exception', 'assert');
 
 /**
@@ -280,5 +242,5 @@ export const assertEOSException = (operation: Promise<any>) =>
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
-export const assertMissingAuthority = (operation: Promise<any>) =>
-	assertEOSError(operation, 'missing_auth_exception', 'missing authority');
+export const assertMissingAuthority = async (operation: Promise<any>) =>
+	assertEOSErrorIncludesMessage(operation, '', 'missing_auth_exception');
