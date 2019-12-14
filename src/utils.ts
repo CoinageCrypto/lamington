@@ -4,6 +4,7 @@ import * as chai from 'chai';
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { EOSManager } from './eosManager';
+import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
 import { verbose_logging } from './cli/lamington-test';
 
@@ -133,6 +134,50 @@ export const assertRowCount = async (
 
 /**
  * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
+ * Also asserts that other aspects of the error as checked through an optional passed in function.
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @param operation Operation promise
+ * @param eosErrorName Expected EOS error name
+ * @param description Output message description
+ * @param furtherErrorCheck function to run further assertions on a thrown error.
+ * @returns a Boolean of true if an error was thrown as is expected.
+ */
+const assertExpectedEOSError = async (
+	operation: Promise<any>,
+	eosErrorName: string,
+	furtherErrorCheck?: (err: any) => any
+): Promise<boolean> => {
+	// Execute operation and handle exceptions
+	try {
+		await operation;
+	} catch (error) {
+		if (verbose_logging) {
+			console.log('Verbose error output: ' + JSON.stringify(error, null, 4));
+		}
+		if (error.json && error.json.error && error.json.error.name) {
+			// Compare error and fail if the error doesn't match the expected
+			assert(
+				error.json.error.name === eosErrorName,
+				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
+			);
+			if (furtherErrorCheck) {
+				furtherErrorCheck(error);
+			}
+		} else {
+			// Fail if error not thrown by EOS
+			assert.fail(
+				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
+			);
+		}
+		return true;
+	}
+	return false;
+};
+
+/**
+ * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  * @param eosErrorName Expected EOS error name
@@ -143,26 +188,42 @@ export const assertEOSError = async (
 	eosErrorName: string,
 	description: string
 ) => {
-	// Execute operation and handle exceptions
-	try {
-		await operation;
-	} catch (error) {
-		if (error.json && error.json.error && error.json.error.name) {
-			// Compare error and fail if the error doesn't match the expected
-			assert(
-				error.json.error.name === eosErrorName,
-				`Expected ${eosErrorName}, got ${error.json.error.name} instead.`
-			);
-			return;
-		} else {
-			// Fail if error not thrown by EOS
-			assert.fail(
-				`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
-			);
-		}
+	if (assertExpectedEOSError(operation, eosErrorName)) {
+		// Execute operation and handle exceptions
+		assert.fail(`Expected ${description} but operation completed successfully.`);
 	}
-	// Fail if no exception thrown
-	assert.fail(`Expected ${description} but operation completed successfully.`);
+};
+
+/**
+ * Asserts EOS throws an error and validates the error output name matches the
+ * expected 'eosio_assert_message_exception' and the error message includes `description`
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @param operation Operation promise
+ * @param message Output message expected to be included
+ */
+export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
+	const eosErrorName = 'eosio_assert_message_exception';
+	// Execute operation and handle exceptions
+	if (
+		!(await assertExpectedEOSError(operation, eosErrorName, error => {
+			let errorMessage = error.json.error.details[0].message;
+
+			if (!errorMessage) {
+				assert.fail(
+					`Expected EOS error ${eosErrorName}, but got ${JSON.stringify(error, null, 4)} instead.`
+				);
+			}
+			assert(
+				errorMessage.includes(message),
+				`Expected to include ${message}, got ${errorMessage} instead.`
+			);
+		}))
+	) {
+		// Fail if no exception thrown
+		assert.fail(
+			`Expected ${eosErrorName} with message to include ${message} but operation completed successfully.`
+		);
+	}
 };
 
 /**

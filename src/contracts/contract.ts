@@ -208,8 +208,6 @@ export class Contract implements EOSJSContract {
 			}
 		}
 
-		// Bool is the only type we need to fiddle with at the moment, so only do this if
-		// there's a field with a bool type in it.
 		const dateFields = tableRowType.fields.filter(field => field.typeName === 'time_point_sec');
 
 		if (dateFields.length > 0) {

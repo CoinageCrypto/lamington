@@ -5,7 +5,7 @@ import { eosIsReady, startEos, buildAll, stopContainer } from '../cli/utils';
 import { mapParameterType } from './typeGenerator';
 
 /**
- * Javascript only supports number, so CPP integer types need to be mapped accordingly
+ * Javascript only supports 64 bit floating point numbers natively, so CPP integer types need to be mapped accordingly
  */
 const numberTypes = [
 	'int8',
@@ -43,27 +43,31 @@ const stringNumberTypes = [
 describe('type generator', function() {
 	context('map parameter types', function() {
 		it(`should map 'string' to 'string'`, function() {
-			assert.equal(mapParameterType('string'), 'string', `'string' types should map to 'string'`);
+			assert.equal(
+				mapParameterType({ eosType: 'string' }),
+				'string',
+				`'string' types should map to 'string'`
+			);
 		});
 
 		it(`should map 'bool' to 'boolean'`, function() {
-			assert.equal(mapParameterType('bool'), 'boolean');
+			assert.equal(mapParameterType({ eosType: 'bool' }), 'boolean');
 		});
 
 		context('eos types', function() {
 			it(`should map name types to 'string|number'`, function() {
-				stringNumberTypes.map(type =>
+				stringNumberTypes.map(eosType =>
 					assert.equal(
-						mapParameterType(type),
+						mapParameterType({ eosType }),
 						'string|number',
-						`'${type}' type should map to 'string' or 'number'`
+						`'${eosType}' type should map to 'string' or 'number'`
 					)
 				);
 			});
 
 			it(`should map 'checksum' to 'string'`, function() {
 				assert.equal(
-					mapParameterType('checksum'),
+					mapParameterType({ eosType: 'checksum' }),
 					'string',
 					`'checksum' type should map to 'string'`
 				);
@@ -71,12 +75,12 @@ describe('type generator', function() {
 		});
 
 		context('big numbers', function() {
-			numberTypes.forEach(type => {
-				it(`should map '${type}' to 'number'`, function() {
+			numberTypes.forEach(eosType => {
+				it(`should map '${eosType}' to 'number'`, function() {
 					assert.equal(
-						mapParameterType(type),
+						mapParameterType({ eosType }),
 						'number',
-						`Integer type '${type}' should map to 'number'`
+						`Integer type '${eosType}' should map to 'number'`
 					);
 				});
 			});
@@ -84,11 +88,11 @@ describe('type generator', function() {
 
 		context('complex types', function() {
 			it(`should handle array types`, function() {
-				assert.equal(mapParameterType('bool[]'), 'Array<boolean>');
+				assert.equal(mapParameterType({ eosType: 'bool[]' }), 'Array<boolean>');
 			});
 
 			xit(`should handle vector types`, function() {
-				assert.equal(mapParameterType('vector<string>'), 'Array<string>');
+				assert.equal(mapParameterType({ eosType: 'vector<string>' }), 'Array<string>');
 			});
 		});
 	});

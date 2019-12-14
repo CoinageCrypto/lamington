@@ -1,8 +1,8 @@
-import ora, { Ora } from 'ora';
+import ora = require('ora');
 import * as colors from 'colors';
 
 /** Holds spinner instances */
-const cache: { spinner?: Ora } = {};
+const cache: { spinner?: ora.Ora } = {};
 
 /**
  * Creates a new spinner instance with the specified message
