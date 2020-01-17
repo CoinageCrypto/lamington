@@ -37,9 +37,9 @@ const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 /** @hidden Slowest Expected test duration */
 const TEST_EXPECTED_DURATION = 5000;
 /** @hidden Maximum test duration */
-const TEST_TIMEOUT_DURATION = 30000;
+const TEST_TIMEOUT_DURATION = 80000;
 /** @hidden Maximum number of EOS connection attempts before fail */
-const MAX_CONNECTION_ATTEMPTS = 8;
+const MAX_CONNECTION_ATTEMPTS = 20;
 
 /**
  * Extracts the version identifier from a string
@@ -286,7 +286,7 @@ export const runTests = async () => {
 	mocha.slow(TEST_EXPECTED_DURATION);
 	mocha.timeout(TEST_TIMEOUT_DURATION);
 	mocha.reporter(ConfigManager.testReporter);
-	// mocha.bail(true);
+	mocha.bail(true);
 
 	// Run the tests.
 	await new Promise((resolve, reject) =>
