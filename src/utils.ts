@@ -87,6 +87,7 @@ export const assertRowsEqual = async <RowType>(
 	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
 	chai.expect(result).to.deep.equalInAnyOrder({
 		rows: expected,
+		next_key: '',
 		more: false,
 	});
 };
@@ -106,6 +107,7 @@ export const assertRowsEqualStrict = async <RowType>(
 
 	assert.deepStrictEqual(result, {
 		rows: expected,
+		next_key: '',
 		more: false,
 	});
 };

@@ -15,7 +15,7 @@ rm -rf /mnt/dev/data
 # run it in a background job such that docker run could continue
 nodeos -e -p eosio -d /mnt/dev/data \
   --config-dir /mnt/dev/config \
-  --max-transaction-time=50 \
+  --max-transaction-time=40 \
   --http-validate-host=false \
   --plugin eosio::producer_plugin \
   --plugin eosio::producer_api_plugin \
