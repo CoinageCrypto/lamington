@@ -32,6 +32,8 @@ import * as spinner from './logIndicator';
 
 /** @hidden Current working directory reference */
 const WORKING_DIRECTORY = process.cwd();
+/** @hidden Config directory for running EOSIO */
+const CONFIG_DIRECTORY = path.join(__dirname, '../eosio-config');
 /** @hidden Temporary docker resource directory */
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 /** @hidden Slowest Expected test duration */
@@ -134,6 +136,7 @@ export const startContainer = async () => {
 				-p 9876:9876
 				--mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project
 				--mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts
+				--mount type=bind,src="${CONFIG_DIRECTORY}",dst=/mnt/dev/config
 				-w "/opt/eosio/bin/"
 				${await dockerImageName()}
 				/bin/bash -c "./scripts/init_blockchain.sh"`
@@ -286,7 +289,7 @@ export const runTests = async () => {
 	mocha.slow(TEST_EXPECTED_DURATION);
 	mocha.timeout(TEST_TIMEOUT_DURATION);
 	mocha.reporter(ConfigManager.testReporter);
-	mocha.bail(true);
+	mocha.bail(ConfigManager.bailOnFailure);
 
 	// Run the tests.
 	await new Promise((resolve, reject) =>

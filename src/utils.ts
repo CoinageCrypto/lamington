@@ -6,6 +6,8 @@ import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 import { EOSManager } from './eosManager';
 import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
+import { ConfigManager } from './configManager';
+import * as chalk from 'chalk';
 
 // Extend Chai's expect methods
 chai.use(deepEqualInAnyOrder);
@@ -87,7 +89,6 @@ export const assertRowsEqual = async <RowType>(
 	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
 	chai.expect(result).to.deep.equalInAnyOrder({
 		rows: expected,
-		next_key: '',
 		more: false,
 	});
 };
@@ -107,7 +108,6 @@ export const assertRowsEqualStrict = async <RowType>(
 
 	assert.deepStrictEqual(result, {
 		rows: expected,
-		next_key: '',
 		more: false,
 	});
 };
@@ -246,3 +246,49 @@ export const assertEOSException = async (operation: Promise<any>) =>
  */
 export const assertMissingAuthority = async (operation: Promise<any>) =>
 	assertEOSErrorIncludesMessage(operation, '', 'missing_auth_exception');
+
+export async function debugPromise<T>(
+	promise: Promise<T>,
+	successMessage: string,
+	errorMessage?: string
+) {
+	let debugPrefix = 'DebugPromise: ';
+	let successString = debugPrefix + successMessage;
+
+	let errorString = errorMessage
+		? debugPrefix + errorMessage + ': '
+		: debugPrefix + 'error - ' + successMessage + ': ';
+	const promiseTimer = timer();
+	return promise
+		.then(value => {
+			if (ConfigManager.debugLevelVerbose || ConfigManager.debugLevelMin) {
+				console.log(chalk.green(successString) + chalk.blue(' (%s)'), promiseTimer.ms);
+			}
+			if (ConfigManager.debugLevelVerbose) {
+				console.log(`Promise result: ${JSON.stringify(value, null, 4)}`);
+			}
+			return value;
+		})
+		.catch(err => {
+			assert.fail(errorString + err);
+		});
+}
+
+/**
+ * Simple timer
+ */
+export function timer() {
+	let timeStart = new Date().getTime();
+	return {
+		/** <integer>s e.g 2s etc. */
+		get seconds() {
+			const seconds = Math.ceil((new Date().getTime() - timeStart) / 1000) + 's';
+			return seconds;
+		},
+		/** Milliseconds e.g. 2000ms etc. */
+		get ms() {
+			const ms = new Date().getTime() - timeStart + 'ms';
+			return ms;
+		},
+	};
+}

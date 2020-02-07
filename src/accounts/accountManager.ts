@@ -149,7 +149,9 @@ export class AccountManager {
 			});
 		}
 		// Execute the transaction
-		return await EOSManager.transact({ actions }, eos);
+		return await EOSManager.transact({ actions }, eos, {
+			logMessage: `Creating account: ${account.name}}`,
+		});
 	};
 
 	/**

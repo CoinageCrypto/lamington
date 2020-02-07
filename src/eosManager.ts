@@ -3,8 +3,10 @@ import { TextEncoder, TextDecoder } from 'util';
 import { Api, JsonRpc } from 'eosjs';
 import { JsSignatureProvider } from 'eosjs/dist/eosjs-jssig';
 import { Account } from './accounts';
-import { ConfigManager } from './configManager';
+import { ConfigManager, LamingtonDebugLevel } from './configManager';
 import { convertLegacyPublicKey } from 'eosjs/dist/eosjs-numeric';
+import { timer } from './utils';
+import * as chalk from 'chalk';
 
 interface InitArgs {
 	adminAccount: Account;
@@ -95,18 +97,42 @@ export class EOSManager {
 	static transact = async (
 		transaction: any,
 		eos = EOSManager.api,
-		options?: { debug?: boolean; blocksBehind?: number; expireSeconds?: number }
+		options?: {
+			debug?: boolean;
+			debugLevel?: LamingtonDebugLevel;
+			blocksBehind?: number;
+			expireSeconds?: number;
+			logMessage?: string;
+		}
 	) => {
 		const flattenedOptions = Object.assign({ blocksBehind: 1, expireSeconds: 30 }, options);
 
-		if (ConfigManager.debugTransactions || flattenedOptions.debug) {
-			const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);
-			console.log(`========== Calling ${calls.join(', ')} ==========`);
-			console.log('Transaction: ', JSON.stringify(transaction, null, 4));
-			console.log('Options: ', options);
-			console.log();
+		const transactionTimer = timer();
+
+		async function logOutput(verboseOutput: string) {
+			const legacyDebugOption = ConfigManager.debugTransactions || flattenedOptions.debug;
+
+			if (ConfigManager.debugLevelMin || ConfigManager.debugLevelVerbose || legacyDebugOption) {
+				let consoleHeader = '';
+				const calls = transaction.actions.map((action: any) => `${action.account}.${action.name}`);
+				consoleHeader += `========== Calling ${calls.join(', ')} ==========`;
+				console.log(chalk.cyan(consoleHeader) + chalk.blue(' (%s)'), transactionTimer.ms);
+			}
+			if (ConfigManager.debugLevelVerbose) {
+				console.log(verboseOutput);
+				console.log('Options: ', options);
+			}
 		}
 
-		return await eos.transact(transaction, flattenedOptions);
+		return await eos
+			.transact(transaction, flattenedOptions)
+			.then(value => {
+				logOutput(chalk.green('Succeeded: ') + JSON.stringify(value, null, 4));
+				return value;
+			})
+			.catch(error => {
+				logOutput(chalk.red('Threw error: ') + error);
+				throw error;
+			});
 	};
 }

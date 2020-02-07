@@ -33,13 +33,30 @@ export interface LamingtonConfig {
 	debug: LamingtonDebugLevel;
 	reporter?: string;
 	reporterOptions?: any;
+	bailOnFailure: boolean;
 }
 
-/** Level of debug output */
+/**
+ * Level of debug output
+ */
 export enum LamingtonDebugLevel {
-	NONE = 0,
-	TRANSACTIONS,
-	ALL,
+	NONE = 0, // No debug logging
+	MINIMAL, // Brief summary of actions as executed
+	VERBOSE, // Verbose output from actions including all transaction output
+}
+
+export namespace LamingtonDebugLevel {
+	export function isNone(debugLevel: LamingtonDebugLevel) {
+		return debugLevel == LamingtonDebugLevel.NONE;
+	}
+
+	export function isMin(debugLevel: LamingtonDebugLevel) {
+		return debugLevel == LamingtonDebugLevel.MINIMAL;
+	}
+
+	export function isVerbose(debugLevel: LamingtonDebugLevel) {
+		return debugLevel == LamingtonDebugLevel.VERBOSE;
+	}
 }
 
 /**
@@ -56,6 +73,7 @@ const DEFAULT_CONFIG = {
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
 	exclude: [],
+	bailOnFailure: false,
 };
 
 /**
@@ -217,6 +235,31 @@ export class ConfigManager {
 	}
 
 	/**
+	 * Returns the container's debugLevel output setting
+	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 */
+	static get debugLevel() {
+		return (ConfigManager.config && ConfigManager.config.debug) || DEFAULT_CONFIG.debug;
+	}
+
+	/**
+	 * Returns the container's debugLevel output setting
+	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 */
+
+	static get debugLevelNone() {
+		return LamingtonDebugLevel.isNone(this.debugLevel);
+	}
+
+	static get debugLevelMin() {
+		return LamingtonDebugLevel.isMin(this.debugLevel);
+	}
+
+	static get debugLevelVerbose() {
+		return LamingtonDebugLevel.isVerbose(this.debugLevel);
+	}
+
+	/**
 	 * Returns the output build directory or [[CACHE_DIRECTORY]]
 	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
@@ -238,5 +281,15 @@ export class ConfigManager {
 	 */
 	static get testReporter() {
 		return (ConfigManager.config && ConfigManager.config.reporter) || Mocha.reporters.Min;
+	}
+
+	/**
+	 * Returns the array of excluded strings or patterns
+	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 */
+	static get bailOnFailure() {
+		return (
+			(ConfigManager.config && ConfigManager.config.bailOnFailure) || DEFAULT_CONFIG.bailOnFailure
+		);
 	}
 }
