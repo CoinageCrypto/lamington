@@ -132,6 +132,9 @@ export class EOSManager {
 			})
 			.catch(error => {
 				logOutput(chalk.red('Threw error: ') + error);
+				console.log(
+					chalk.cyan('Payload causing the above error: ') + JSON.stringify(transaction, null, 4)
+				);
 				throw error;
 			});
 	};
