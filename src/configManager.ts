@@ -28,6 +28,7 @@ export interface LamingtonConfig {
 	contracts: string;
 	keepAlive?: boolean;
 	outDir?: string;
+	include?: Array<string>;
 	exclude?: Array<string>;
 	debugTransactions?: boolean;
 	debug: LamingtonDebugLevel;
@@ -72,6 +73,7 @@ const DEFAULT_CONFIG = {
 	debugTransactions: false,
 	keepAlive: false,
 	outDir: CACHE_DIRECTORY,
+	include: ['.*'],
 	exclude: [],
 	bailOnFailure: false,
 };
@@ -246,7 +248,6 @@ export class ConfigManager {
 	 * Returns the container's debugLevel output setting
 	 * @author Dallas Johnson <github.com/dallasjohnson>
 	 */
-
 	static get debugLevelNone() {
 		return LamingtonDebugLevel.isNone(this.debugLevel);
 	}
@@ -265,6 +266,14 @@ export class ConfigManager {
 	 */
 	static get outDir() {
 		return (ConfigManager.config && ConfigManager.config.outDir) || DEFAULT_CONFIG.outDir;
+	}
+
+	/**
+	 * Returns the array of included strings or patterns. Defaults to include all `*.cpp` files
+	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 */
+	static get include() {
+		return (ConfigManager.config && ConfigManager.config.include) || DEFAULT_CONFIG.include;
 	}
 
 	/**

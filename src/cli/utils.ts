@@ -311,7 +311,7 @@ export const buildAll = async (match?: string[]) => {
 	const errors = [];
 	let contracts = await glob('!(node_modules)/**/*.cpp');
 	// Cleanse ignored contracts
-	contracts = filterMatches(onlyMatches(contracts, match || ['\\.cpp$']));
+	contracts = filterMatches(includeMatches(onlyMatches(contracts, match || ['\\.cpp$'])));
 
 	if (contracts.length === 0) {
 		console.error();
@@ -348,6 +348,15 @@ const onlyMatches = (paths: string[], matches: string[] = []) => {
 	return paths.filter(filePath => {
 		return matches.reduce<boolean>((result, str) => {
 			const pattern = new RegExp(str, 'gi');
+			return result || pattern.test(filePath);
+		}, false);
+	});
+};
+
+const includeMatches = (paths: string[]) => {
+	return paths.filter(filePath => {
+		return ConfigManager.include.reduce<boolean>((result, match) => {
+			const pattern = new RegExp(match, 'gi');
 			return result || pattern.test(filePath);
 		}, false);
 	});
