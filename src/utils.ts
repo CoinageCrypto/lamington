@@ -154,9 +154,6 @@ const assertExpectedEOSError = async (
 	try {
 		await operation;
 	} catch (error) {
-		if (verbose_logging) {
-			console.log('Verbose error output: ' + JSON.stringify(error, null, 4));
-		}
 		if (error.json && error.json.error && error.json.error.name) {
 			// Compare error and fail if the error doesn't match the expected
 			assert(

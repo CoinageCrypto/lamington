@@ -3,7 +3,11 @@ import * as Mocha from 'mocha';
 import * as mkdirpCallback from 'mkdirp';
 import * as rimrafCallback from 'rimraf';
 import * as qrcode from 'qrcode-terminal';
-import { writeFile as writeFileCallback, exists as existsCallback } from 'fs';
+import {
+	writeFile as writeFileCallback,
+	exists as existsCallback,
+	readFile as readFileCallback,
+} from 'fs';
 import * as globCallback from 'glob';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -13,6 +17,7 @@ const glob = promisify(globCallback);
 const mkdirp = promisify(mkdirpCallback);
 const rimraf = promisify(rimrafCallback);
 const writeFile = promisify(writeFileCallback);
+const readFile = promisify(readFileCallback);
 
 // It's nice to give people proper stack traces when they have a problem with their code.
 // Trace shows async traces, and Clarify removes internal Node entries.
@@ -389,7 +394,7 @@ export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePat
  */
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
-	const basename = path.basename(contractPath, '.cpp');
+	// const basename = path.basename(contractPath, '.cpp'); // Never Used
 	// Compile contract at path
 	await compileContract(contractPath);
 	// Generate Typescript definitions for contract
@@ -433,6 +438,17 @@ export const compileContract = async (contractPath: string) => {
 	}
 
 	const outputPath = outputPathForContract(contractPath);
+	const buildFlagsPathComponents = path.parse(contractPath);
+	const buildFlagsPath =
+		buildFlagsPathComponents.dir + '/' + buildFlagsPathComponents.name + '.lamflags';
+	let buildFlags = '';
+
+	if (await exists(buildFlagsPath)) {
+		const data = await readFile(buildFlagsPath);
+
+		console.log('\n Adding build flags to compile command: ' + data.toString());
+		buildFlags = data.toString();
+	}
 
 	// Run the compile contract script inside our docker container.
 	await docker
@@ -444,7 +460,7 @@ export const compileContract = async (contractPath: string) => {
 				'bin',
 				'project',
 				contractPath
-			)}" "${outputPath}" "${basename}"`
+			)}" "${outputPath}" "${basename}" ${buildFlags}`
 		)
 		.catch(err => {
 			spinner.fail('Failed to compile');
