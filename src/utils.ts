@@ -4,7 +4,6 @@ import * as chai from 'chai';
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { EOSManager } from './eosManager';
-import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
 import { ConfigManager } from './configManager';
 import * as chalk from 'chalk';
