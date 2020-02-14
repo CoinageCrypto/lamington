@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -o errexit
+# set -o errexit
 
 echo "=== lamington: setup blockchain accounts and smart contract ==="
 
@@ -15,8 +15,10 @@ rm -rf /mnt/dev/data
 # run it in a background job such that docker run could continue
 nodeos -e -p eosio -d /mnt/dev/data \
   --config-dir /mnt/dev/config \
-  --max-transaction-time=1000 \
+  --genesis-json /mnt/dev/config/genesis.json \
+  --max-transaction-time=60 \
   --http-validate-host=false \
+  --http-max-response-time-ms=500 \
   --plugin eosio::producer_plugin \
   --plugin eosio::producer_api_plugin \
   --plugin eosio::chain_api_plugin \
@@ -25,7 +27,7 @@ nodeos -e -p eosio -d /mnt/dev/data \
   --access-control-allow-origin=* \
   --contracts-console \
   --verbose-http-errors &
-sleep 1s
+sleep 6s
 until $(curl --output /dev/null \
              --silent \
              --head \

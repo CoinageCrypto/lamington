@@ -46,9 +46,9 @@ export const end = (message: string = '', isError: boolean = false) => {
 	if (!cache.spinner) return;
 	// Handle output
 	if (isError) {
-		cache.spinner.fail(colors.grey(message));
+		cache.spinner.fail(colors.cyan(message));
 	} else {
-		cache.spinner.succeed(colors.grey(message));
+		cache.spinner.succeed(colors.cyan(message));
 	}
 	// Clear spinner reference
 	delete cache.spinner;

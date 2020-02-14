@@ -3,7 +3,11 @@ import * as Mocha from 'mocha';
 import * as mkdirpCallback from 'mkdirp';
 import * as rimrafCallback from 'rimraf';
 import * as qrcode from 'qrcode-terminal';
-import { writeFile as writeFileCallback, exists as existsCallback } from 'fs';
+import {
+	writeFile as writeFileCallback,
+	exists as existsCallback,
+	readFile as readFileCallback,
+} from 'fs';
 import * as globCallback from 'glob';
 import * as path from 'path';
 import { promisify } from 'util';
@@ -13,6 +17,7 @@ const glob = promisify(globCallback);
 const mkdirp = promisify(mkdirpCallback);
 const rimraf = promisify(rimrafCallback);
 const writeFile = promisify(writeFileCallback);
+const readFile = promisify(readFileCallback);
 
 // It's nice to give people proper stack traces when they have a problem with their code.
 // Trace shows async traces, and Clarify removes internal Node entries.
@@ -32,14 +37,16 @@ import * as spinner from './logIndicator';
 
 /** @hidden Current working directory reference */
 const WORKING_DIRECTORY = process.cwd();
+/** @hidden Config directory for running EOSIO */
+const CONFIG_DIRECTORY = path.join(__dirname, '../eosio-config');
 /** @hidden Temporary docker resource directory */
 const TEMP_DOCKER_DIRECTORY = path.join(__dirname, '.temp-docker');
 /** @hidden Slowest Expected test duration */
-const TEST_EXPECTED_DURATION = 2000;
+const TEST_EXPECTED_DURATION = 5000;
 /** @hidden Maximum test duration */
-const TEST_TIMEOUT_DURATION = 10000;
+const TEST_TIMEOUT_DURATION = 80000;
 /** @hidden Maximum number of EOS connection attempts before fail */
-const MAX_CONNECTION_ATTEMPTS = 8;
+const MAX_CONNECTION_ATTEMPTS = 20;
 
 /**
  * Extracts the version identifier from a string
@@ -134,6 +141,7 @@ export const startContainer = async () => {
 				-p 9876:9876
 				--mount type=bind,src="${WORKING_DIRECTORY}",dst=/opt/eosio/bin/project
 				--mount type=bind,src="${__dirname}/../scripts",dst=/opt/eosio/bin/scripts
+				--mount type=bind,src="${CONFIG_DIRECTORY}",dst=/mnt/dev/config
 				-w "/opt/eosio/bin/"
 				${await dockerImageName()}
 				/bin/bash -c "./scripts/init_blockchain.sh"`
@@ -286,6 +294,7 @@ export const runTests = async () => {
 	mocha.slow(TEST_EXPECTED_DURATION);
 	mocha.timeout(TEST_TIMEOUT_DURATION);
 	mocha.reporter(ConfigManager.testReporter);
+	mocha.bail(ConfigManager.bailOnFailure);
 
 	// Run the tests.
 	await new Promise((resolve, reject) =>
@@ -307,7 +316,7 @@ export const buildAll = async (match?: string[]) => {
 	const errors = [];
 	let contracts = await glob('!(node_modules)/**/*.cpp');
 	// Cleanse ignored contracts
-	contracts = filterMatches(onlyMatches(contracts, match || ['\\.cpp$']));
+	contracts = filterMatches(includeMatches(onlyMatches(contracts, match || ['\\.cpp$'])));
 
 	if (contracts.length === 0) {
 		console.error();
@@ -349,6 +358,15 @@ const onlyMatches = (paths: string[], matches: string[] = []) => {
 	});
 };
 
+const includeMatches = (paths: string[]) => {
+	return paths.filter(filePath => {
+		return ConfigManager.include.reduce<boolean>((result, match) => {
+			const pattern = new RegExp(match, 'gi');
+			return result || pattern.test(filePath);
+		}, false);
+	});
+};
+
 const filterMatches = (paths: string[]) => {
 	return paths.filter(filePath => {
 		return !ConfigManager.exclude.reduce<boolean>((result, match) => {
@@ -376,7 +394,7 @@ export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePat
  */
 export const build = async (contractPath: string) => {
 	// Get the base filename from path and log status
-	const basename = path.basename(contractPath, '.cpp');
+	// const basename = path.basename(contractPath, '.cpp'); // Never Used
 	// Compile contract at path
 	await compileContract(contractPath);
 	// Generate Typescript definitions for contract
@@ -420,6 +438,17 @@ export const compileContract = async (contractPath: string) => {
 	}
 
 	const outputPath = outputPathForContract(contractPath);
+	const buildFlagsPathComponents = path.parse(contractPath);
+	const buildFlagsPath =
+		buildFlagsPathComponents.dir + '/' + buildFlagsPathComponents.name + '.lamflags';
+	let buildFlags = '';
+
+	if (await exists(buildFlagsPath)) {
+		const data = await readFile(buildFlagsPath);
+
+		console.log('\n Adding build flags to compile command: ' + data.toString());
+		buildFlags = data.toString();
+	}
 
 	// Run the compile contract script inside our docker container.
 	await docker
@@ -431,7 +460,7 @@ export const compileContract = async (contractPath: string) => {
 				'bin',
 				'project',
 				contractPath
-			)}" "${outputPath}" "${basename}"`
+			)}" "${outputPath}" "${basename}" ${buildFlags}`
 		)
 		.catch(err => {
 			spinner.fail('Failed to compile');

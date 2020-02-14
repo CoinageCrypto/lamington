@@ -42,43 +42,20 @@ export const mapParameterType = ({
 	}
 };
 
-/**
- * Loads all `.abi` files and generates types
- * @author Kevin Brown <github.com/thekevinbrown>
- */
-export const generateAllTypes = async () => {
-	// Load all `.abi` files
-	const files = await glob('**/*.abi');
-	// Handle no files found
-	if (files.length === 0) throw new Error('No ABI files to generate from. Exiting.');
-	// Generate types for each file
-	for (const file of files) await generateTypes(file);
-};
-
-/**
- * Generates a Typescript definition file from a contract ABI file
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
- * @param contractIdentifier Path to file without extension
- */
-export const generateTypes = async (contractIdentifier: string) => {
-	// Create contract details
-	const contractName = path.basename(contractIdentifier);
-	const abiPath = path.join(
-		ConfigManager.outDir,
-		'compiled_contracts',
-		`${contractIdentifier}.abi`
-	);
-	// Handle ABI file loading
-	if (!fs.existsSync(path.resolve(abiPath)))
-		throw new Error(`Missing ABI file at path '${path.resolve(abiPath)}'`);
-	const abi = JSON.parse(fs.readFileSync(path.resolve(abiPath), 'utf8'));
+export const generateTypesFromString = async (
+	rawABI: string,
+	contractName: string
+): Promise<string> => {
+	const abi = JSON.parse(rawABI);
 	let contractActions = abi.actions;
 	let contractTables = abi.tables;
 	let contractStructs = Object.assign(
 		{},
 		...abi.structs.map((struct: any) => ({ [struct['name']]: struct }))
 	);
+
+	// console.log('tables: ' + JSON.stringify(contractTables));
+	// console.log('structs: ' + JSON.stringify(contractStructs));
 	// Prepend warning text
 	const result: GeneratorLevel = [
 		'// =====================================================',
@@ -89,7 +66,14 @@ export const generateTypes = async (contractIdentifier: string) => {
 		'',
 	];
 	// Define imports
-	const imports = ['Account', 'Contract', 'GetTableRowsOptions', 'ExtendedAsset', 'ExtendedSymbol'];
+	const imports = [
+		'Account',
+		'Contract',
+		'GetTableRowsOptions',
+		'ExtendedAsset',
+		'ExtendedSymbol',
+		'ActorPermission',
+	];
 	if (contractTables.length > 0) imports.push('TableRowsResult');
 	// Generate import definitions
 	result.push(`import { ${imports.join(', ')} } from 'lamington';`);
@@ -145,25 +129,51 @@ export const generateTypes = async (contractIdentifier: string) => {
 	// Cache contract result
 	result.push(contractInterface);
 	result.push('');
-	// Save generated contract
-	await saveInterface(contractIdentifier, result);
+	return flattenGeneratorLevels(result);
 };
 
 /**
- * Writes the contract interface to file
+ * Loads all `.abi` files and generates types
  * @author Kevin Brown <github.com/thekevinbrown>
- * @param contractIdentifier Path to file without extension
- * @param interfaceContent Generated contract interface
  */
-const saveInterface = async (
-	contractIdentifier: string,
-	interfaceContent: GeneratorLevel | IndentedGeneratorLevel
-) => {
-	// Open a write stream to file
-	const file = fs.createWriteStream(`${contractIdentifier}.ts`);
-	// Write formatted blocks
+export const generateAllTypes = async () => {
+	// Load all `.abi` files
+	const files = await glob('**/*.abi');
+	// Handle no files found
+	if (files.length === 0) throw new Error('No ABI files to generate from. Exiting.');
+	// Generate types for each file
+	for (const file of files) await generateTypes(file);
+};
+
+/**
+ * Generates a Typescript definition file from a contract ABI file
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Mitch Pierias <github.com/MitchPierias>
+ * @author Dallas Johnson <github.com/dallasjohnson>
+
+ * @param contractIdentifier Path to file without extension
+ */
+export const generateTypes = async (contractIdentifier: string) => {
+	// Create contract details
+	const contractName = path.basename(contractIdentifier);
+	const abiPath = path.join(
+		ConfigManager.outDir,
+		'compiled_contracts',
+		`${contractIdentifier}.abi`
+	);
+	// Handle ABI file loading
+	if (!fs.existsSync(path.resolve(abiPath)))
+		throw new Error(`Missing ABI file at path '${path.resolve(abiPath)}'`);
+	const rawABI = fs.readFileSync(path.resolve(abiPath), 'utf8');
+
+	const generaterLevels = await generateTypesFromString(rawABI, contractName);
+	await saveInterface(contractIdentifier, generaterLevels);
+};
+
+const flattenGeneratorLevels = (interfaceContent: GeneratorLevel): string => {
+	let result = '';
 	let indentLevel = 0;
-	const write = (value: string) => file.write('\t'.repeat(indentLevel) + value + '\n');
+	const write = (value: string) => (result += '\t'.repeat(indentLevel) + value + '\n');
 	const writeIndented = (level: IndentedGeneratorLevel) => {
 		for (const outerWrapper of Object.keys(level)) {
 			write(`${outerWrapper} {`);
@@ -191,5 +201,24 @@ const saveInterface = async (
 	};
 	// Write interface to file and close
 	writeLevel(interfaceContent);
+	return result;
+};
+
+/**
+ * Writes the contract interface to file
+ * @author Kevin Brown <github.com/thekevinbrown>
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @param contractIdentifier Path to file without extension
+ * @param interfaceContent Generated contract interface as a string
+ */
+const saveInterface = async (contractIdentifier: string, interfaceContent: string) => {
+	// Open a write stream to file
+	const file = fs.createWriteStream(`${contractIdentifier}.ts`);
+
+	file.write(interfaceContent, error => {
+		if (error) {
+			throw error;
+		}
+	});
 	file.close();
 };

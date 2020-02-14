@@ -16,11 +16,13 @@ export class AccountManager {
 	 * Generates a new random account
 	 * @note Shorthand method for [[AccountManager.createAccounts]]
 	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * @param accountName Optional name for the account to create
 	 * @param options Optional account creation settings
 	 * @returns Result returned from [[AccountManager.createAccounts]]
 	 */
-	static createAccount = async (options?: AccountCreationOptions) => {
-		const [account] = await AccountManager.createAccounts(1, options);
+	static createAccount = async (accountName?: string, options?: AccountCreationOptions) => {
+		let accountNameArray = accountName ? [accountName] : undefined;
+		const [account] = await AccountManager.createAccounts(1, accountNameArray, options);
 		return account;
 	};
 
@@ -28,19 +30,35 @@ export class AccountManager {
 	 * Generates a specified number of random accounts
 	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @param numberOfAccounts Number of accounts to generate
+	 * @param accountNames Array of account names. If array is provided then the numberOfAccounts is ignored.
 	 * @returns Array of created account transaction promises
 	 */
-	static createAccounts = async (numberOfAccounts = 1, options?: AccountCreationOptions) => {
+	static createAccounts = async (
+		numberOfAccounts = 1,
+		accountNames?: string[],
+		options?: AccountCreationOptions
+	) => {
 		const accounts = [];
-		// Repeat account creation for specified
-		for (let i = 0; i < numberOfAccounts; i++) {
-			const privateKey = await ecc.unsafeRandomKey();
-			const publicKey = await ecc.privateToPublic(privateKey);
-			const accountName = accountNameFromPublicKey(publicKey);
-			const account = new Account(accountName, privateKey);
-			// Publish the new account and store result
-			await AccountManager.setupAccount(account, options);
-			accounts.push(account);
+		if (accountNames) {
+			for (let accountName of accountNames) {
+				const privateKey = await ecc.unsafeRandomKey();
+				const publicKey = await ecc.privateToPublic(privateKey);
+				const account = new Account(accountName, privateKey);
+				// Publish the new account and store result
+				await AccountManager.setupAccount(account, options);
+				accounts.push(account);
+			}
+		} else {
+			// Repeat account creation for specified
+			for (let i = 0; i < numberOfAccounts; i++) {
+				const privateKey = await ecc.unsafeRandomKey();
+				const publicKey = await ecc.privateToPublic(privateKey);
+				const accountName = accountNameFromPublicKey(publicKey);
+				const account = new Account(accountName, privateKey);
+				// Publish the new account and store result
+				await AccountManager.setupAccount(account, options);
+				accounts.push(account);
+			}
 		}
 		// Return created acounts
 		return accounts;
@@ -131,7 +149,9 @@ export class AccountManager {
 			});
 		}
 		// Execute the transaction
-		return await EOSManager.transact({ actions }, eos);
+		return await EOSManager.transact({ actions }, eos, {
+			logMessage: `Creating account: ${account.name}}`,
+		});
 	};
 
 	/**

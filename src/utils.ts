@@ -4,8 +4,9 @@ import * as chai from 'chai';
 import * as deepEqualInAnyOrder from 'deep-equal-in-any-order';
 
 import { EOSManager } from './eosManager';
-import { verbose_logging } from './cli/lamington-test';
 import { TableRowsResult } from './contracts';
+import { ConfigManager } from './configManager';
+import * as chalk from 'chalk';
 
 // Extend Chai's expect methods
 chai.use(deepEqualInAnyOrder);
@@ -40,6 +41,29 @@ export const sleep = async (delayInMs: number) =>
  * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const nextBlock = () => sleep(500);
+
+/**
+ * Compares table rows against expected rows irrespective of order
+ * @author Dallas Johnson <github.com/dallasjohnson>
+ * @param getTableRowsResult Get table rows result promise
+ * @param expected Expected table row query results
+ */
+export const assertRowsContain = async <RowType>(
+	getTableRowsResult: Promise<TableRowsResult<RowType>>,
+	expected: RowType,
+	strict: boolean = false
+) => {
+	// Pass-through strict comparison
+
+	// Call table row query and assert results eventually equal expected
+	const result = await getTableRowsResult;
+	// @ts-ignore - Not sure how to add this extended method `equalInAnyOrder`?
+	// let matching: RowType[] = result.rows.some(value => {
+	// 	return value == expected;
+	// });
+	// chai.expect(matching.length > 0).to.be.true;
+	chai.expect(result.rows).contain(expected);
+};
 
 /**
  * Compares table rows against expected rows irrespective of order
@@ -129,9 +153,6 @@ const assertExpectedEOSError = async (
 	try {
 		await operation;
 	} catch (error) {
-		if (verbose_logging) {
-			console.log('Verbose error output: ' + JSON.stringify(error, null, 4));
-		}
 		if (error.json && error.json.error && error.json.error.name) {
 			// Compare error and fail if the error doesn't match the expected
 			assert(
@@ -177,8 +198,12 @@ export const assertEOSError = async (
  * @param operation Operation promise
  * @param message Output message expected to be included
  */
-export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, message: string) => {
-	const eosErrorName = 'eosio_assert_message_exception';
+export const assertEOSErrorIncludesMessage = async (
+	operation: Promise<any>,
+	message: string,
+	errorName?: string
+) => {
+	const eosErrorName = errorName || 'eosio_assert_message_exception';
 	// Execute operation and handle exceptions
 	if (
 		!(await assertExpectedEOSError(operation, eosErrorName, error => {
@@ -207,7 +232,7 @@ export const assertEOSErrorIncludesMessage = async (operation: Promise<any>, mes
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
-export const assertEOSException = (operation: Promise<any>) =>
+export const assertEOSException = async (operation: Promise<any>) =>
 	assertEOSError(operation, 'eosio_assert_message_exception', 'assert');
 
 /**
@@ -215,5 +240,51 @@ export const assertEOSException = (operation: Promise<any>) =>
  * @author Kevin Brown <github.com/thekevinbrown>
  * @param operation Operation promise
  */
-export const assertMissingAuthority = (operation: Promise<any>) =>
-	assertEOSError(operation, 'missing_auth_exception', 'missing authority');
+export const assertMissingAuthority = async (operation: Promise<any>) =>
+	assertEOSErrorIncludesMessage(operation, '', 'missing_auth_exception');
+
+export async function debugPromise<T>(
+	promise: Promise<T>,
+	successMessage: string,
+	errorMessage?: string
+) {
+	let debugPrefix = 'DebugPromise: ';
+	let successString = debugPrefix + successMessage;
+
+	let errorString = errorMessage
+		? debugPrefix + errorMessage + ': '
+		: debugPrefix + 'error - ' + successMessage + ': ';
+	const promiseTimer = timer();
+	return promise
+		.then(value => {
+			if (ConfigManager.debugLevelVerbose || ConfigManager.debugLevelMin) {
+				console.log(chalk.green(successString) + chalk.blue(' (%s)'), promiseTimer.ms);
+			}
+			if (ConfigManager.debugLevelVerbose) {
+				console.log(`Promise result: ${JSON.stringify(value, null, 4)}`);
+			}
+			return value;
+		})
+		.catch(err => {
+			assert.fail(errorString + err);
+		});
+}
+
+/**
+ * Simple timer
+ */
+export function timer() {
+	let timeStart = new Date().getTime();
+	return {
+		/** <integer>s e.g 2s etc. */
+		get seconds() {
+			const seconds = Math.ceil((new Date().getTime() - timeStart) / 1000) + 's';
+			return seconds;
+		},
+		/** Milliseconds e.g. 2000ms etc. */
+		get ms() {
+			const ms = new Date().getTime() - timeStart + 'ms';
+			return ms;
+		},
+	};
+}
