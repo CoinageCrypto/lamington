@@ -1,6 +1,6 @@
 {
 	"name": "lamington",
-	"version": "1.0.0-alpha.4",
+	"version": "1.0.0-alpha.5",
 	"description": "A suite of tools to make building and testing EOS smart contracts easier. ",
 	"main": "lib/index.js",
 	"types": "lib/index.d.ts",
