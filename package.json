@@ -75,7 +75,7 @@
 		"colors": "1.4.0",
 		"commander": "4.0.1",
 		"deep-equal-in-any-order": "1.0.21",
-		"docker-cli-js": "2.5.2",
+		"docker-cli-js": "2.7.1",
 		"dotenv": "8.2.0",
 		"glob": "7.1.6",
 		"got": "^9.6.0",
