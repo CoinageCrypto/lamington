@@ -63,7 +63,7 @@
 		"eosjs-ecc": "4.0.7",
 		"prettier": "1.19.1",
 		"ts-node": "8.6.2",
-		"typedoc": "0.14.2",
+		"typedoc": "0.16.10",
 		"typescript": "3.7.5"
 	},
 	"dependencies": {
