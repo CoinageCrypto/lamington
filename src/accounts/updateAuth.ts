@@ -1,5 +1,6 @@
 import { EOSManager } from '../eosManager';
 import { Account } from './account';
+import { EosioAction } from './utils';
 
 export namespace UpdateAuth {
 	export interface PermissionLevel {
@@ -135,10 +136,3 @@ export namespace UpdateAuth {
 		await EOSManager.transact({ actions });
 	}
 }
-
-export type EosioAction = {
-	account: string;
-	name: string;
-	authorization: { actor: string; permission: string }[];
-	data: any;
-};

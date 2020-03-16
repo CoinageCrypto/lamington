@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # set -o errexit
+set -x
 
 echo "=== lamington: setup blockchain accounts and smart contract ==="
 
