@@ -24,6 +24,11 @@ nodeos -e -p eosio -d /mnt/dev/data \
   --plugin eosio::producer_api_plugin \
   --plugin eosio::chain_api_plugin \
   --plugin eosio::http_plugin \
+  --plugin eosio::state_history_plugin \
+  --disable-replay-opts \
+  --trace-history-debug-mode \
+  --trace-history \
+  --plugin eosio::history_api_plugin \
   --http-server-address=0.0.0.0:8888 \
   --access-control-allow-origin=* \
   --contracts-console \
