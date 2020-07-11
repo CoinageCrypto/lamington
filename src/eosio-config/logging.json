@@ -50,28 +50,28 @@
 		{
 			"name": "default",
 			"level": "all",
-			"enabled": true,
+			"enabled": false,
 			"additivity": false,
 			"appenders": ["stdout"]
 		},
 		{
 			"name": "net_plugin_impl",
-			"level": "all",
-			"enabled": true,
+			"level": "off",
+			"enabled": false,
 			"additivity": false,
 			"appenders": ["stdout"]
 		},
 		{
 			"name": "http_plugin",
-			"level": "all",
-			"enabled": true,
+			"level": "off",
+			"enabled": false,
 			"additivity": false,
 			"appenders": ["stdout"]
 		},
 		{
 			"name": "producer_plugin",
-			"level": "all",
-			"enabled": true,
+			"level": "off",
+			"enabled": false,
 			"additivity": false,
 			"appenders": ["stdout"]
 		},

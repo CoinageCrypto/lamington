@@ -1,6 +1,7 @@
 import { eosIsReady, startEos, runTests, stopContainer, buildAll } from './utils';
 import { GitIgnoreManager } from '../gitignoreManager';
 import { ConfigManager } from '../configManager';
+import { sleep } from '../utils';
 
 /**
  * Executes a build and test procedure
@@ -25,6 +26,8 @@ const run = async () => {
 	// Start compiling smart contracts
 	if (!args.includes('skip-build')) {
 		await buildAll();
+	} else {
+		await sleep(4000);
 	}
 	// Begin running tests
 	await runTests();
