@@ -87,7 +87,5 @@ sleep 2s
 
 cleos push action eosio setpriv '["eosio.msig",1]' -p eosio
 
-sleeps 2s
-
 # put the background nodeos job to foreground for docker run
 fg %1
