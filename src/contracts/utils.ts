@@ -7,7 +7,7 @@
 export const pascalCase = (value: string) => {
 	const snakePattern = /[_.]+./g;
 	const upperFirst = value[0].toUpperCase() + value.slice(1);
-	return upperFirst.replace(snakePattern, match => match[match.length - 1].toUpperCase());
+	return upperFirst.replace(snakePattern, (match) => match[match.length - 1].toUpperCase());
 };
 
 /**
@@ -18,5 +18,5 @@ export const pascalCase = (value: string) => {
  */
 export const camelCase = (value: string) => {
 	const snakePattern = /[_.]+./g;
-	return value.replace(snakePattern, match => match[match.length - 1].toUpperCase());
+	return value.replace(snakePattern, (match) => match[match.length - 1].toUpperCase());
 };

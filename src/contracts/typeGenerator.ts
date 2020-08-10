@@ -111,8 +111,9 @@ export const generateTypesFromString = async (
 	// Generate tables
 	const generatedTables = contractTables.map(
 		(table: any) =>
-			`${camelCase(table.name) +
-				'Table'}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(
+			`${
+				camelCase(table.name) + 'Table'
+			}(options?: GetTableRowsOptions): Promise<TableRowsResult<${pascalCase(
 				contractName
 			)}${pascalCase(table.type)}>>;`
 	);
@@ -215,7 +216,7 @@ const saveInterface = async (contractIdentifier: string, interfaceContent: strin
 	// Open a write stream to file
 	const file = fs.createWriteStream(`${contractIdentifier}.ts`);
 
-	file.write(interfaceContent, error => {
+	file.write(interfaceContent, (error) => {
 		if (error) {
 			throw error;
 		}

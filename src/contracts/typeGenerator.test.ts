@@ -40,9 +40,9 @@ const stringNumberTypes = [
 	'table_name',
 ];
 
-describe('type generator', function() {
-	context('map parameter types', function() {
-		it(`should map 'string' to 'string'`, function() {
+describe('type generator', function () {
+	context('map parameter types', function () {
+		it(`should map 'string' to 'string'`, function () {
 			assert.equal(
 				mapParameterType({ eosType: 'string' }),
 				'string',
@@ -50,13 +50,13 @@ describe('type generator', function() {
 			);
 		});
 
-		it(`should map 'bool' to 'boolean'`, function() {
+		it(`should map 'bool' to 'boolean'`, function () {
 			assert.equal(mapParameterType({ eosType: 'bool' }), 'boolean');
 		});
 
-		context('eos types', function() {
-			it(`should map name types to 'string|number'`, function() {
-				stringNumberTypes.map(eosType =>
+		context('eos types', function () {
+			it(`should map name types to 'string|number'`, function () {
+				stringNumberTypes.map((eosType) =>
 					assert.equal(
 						mapParameterType({ eosType }),
 						'string|number',
@@ -65,7 +65,7 @@ describe('type generator', function() {
 				);
 			});
 
-			it(`should map 'checksum' to 'string'`, function() {
+			it(`should map 'checksum' to 'string'`, function () {
 				assert.equal(
 					mapParameterType({ eosType: 'checksum' }),
 					'string',
@@ -74,9 +74,9 @@ describe('type generator', function() {
 			});
 		});
 
-		context('big numbers', function() {
-			numberTypes.forEach(eosType => {
-				it(`should map '${eosType}' to 'number'`, function() {
+		context('big numbers', function () {
+			numberTypes.forEach((eosType) => {
+				it(`should map '${eosType}' to 'number'`, function () {
 					assert.equal(
 						mapParameterType({ eosType }),
 						'number',
@@ -86,12 +86,12 @@ describe('type generator', function() {
 			});
 		});
 
-		context('complex types', function() {
-			it(`should handle array types`, function() {
+		context('complex types', function () {
+			it(`should handle array types`, function () {
 				assert.equal(mapParameterType({ eosType: 'bool[]' }), 'Array<boolean>');
 			});
 
-			it(`should handle custom types from the contract`, function() {
+			it(`should handle custom types from the contract`, function () {
 				assert.equal(
 					mapParameterType({
 						eosType: 'pair_uint8_string',
@@ -102,7 +102,7 @@ describe('type generator', function() {
 				);
 			});
 
-			it(`should handle custom types in containers`, function() {
+			it(`should handle custom types in containers`, function () {
 				assert.equal(
 					mapParameterType({
 						eosType: 'pair_uint8_string[]',
@@ -302,8 +302,8 @@ describe('type generator', function() {
 		});
 	});
 
-	context('type generation integration tests', function() {
-		before(async function() {
+	context('type generation integration tests', function () {
+		before(async function () {
 			// This can take a long time.
 			this.timeout(400000);
 

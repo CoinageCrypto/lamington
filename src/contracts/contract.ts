@@ -87,7 +87,7 @@ export class Contract implements EOSJSContract {
 		this.types = types;
 		// Set up all the actions as methods on the contract.
 		for (const action of actions.values()) {
-			(this as any)[action.name] = function() {
+			(this as any)[action.name] = function () {
 				const data: { [key: string]: any } = {};
 
 				// Copy the params across for the call.
@@ -141,7 +141,7 @@ export class Contract implements EOSJSContract {
 		}
 		// And now the tables.
 		for (const table of abi.tables) {
-			(this as any)[camelCase(table.name) + 'Table'] = function() {
+			(this as any)[camelCase(table.name) + 'Table'] = function () {
 				return this.getTableRows(table.name, arguments[0]);
 			};
 		}
@@ -182,14 +182,14 @@ export class Contract implements EOSJSContract {
 		// This mapping will always be limited to just the types we do special
 		// things with in Lamington world, and will always match the generated
 		// types for table rows. Other values will pass through untouched.
-		const tableAbi = this._abi.tables.find(tableAbi => tableAbi.name === table);
+		const tableAbi = this._abi.tables.find((tableAbi) => tableAbi.name === table);
 		if (!tableAbi) throw new Error(`Could not find ABI for table ${table}`);
 		const tableRowType = this.types.get(tableAbi.type);
 		if (!tableRowType) throw new Error(`Could not find table row type for table ${table}`);
 
 		// Bool is the only type we need to fiddle with at the moment, so only do this if
 		// there's a field with a bool type in it.
-		const booleanFields = tableRowType.fields.filter(field => field.typeName === 'bool');
+		const booleanFields = tableRowType.fields.filter((field) => field.typeName === 'bool');
 
 		if (booleanFields.length > 0) {
 			// Map all `bool` fields from numbers to booleans
@@ -208,7 +208,7 @@ export class Contract implements EOSJSContract {
 			}
 		}
 
-		const dateFields = tableRowType.fields.filter(field => field.typeName === 'time_point_sec');
+		const dateFields = tableRowType.fields.filter((field) => field.typeName === 'time_point_sec');
 
 		if (dateFields.length > 0) {
 			// Map all `time_point_sec` fields from numbers to Date

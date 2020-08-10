@@ -33,7 +33,7 @@ export const untilBlocknumber = async (number: number) => {
  * @param delayInMs Process sleep duration
  */
 export const sleep = async (delayInMs: number) =>
-	new Promise(resolve => setTimeout(resolve, delayInMs));
+	new Promise((resolve) => setTimeout(resolve, delayInMs));
 
 /**
  * Pauses the current process for the 500ms EOS block time
@@ -206,7 +206,7 @@ export const assertEOSErrorIncludesMessage = async (
 	const eosErrorName = errorName || 'eosio_assert_message_exception';
 	// Execute operation and handle exceptions
 	if (
-		!(await assertExpectedEOSError(operation, eosErrorName, error => {
+		!(await assertExpectedEOSError(operation, eosErrorName, (error) => {
 			let errorMessage = error.json.error.details[0].message;
 
 			if (!errorMessage) {
@@ -256,7 +256,7 @@ export async function debugPromise<T>(
 		: debugPrefix + 'error - ' + successMessage + ': ';
 	const promiseTimer = timer();
 	return promise
-		.then(value => {
+		.then((value) => {
 			if (ConfigManager.debugLevelVerbose || ConfigManager.debugLevelMin) {
 				console.log(chalk.green(successString) + chalk.blue(' (%s)'), promiseTimer.ms);
 			}
@@ -265,7 +265,7 @@ export async function debugPromise<T>(
 			}
 			return value;
 		})
-		.catch(err => {
+		.catch((err) => {
 			assert.fail(errorString + err);
 		});
 }

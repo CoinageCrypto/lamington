@@ -16,7 +16,7 @@ const run = async () => {
 	await startEos();
 };
 
-run().catch(error => {
+run().catch((error) => {
 	process.exitCode = 1;
 	console.log(error);
 });
