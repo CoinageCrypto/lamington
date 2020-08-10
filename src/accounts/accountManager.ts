@@ -5,10 +5,14 @@ import * as ecc from 'eosjs-ecc';
 import { Account } from './account';
 import { accountNameFromPublicKey } from './utils';
 import { EOSManager } from '../eosManager';
+import { ConfigManager, LamingtonDebugLevel } from '../configManager';
+import * as chalk from 'chalk';
 
 interface AccountCreationOptions {
 	creator?: Account;
 	eos?: Api;
+	privateKey?: string;
+	bytesToBuy?: Number;
 }
 
 export class AccountManager {
@@ -41,9 +45,9 @@ export class AccountManager {
 		const accounts = [];
 		if (accountNames) {
 			for (let accountName of accountNames) {
-				const privateKey = await ecc.unsafeRandomKey();
-				const publicKey = await ecc.privateToPublic(privateKey);
-				const account = new Account(accountName, privateKey);
+				const resolvedPrivateKey = options?.privateKey ?? (await ecc.unsafeRandomKey());
+				const publicKey = await ecc.privateToPublic(resolvedPrivateKey);
+				const account = new Account(accountName, resolvedPrivateKey);
 				// Publish the new account and store result
 				await AccountManager.setupAccount(account, options);
 				accounts.push(account);
@@ -51,10 +55,12 @@ export class AccountManager {
 		} else {
 			// Repeat account creation for specified
 			for (let i = 0; i < numberOfAccounts; i++) {
-				const privateKey = await ecc.unsafeRandomKey();
-				const publicKey = await ecc.privateToPublic(privateKey);
+				const resolvedPrivateKey = options?.privateKey ?? (await ecc.unsafeRandomKey());
+
+				const seedKey = await ecc.unsafeRandomKey();
+				const publicKey = await ecc.privateToPublic(seedKey);
 				const accountName = accountNameFromPublicKey(publicKey);
-				const account = new Account(accountName, privateKey);
+				const account = new Account(accountName, resolvedPrivateKey);
 				// Publish the new account and store result
 				await AccountManager.setupAccount(account, options);
 				accounts.push(account);
@@ -72,8 +78,13 @@ export class AccountManager {
 	 * @returns Transaction result promise
 	 */
 	static setupAccount = async (account: Account, options?: AccountCreationOptions) => {
+		let logMessage = `Create account: ${account.name}`;
+		if (options?.privateKey) {
+			logMessage += ` private key: ${options.privateKey} `;
+		}
 		const { creator, eos } = AccountManager.flattenOptions(options);
 		// Validate account contains required values
+
 		if (!account.name) throw new Error('Missing account name.');
 		if (!account.publicKey) throw new Error('Missing public key.');
 		if (!account.privateKey) throw new Error('Missing private key.');
@@ -122,19 +133,25 @@ export class AccountManager {
 		// newaccount alone is enough. If there is a system contract with the buyrambytes action,
 		// then we definitely need to do it, but if there isn't, then trying to call it is an error.
 		if (systemContract.actions.has('buyrambytes')) {
+			const bytesToBuy = options?.bytesToBuy ?? 4000000;
+			logMessage += ` with ram: ${bytesToBuy}`;
+
 			actions.push({
 				account: 'eosio',
 				name: 'buyrambytes',
 				authorization: creator.active,
 				data: {
 					payer: creator.name,
-					receiver: account,
-					bytes: 8192,
+					receiver: account.name,
+					bytes: bytesToBuy,
 				},
 			});
 		}
 		// Same deal for delegatebw. Only if it's actually a thing.
 		if (systemContract.actions.has('delegatebw')) {
+			const delegateAmount = '10.0000 EOS';
+			logMessage += ` bandwidth: ${delegateAmount} for net and cpu`;
+
 			actions.push({
 				account: 'eosio',
 				name: 'delegatebw',
@@ -142,15 +159,19 @@ export class AccountManager {
 				data: {
 					from: creator.name,
 					receiver: account.name,
-					stake_net_quantity: '10.0000 SYS',
-					stake_cpu_quantity: '10.0000 SYS',
+					stake_net_quantity: delegateAmount,
+					stake_cpu_quantity: delegateAmount,
 					transfer: false,
 				},
 			});
 		}
+		if (ConfigManager.debugLevelMin || ConfigManager.debugLevelVerbose) {
+			console.log(chalk.cyan(logMessage));
+		}
+
 		// Execute the transaction
 		return await EOSManager.transact({ actions }, eos, {
-			logMessage: `Creating account: ${account.name}}`,
+			logMessage: logMessage,
 		});
 	};
 

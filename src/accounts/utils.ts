@@ -30,3 +30,10 @@ export const hashToEOSName = (data: string) =>
 		.substring(0, 11)
 		.replace(digitPattern, match => digitMapping[match])
 		.toLowerCase()}`;
+
+export type EosioAction = {
+	account: string;
+	name: string;
+	authorization: { actor: string; permission: string }[];
+	data: any;
+};

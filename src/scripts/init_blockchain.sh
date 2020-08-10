@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # set -o errexit
+set -x
 
 echo "=== lamington: setup blockchain accounts and smart contract ==="
 
@@ -23,11 +24,16 @@ nodeos -e -p eosio -d /mnt/dev/data \
   --plugin eosio::producer_api_plugin \
   --plugin eosio::chain_api_plugin \
   --plugin eosio::http_plugin \
+  --plugin eosio::state_history_plugin \
+  --disable-replay-opts \
+  --trace-history-debug-mode \
+  --trace-history \
+  --plugin eosio::history_api_plugin \
   --http-server-address=0.0.0.0:8888 \
   --access-control-allow-origin=* \
   --contracts-console \
   --verbose-http-errors &
-sleep 6s
+
 until $(curl --output /dev/null \
              --silent \
              --head \
@@ -56,10 +62,17 @@ done
 echo "=== lamington: activate protocol features ==="
 curl --silent --output /dev/null -X POST localhost:8888/v1/producer/schedule_protocol_feature_activations \
   -d '{"protocol_features_to_activate": ["0ec7e080177b2c02b278d5088611686b49d739925a92d9bfcacd7fc6b74053bd"]}'
-sleep 2s
+sleep 1s
 
 echo "=== lamington: install system contracts ==="
+
 cleos set contract eosio "$contracts_dir/eosio.system" -p eosio@active
+sleep 0.5s
+cleos set contract eosio "$contracts_dir/eosio.system" -p eosio@active
+sleep 0.5s
+cleos set contract eosio "$contracts_dir/eosio.system" -p eosio@active
+sleep 0.5s
+
 cleos set contract eosio.token "$contracts_dir/eosio.token"
 cleos set contract eosio.msig "$contracts_dir/eosio.msig"
 
@@ -69,6 +82,10 @@ cleos push action eosio.token issue '["eosio", "100000000.0000 EOS", "memo"]\' -
 
 echo "=== lamington: init system contract ==="
 cleos push action eosio init '[0, "4,EOS"]' -p eosio@active
+
+sleep 2s
+
+cleos push action eosio setpriv '["eosio.msig",1]' -p eosio
 
 # put the background nodeos job to foreground for docker run
 fg %1
