@@ -59,12 +59,12 @@
 		"@types/ora": "3.2.0",
 		"@types/rimraf": "3.0.0",
 		"@types/text-encoding": "0.0.35",
-		"auto-changelog": "1.16.2",
+		"auto-changelog": "2.2.0",
 		"eosjs": "20.0.3",
 		"eosjs-ecc": "4.0.7",
 		"prettier": "2.0.5",
-		"ts-node": "8.6.2",
-		"typedoc": "0.16.10",
+		"ts-node": "8.10.2",
+		"typedoc": "0.18.0",
 		"typescript": "3.9.7"
 	},
 	"dependencies": {
