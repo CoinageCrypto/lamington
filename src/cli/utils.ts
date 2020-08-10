@@ -99,7 +99,7 @@ export const buildImage = async () => {
 	spinner.create('Building docker image');
 	// Clear the docker directory if it exists.
 	await rimraf(TEMP_DOCKER_DIRECTORY);
-	await mkdirp(TEMP_DOCKER_DIRECTORY);
+	await mkdirp(TEMP_DOCKER_DIRECTORY, {});
 	// Write a Dockerfile so Docker knows what to build.
 	const systemDeps = ['build-essential', 'ca-certificates', 'cmake', 'curl', 'git', 'wget'];
 	await writeFile(
