@@ -70,7 +70,7 @@
 	"dependencies": {
 		"axios": "0.19.2",
 		"chai": "4.2.0",
-		"chalk": "3.0.0",
+		"chalk": "4.1.0",
 		"clarify": "2.1.0",
 		"colors": "1.4.0",
 		"commander": "4.0.1",
