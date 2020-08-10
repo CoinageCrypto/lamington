@@ -126,11 +126,11 @@ export class EOSManager {
 
 		return await eos
 			.transact(transaction, flattenedOptions)
-			.then(value => {
+			.then((value) => {
 				logOutput(chalk.green('Succeeded: ') + JSON.stringify(value, null, 4));
 				return value;
 			})
-			.catch(error => {
+			.catch((error) => {
 				logOutput(
 					chalk.red('Threw error: ') +
 						error +

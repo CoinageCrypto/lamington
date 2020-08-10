@@ -12,7 +12,7 @@
 		"copy:configs": "cp -R ./src/eosio-config ./lib/eosio-config",
 		"clean": "rm -rf ./lib",
 		"docs": "typedoc --out api-docs ./src",
-		"format": "prettier --write \"src/**/*.ts\" \"src/**/*.js\"",
+		"format": "prettier --write \"src/**/*.ts\"",
 		"lamington:init": "lamington init",
 		"prepublishOnly": "npm test",
 		"prepare": "npm run build",
@@ -62,7 +62,7 @@
 		"auto-changelog": "1.16.2",
 		"eosjs": "20.0.3",
 		"eosjs-ecc": "4.0.7",
-		"prettier": "1.19.1",
+		"prettier": "2.0.5",
 		"ts-node": "8.6.2",
 		"typedoc": "0.16.10",
 		"typescript": "3.9.7"

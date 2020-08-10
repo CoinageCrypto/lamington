@@ -17,7 +17,7 @@ const run = async () => {
 	await stopContainer();
 };
 
-run().catch(error => {
+run().catch((error) => {
 	process.exitCode = 1;
 	console.log(error);
 });

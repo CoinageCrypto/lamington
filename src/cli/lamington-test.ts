@@ -37,7 +37,7 @@ const run = async () => {
 	}
 };
 
-run().catch(async error => {
+run().catch(async (error) => {
 	process.exitCode = 1;
 	console.log(error);
 

@@ -28,7 +28,7 @@ export const accountNameFromPublicKey = (publicKey: string) => hashToEOSName(ecc
 export const hashToEOSName = (data: string) =>
 	`l${data
 		.substring(0, 11)
-		.replace(digitPattern, match => digitMapping[match])
+		.replace(digitPattern, (match) => digitMapping[match])
 		.toLowerCase()}`;
 
 export type EosioAction = {
