@@ -190,7 +190,7 @@ export class ProjectManager {
 		// Construct directory path
 		const dirPath = path.join(process.cwd(), dirName);
 		// Create directory if missing
-		if (!(await exists(dirPath))) await mkdirp(path.join(process.cwd(), dirName));
+		if (!(await exists(dirPath))) await mkdirp(path.join(process.cwd(), dirName), {});
 		// Return the directory name
 		return dirPath;
 	}
