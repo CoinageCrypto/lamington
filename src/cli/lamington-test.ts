@@ -4,10 +4,8 @@ import { ConfigManager } from '../configManager';
 import { sleep } from '../utils';
 
 /**
- * Executes a build and test procedure
- * @note Keep alive setup is incomplete
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Starts an EOSIO docker container if none is found,
+ * and executes a smart contract build and test flow.
  */
 const run = async () => {
 	// Initialize the configuration

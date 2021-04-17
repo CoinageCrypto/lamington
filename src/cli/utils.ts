@@ -49,8 +49,8 @@ const TEST_TIMEOUT_DURATION = 80000;
 const MAX_CONNECTION_ATTEMPTS = 20;
 
 /**
- * Extracts the version identifier from a string
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Extracts the version identifier from a string.
+ * 
  * @returns Version identifier
  */
 const versionFromUrl = (url: string) => {
@@ -64,9 +64,8 @@ const versionFromUrl = (url: string) => {
 };
 
 /**
- * Constructs the name of the current Lamington Docker image
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Johan Nordberg <github.com/jnordberg>
+ * Constructs the name of the current Lamington Docker image.
+ * 
  * @returns Docker image name
  */
 const dockerImageName = async () => {
@@ -78,8 +77,8 @@ const dockerImageName = async () => {
 };
 
 /**
- * Determines if the docker image exists
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Determines if the docker image exists.
+ * 
  * @returns Result of search
  */
 export const imageExists = async () => {
@@ -89,10 +88,8 @@ export const imageExists = async () => {
 };
 
 /**
- * Configures and builds the docker image
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
- * @author Johan Nordberg <github.com/jnordberg>
+ * Configures and builds the docker image.
+ * 
  */
 export const buildImage = async () => {
 	// Log notification
@@ -128,8 +125,7 @@ export const buildImage = async () => {
 };
 
 /**
- * Starts the Lamington container
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Starts the Lamington Docker container.
  */
 export const startContainer = async () => {
 	await docker.command(
@@ -151,9 +147,8 @@ export const startContainer = async () => {
 };
 
 /**
- * Stops the current Lamington container
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Stops the current Lamington container.
+ * 
  * @returns Docker command promise
  */
 export const stopContainer = async () => {
@@ -168,9 +163,8 @@ export const stopContainer = async () => {
 };
 
 /**
- * Sleeps the process until the EOS instance is available
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Sleeps the process until the EOS instance is available.
+ * 
  * @returns Connection success or throws error
  */
 export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS) => {
@@ -194,8 +188,8 @@ export const untilEosIsReady = async (attempts: number = MAX_CONNECTION_ATTEMPTS
 };
 
 /**
- * Determines if EOS is available using the `get_info` query response
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Determines if EOS is available using the `get_info` query response.
+ * 
  * @returns EOS instance availability
  */
 export const eosIsReady = async () => {
@@ -209,9 +203,8 @@ export const eosIsReady = async () => {
 
 /**
  * Pulls the EOSIO docker image if it doesn't exist and starts
- * a new EOSIO docker container
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * a new EOSIO docker container.
+ * 
  */
 export const startEos = async () => {
 	spinner.create('Starting EOS docker container');
@@ -255,8 +248,8 @@ export const startEos = async () => {
 };
 
 /**
- * Loads all test files and executes with Mocha
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Loads all test files and executes with Mocha.
+ * 
  * @note This is where we should allow configuration over all files or specified files/folder
  */
 export const runTests = async () => {
@@ -306,9 +299,8 @@ export const runTests = async () => {
 };
 
 /**
- * Finds and builds all C++ contracts
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Finds and builds all C++ contracts.
+ * 
  * @param match Optional specific contract identifiers to build
  */
 export const buildAll = async (match?: string[]) => {
@@ -378,8 +370,8 @@ const filterMatches = (paths: string[]) => {
 
 /**
  * Resolves the path to file identifier.
- * This is the path without trailing file extension
- * @author Kevin Brown <github.com/thekevinbrown>
+ * This is the path without trailing file extension.
+ * 
  * @note What happens when the input path contains no trailing extension?
  * @param filePath Path to file
  * @returns Identifier path
@@ -387,9 +379,8 @@ const filterMatches = (paths: string[]) => {
 export const pathToIdentifier = (filePath: string) => filePath.substr(0, filePath.lastIndexOf('.'));
 
 /**
- * Builds contract resources for contract at path
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Builds contract resources for contract at path.
+ * 
  * @param contractPath Local path to C++ contract file
  */
 export const build = async (contractPath: string) => {
@@ -409,8 +400,8 @@ export const build = async (contractPath: string) => {
 };
 
 /**
- * Determines the output location for a contract based on the full path of its C++ file.
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Determines the output location for a contract based on the full path of its C++ file..
+ * 
  * @param contractPath Full path to C++ contract file
  * @returns Output path for contract compilation artefacts
  */
@@ -418,9 +409,8 @@ export const outputPathForContract = (contractPath: string) =>
 	path.join(ConfigManager.outDir, 'compiled_contracts', path.dirname(contractPath));
 
 /**
- * Compiles a C++ EOSIO smart contract at path
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Compiles a C++ EOSIO smart contract at path.
+ * 
  * @param contractPath Full path to C++ contract file
  */
 export const compileContract = async (contractPath: string) => {

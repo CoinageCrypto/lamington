@@ -16,7 +16,7 @@ export class ContractLoader {
 	 *
 	 * ContractLoader.at<MyContractTypeDef>('my.contract');
 	 * ```
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * 
 	 * @param accountOrName The account or account name where the contract is already deployed.
 	 * @returns Contract instance
 	 */

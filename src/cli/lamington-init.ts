@@ -4,10 +4,8 @@ import { ProjectManager } from './../project/projectManager';
 import { ConfigManager } from '../configManager';
 
 /**
- * Executes a contract build procedure
- * @note Keep alive setup is incomplete
- * @author Mitch Pierias <github.com/MitchPierias>
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Bootstraps a basic Lamington project setup ready
+ * for smart contract development.
  */
 const run = async () => {
 	await ProjectManager.initWithDefaults();

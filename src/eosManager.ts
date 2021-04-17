@@ -30,7 +30,6 @@ export class EOSManager {
 	/**
 	 * Initializes a default connection to the local EOSIO node on port `8888` and
 	 * assigns the default `eosio` account with administration keys
-	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static initWithDefaults = () => {
 		// Create eosio account and configure signature provider
@@ -46,7 +45,6 @@ export class EOSManager {
 	/**
 	 * Initializes a connection to any EOSIO node and sets the administration keys which
 	 * Lamington uses to deploy contracts, create accounts, etc.
-	 * @author Kevin Brown <github.com/thekevinbrown>
 	 */
 	static init = ({ httpEndpoint, adminAccount, chainId }: InitArgs) => {
 		// Create eosio account and configure signature provider
@@ -72,7 +70,7 @@ export class EOSManager {
 
 	/**
 	 * Ensures our signature provider has the key in question, and if not, adds it.
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * 
 	 * @param account Account to be unioned into the signature list.
 	 */
 	static addSigningAccountIfMissing = (account: Account) => {
@@ -89,7 +87,7 @@ export class EOSManager {
 
 	/**
 	 * Executes a transaction against a connected EOSjs client
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * 
 	 * @param transaction EOSIO transaction object
 	 * @param eos Connected EOSjs client
 	 * @param options Additional transaction options

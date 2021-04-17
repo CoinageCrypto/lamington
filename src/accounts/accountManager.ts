@@ -17,12 +17,11 @@ interface AccountCreationOptions {
 
 export class AccountManager {
 	/**
-	 * Generates a new random account
-	 * @note Shorthand method for [[AccountManager.createAccounts]]
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Generates a new random account.
+	 * 
 	 * @param accountName Optional name for the account to create
 	 * @param options Optional account creation settings
-	 * @returns Result returned from [[AccountManager.createAccounts]]
+	 * @returns Result returned from `createAccounts()`
 	 */
 	static createAccount = async (accountName?: string, options?: AccountCreationOptions) => {
 		let accountNameArray = accountName ? [accountName] : undefined;
@@ -31,8 +30,8 @@ export class AccountManager {
 	};
 
 	/**
-	 * Generates a specified number of random accounts
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Generates a specified number of random accounts.
+	 * 
 	 * @param numberOfAccounts Number of accounts to generate
 	 * @param accountNames Array of account names. If array is provided then the numberOfAccounts is ignored.
 	 * @returns Array of created account transaction promises
@@ -66,13 +65,13 @@ export class AccountManager {
 				accounts.push(account);
 			}
 		}
-		// Return created acounts
+		// Return created accounts
 		return accounts;
 	};
 
 	/**
-	 * Publishes a new account and allocates ram where possible
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Publishes a new account and allocates ram where possible.
+	 * 
 	 * @param account [[Account]] to publish
 	 * @param options Optional account settings
 	 * @returns Transaction result promise
@@ -176,10 +175,9 @@ export class AccountManager {
 	};
 
 	/**
-	 * Grants `eosio.code` permission to the specified account's `active` key
-	 * @note Can also be called directly on a contract.
-	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Grants `eosio.code` permission to the specified account's `active` key,
+	 * where `account` is the owner of a contract.
+	 * 
 	 * @param account Account without `eosio.code` permissions
 	 */
 	public static addCodePermission = async (account: Account) => {
@@ -227,8 +225,8 @@ export class AccountManager {
 	};
 
 	/**
-	 * Flattens account creation options
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Flattens account creation options.
+	 * 
 	 * @returns Account creation options
 	 */
 	private static flattenOptions(options?: AccountCreationOptions) {

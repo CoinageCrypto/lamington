@@ -4,9 +4,8 @@ import { ConfigManager } from '../configManager';
 
 /**
  * Executes a contract build procedure
- * @note Keep alive setup is incomplete
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * 
+ * TODO: Complete chain keep alive functionality
  */
 const run = async () => {
 	// Capture CLI defined contract identifiers

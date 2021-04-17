@@ -12,9 +12,8 @@ type IndentedGeneratorLevel = { [key: string]: Array<string> | IndentedGenerator
 type GeneratorLevel = Array<string | IndentedGeneratorLevel>;
 
 /**
- * Parses a C++ type definition into a Typescript definition
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Parses a C++ type definition into a Typescript definition.
+ * 
  * @param eosType The type from the ABI we want to map over to a Typescript type
  * @param contractName (optional) The name of the contract to prefix the mapped type with if this is a contract struct type
  * @param contractStructs (optional) Structs in the contract used to match against, falling back to built in types if not found
@@ -42,6 +41,7 @@ export const mapParameterType = ({
 	}
 };
 
+// TODO: Document method
 export const generateTypesFromString = async (
 	rawABI: string,
 	contractName: string
@@ -134,8 +134,7 @@ export const generateTypesFromString = async (
 };
 
 /**
- * Loads all `.abi` files and generates types
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Loads all `.abi` files and generates types.
  */
 export const generateAllTypes = async () => {
 	// Load all `.abi` files
@@ -147,11 +146,8 @@ export const generateAllTypes = async () => {
 };
 
 /**
- * Generates a Typescript definition file from a contract ABI file
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
- * @author Dallas Johnson <github.com/dallasjohnson>
-
+ * Generates a Typescript definition file from a contract ABI file.
+ * 
  * @param contractIdentifier Path to file without extension
  */
 export const generateTypes = async (contractIdentifier: string) => {
@@ -171,6 +167,7 @@ export const generateTypes = async (contractIdentifier: string) => {
 	await saveInterface(contractIdentifier, generaterLevels);
 };
 
+// TODO: Document method
 const flattenGeneratorLevels = (interfaceContent: GeneratorLevel): string => {
 	let result = '';
 	let indentLevel = 0;
@@ -206,9 +203,8 @@ const flattenGeneratorLevels = (interfaceContent: GeneratorLevel): string => {
 };
 
 /**
- * Writes the contract interface to file
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Dallas Johnson <github.com/dallasjohnson>
+ * Writes the contract interface to file.
+ * 
  * @param contractIdentifier Path to file without extension
  * @param interfaceContent Generated contract interface as a string
  */
@@ -221,5 +217,6 @@ const saveInterface = async (contractIdentifier: string, interfaceContent: strin
 			throw error;
 		}
 	});
+	
 	file.close();
 };

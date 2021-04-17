@@ -5,8 +5,8 @@ import * as colors from 'colors';
 const cache: { spinner?: ora.Ora } = {};
 
 /**
- * Creates a new spinner instance with the specified message
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Creates a new spinner instance with the specified message.
+ * 
  * @param text Output display message
  */
 export const create = (text: string) => {
@@ -20,8 +20,8 @@ export const create = (text: string) => {
 };
 
 /**
- * Updates the text of the current spinner
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Updates the text of the current spinner.
+ * 
  * @param text CLI output text to display
  */
 export const update = (text: string) => {
@@ -36,8 +36,8 @@ export const update = (text: string) => {
 };
 
 /**
- * Terminates the current spinner with the specified output message
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Terminates the current spinner with the specified output message.
+ * 
  * @param message Output message
  * @param isError Renders output as error toggle
  */
@@ -55,8 +55,8 @@ export const end = (message: string = '', isError: boolean = false) => {
 };
 
 /**
- * Terminates the current spinner as an error with output message
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Terminates the current spinner as an error with output message.
+ * 
  * @param message Spinner message.
  */
 export const fail = (message: string) => {

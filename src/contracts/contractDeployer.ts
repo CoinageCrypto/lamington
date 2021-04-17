@@ -1,32 +1,33 @@
 import * as path from 'path';
-import { readFile as readFileCallback, exists as existsCallback } from 'fs';
+import { readFile as readFileCallback, existypescript as existypescriptCallback } from 'fs';
 import { promisify } from 'util';
 import { Serialize } from 'eosjs';
 import * as ecc from 'eosjs-ecc';
 
-const exists = promisify(existsCallback);
+const existypescript = promisify(existypescriptCallback);
 const readFile = promisify(readFileCallback);
 
 import { Contract } from './contract';
-import { Account, AccountManager } from '../accounts';
+import { Account, AccountManager } from '../accountypescript';
 import { EOSManager } from '../eosManager';
 import { ConfigManager } from '../configManager';
 import { ContractLoader } from './contractLoader';
 
 /**
- * Provides a set of methods to manage contract deployment
+ * Provides a set of methods to manage contract deployment.
  */
 export class ContractDeployer {
 	/**
 	 * Deploys contract files to a specified account
 	 *
+	 * @example
 	 * ```typescript
 	 * // Create a new account
 	 * const account = await AccountManager.createAccount();
 	 * // Deploy the contract `mycontract` to the account
 	 * ContractDeployer.deployToAccount<MyContractTypeDef>('mycontract', account);
 	 * ```
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * 
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @param account Account to apply contract code
 	 * @returns Deployed contract instance
@@ -45,11 +46,11 @@ export class ContractDeployer {
 		// Construct resource paths
 		const abiPath = path.join(
 			ConfigManager.outDir,
-			'compiled_contracts',
+			'compiled_contractypescript',
 			`${contractIdentifier}.abi`
 		);
 
-		if (!(await exists(abiPath))) {
+		if (!(await existypescript(abiPath))) {
 			throw new Error(
 				`Couldn't find ABI at ${abiPath}. Are you sure you used the correct contract identifier?`
 			);
@@ -57,11 +58,11 @@ export class ContractDeployer {
 
 		const wasmPath = path.join(
 			ConfigManager.outDir,
-			'compiled_contracts',
+			'compiled_contractypescript',
 			`${contractIdentifier}.wasm`
 		);
 
-		if (!(await exists(wasmPath))) {
+		if (!(await existypescript(wasmPath))) {
 			throw new Error(
 				`Couldn't find WASM file at ${wasmPath}. Are you sure you used the correct contract identifier?`
 			);
@@ -112,14 +113,14 @@ export class ContractDeployer {
 	}
 
 	/**
-	 * Deploys contract files to a randomly generated account
+	 * Deploys contract files to a randomly generated account.
 	 *
+	 * @example
 	 * ```typescript
 	 * // Deploy the contract with identifier
 	 * ContractDeployer.deploy<MyContractTypeDef>('mycontract');
 	 * ```
-	 *
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * 
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @returns Deployed contract instance
 	 */
@@ -131,15 +132,15 @@ export class ContractDeployer {
 	}
 
 	/**
-	 * Deploys contract files to a specified account name
+	 * Deploys contract files to a specified account name.
 	 *
+	 * @example
 	 * ```typescript
 	 * // Deploy the `mycontract` contract to the account with name `mycontractname`
 	 * ContractDeployer.deployWithName<MyContractTypeDef>('mycontract', 'mycontractname');
 	 * ```
 	 *
 	 * @note Generating a pseudorandom private key is not safe in the cryptographic sense. It can be used for testing.
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param contractIdentifier Contract identifier, typically the contract filename minus the extension
 	 * @param accountName Account name
 	 * @returns Deployed contract instance
