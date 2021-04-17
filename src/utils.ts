@@ -12,9 +12,9 @@ import * as chalk from 'chalk';
 chai.use(deepEqualInAnyOrder);
 
 /**
- * Pauses the current process until the specified EOS block number occurs
+ * Pauses the current process until the specified EOS block number occurs.
+ * 
  * @note Assumes blocks will always be produced every 500ms
- * @author Kevin Brown <github.com/thekevinbrown>
  * @param number Process sleep duration
  */
 export const untilBlocknumber = async (number: number) => {
@@ -28,23 +28,23 @@ export const untilBlocknumber = async (number: number) => {
 };
 
 /**
- * Pauses the current process for the specified duration
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Pauses the current process for the specified duration.
+ * 
  * @param delayInMs Process sleep duration
  */
 export const sleep = async (delayInMs: number) =>
 	new Promise((resolve) => setTimeout(resolve, delayInMs));
 
 /**
- * Pauses the current process for the 500ms EOS block time
+ * Pauses the current process for the 500ms EOS block time.
+ * 
  * @note The process will wake during and not on the next block
- * @author Kevin Brown <github.com/thekevinbrown>
  */
 export const nextBlock = () => sleep(500);
 
 /**
- * Compares table rows against expected rows irrespective of order
- * @author Dallas Johnson <github.com/dallasjohnson>
+ * Compares table rows against expected rows irrespective of order.
+ * 
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
  */
@@ -66,9 +66,8 @@ export const assertRowsContain = async <RowType>(
 };
 
 /**
- * Compares table rows against expected rows irrespective of order
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Compares table rows against expected rows irrespective of order.
+ * 
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
  * @param strict Strict comparison flag
@@ -93,8 +92,8 @@ export const assertRowsEqual = async <RowType>(
 };
 
 /**
- * Performs a strict comparison of queried table rows against expected rows
- * @author Mitch Pierias <github.com/MitchPierias>
+ * Performs a strict comparison of queried table rows against expected rows.
+ * 
  * @param getTableRowsResult Get table rows result promise
  * @param expected Expected table row query results
  */
@@ -112,8 +111,8 @@ export const assertRowsEqualStrict = async <RowType>(
 };
 
 /**
- * Validates the number of rows returned is equal to the expected count
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Validates the number of rows returned is equal to the expected count.
+ * 
  * @param getTableRowsResult Get table rows result promise
  * @param expectedRowCount Expected number of table rows
  */
@@ -135,9 +134,7 @@ export const assertRowCount = async (
 /**
  * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
  * Also asserts that other aspects of the error as checked through an optional passed in function.
- * @author Dallas Johnson <github.com/dallasjohnson>
- * @author Kevin Brown <github.com/thekevinbrown>
- * @author Mitch Pierias <github.com/MitchPierias>
+ * 
  * @param operation Operation promise
  * @param eosErrorName Expected EOS error name
  * @param description Output message description
@@ -174,8 +171,8 @@ const assertExpectedEOSError = async (
 };
 
 /**
- * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Asserts EOS throws an error and validates the error output name matches the expected `eosErrorName`.
+ * 
  * @param operation Operation promise
  * @param eosErrorName Expected EOS error name
  * @param description Output message description
@@ -193,8 +190,8 @@ export const assertEOSError = async (
 
 /**
  * Asserts EOS throws an error and validates the error output name matches the
- * expected 'eosio_assert_message_exception' and the error message includes `description`
- * @author Dallas Johnson <github.com/dallasjohnson>
+ * expected 'eosio_assert_message_exception' and the error message includes `description`.
+ * 
  * @param operation Operation promise
  * @param message Output message expected to be included
  */
@@ -228,16 +225,16 @@ export const assertEOSErrorIncludesMessage = async (
 };
 
 /**
- * Asserts operation throws an `eosio_assert_message_exception` error
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Asserts operation throws an `eosio_assert_message_exception` error.
+ * 
  * @param operation Operation promise
  */
 export const assertEOSException = async (operation: Promise<any>) =>
 	assertEOSError(operation, 'eosio_assert_message_exception', 'assert');
 
 /**
- * Asserts operation is missing the required authority by throwing a `missing_auth_exception` error
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Asserts operation is missing the required authority by throwing a `missing_auth_exception` error.
+ * 
  * @param operation Operation promise
  */
 export const assertMissingAuthority = async (operation: Promise<any>) =>

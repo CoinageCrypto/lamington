@@ -60,8 +60,8 @@ export class Contract implements EOSJSContract {
 	public types: Map<string, Type> = new Map();
 
 	/**
-	 * Gets the currently configured contract account
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Gets the currently configured contract account.
+	 * 
 	 * @returns Current contract account
 	 */
 	public get account() {
@@ -69,8 +69,8 @@ export class Contract implements EOSJSContract {
 	}
 
 	/**
-	 * Gets the current contract identifier
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Gets the current contract identifier.
+	 * 
 	 * @returns Contract identifier
 	 */
 	public get identifier() {
@@ -148,8 +148,8 @@ export class Contract implements EOSJSContract {
 	}
 
 	/**
-	 * Retrieves table rows with the specified table name and optional scope
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Retrieves table rows with the specified table name and optional scope.
+	 * 
 	 * @note Implements a temporary patch for the EOSjs `bool` mapping error
 	 * @param table The table name
 	 * @param scope Optional table scope, defaults to the table name
@@ -233,10 +233,9 @@ export class Contract implements EOSJSContract {
 	};
 
 	/**
-	 * Grants `eosio.code` permission to the contract account's `active` key
-	 * @note Can also be called from AccountManager, as the action is technically an account based action.
-	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Grants `eosio.code` permission to the contract account's `active` key by
+	 * calling the `addCodePermission` of `AccountManager` with the current
+	 * `account` state.
 	 */
 	public addCodePermission = () => AccountManager.addCodePermission(this._account);
 }

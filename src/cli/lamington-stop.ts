@@ -2,8 +2,7 @@ import { stopContainer, eosIsReady } from './utils';
 import { ConfigManager } from '../configManager';
 
 /**
- * Stops the current Lamington docker container
- * @author Kevin Brown <github.com/thekevinbrown>
+ * Kills the current Lamington docker container.
  */
 const run = async () => {
 	await ConfigManager.initWithDefaults();

@@ -1,7 +1,7 @@
 /**
  * Transforms a string into the pascal-case format.
  * ThisIsPascalCase, while thisIsCamelCase, this-is-kebab-case, and this_is_snake_case.
- * @author Kevin Brown <github.com/thekevinbrown>
+ * 
  * @param value String for case transformation
  */
 export const pascalCase = (value: string) => {
@@ -13,7 +13,7 @@ export const pascalCase = (value: string) => {
 /**
  * Transforms a string into the camel-case format.
  * ThisIsPascalCase, while thisIsCamelCase, this-is-kebab-case, and this_is_snake_case.
- * @author Kevin Brown <github.com/thekevinbrown>
+ * 
  * @param value String for case transformation
  */
 export const camelCase = (value: string) => {

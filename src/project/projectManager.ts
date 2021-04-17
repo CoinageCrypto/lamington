@@ -41,7 +41,6 @@ const DEFAULT_DEV_DEPENDENCIES = {
 
 /**
  * Fetches and stores the latest EOS configuration images
- * @author Mitch Pierias <github.com/MitchPierias>
  */
 export class ProjectManager {
 	/** @hidden Reference to the local `package.json` file */
@@ -52,7 +51,6 @@ export class ProjectManager {
 
 	/**
 	 * Downloads the example project and integrates aspects where required.
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 */
 	public static async initWithDefaults() {
 		await ProjectManager.cloneExampleProject();
@@ -79,7 +77,6 @@ export class ProjectManager {
 	/**
 	 * Examines the current directory and loads any existing `package.json` file
 	 * into this object cache state.
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @hidden
 	 */
 	private static async loadExistingProject() {
@@ -103,7 +100,6 @@ export class ProjectManager {
 
 	/**
 	 * Injects recommended Lamington scripts into the currently cached package data
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @hidden
 	 */
 	private static async injectScripts() {
@@ -115,7 +111,6 @@ export class ProjectManager {
 
 	/**
 	 * Injects the required project dependencies into the currently cached package data
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @hidden
 	 */
 	private static async configureDependencies() {
@@ -127,7 +122,6 @@ export class ProjectManager {
 
 	/**
 	 * Downloads the latest example Lamington project from GitHub
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @hidden
 	 */
 	private static async cloneExampleProject() {
@@ -181,7 +175,6 @@ export class ProjectManager {
 
 	/**
 	 * Creates a new local directory if missing and returns the path
-	 * @author Mitch Pierias <github.com/MitchPierias>
 	 * @param dirName Directory to create
 	 * @returns Path to local directory
 	 * @private

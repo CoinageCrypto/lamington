@@ -21,7 +21,11 @@ const ENCODING = 'utf8';
 /** @hidden Configuration file name */
 const CONFIGURATION_FILE_NAME = '.lamingtonrc';
 
-/** @hidden Configuration object structure */
+/**
+ * @hidden Configuration object structure
+ * 
+ * TODO: Extract type definitions amd create BaseConfig
+ */
 export interface LamingtonConfig {
 	cdt: string;
 	eos: string;
@@ -39,6 +43,8 @@ export interface LamingtonConfig {
 
 /**
  * Level of debug output
+ * 
+ * TODO: Extract type definitions
  */
 export enum LamingtonDebugLevel {
 	NONE = 0, // No debug logging
@@ -65,7 +71,7 @@ export namespace LamingtonDebugLevel {
  * as the base layer config. Users can override these
  * values by specifying them in their `.lamingtonrc`
  */
-const DEFAULT_CONFIG = {
+const DEFAULT_CONFIG:LamingtonConfig = {
 	eos: '',
 	cdt: '',
 	contracts: 'v1.8.0-rc1',
@@ -87,9 +93,7 @@ export class ConfigManager {
 
 	/**
 	 * Initialize application configuration using the user
-	 * defined configurations and defaults
-	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * defined configurations and defaults.
 	 */
 	public static async initWithDefaults() {
 		DEFAULT_CONFIG.cdt = await ConfigManager.getAssetURL('EOSIO', 'eosio.cdt', 'amd64.deb');
@@ -107,8 +111,7 @@ export class ConfigManager {
 
 	/**
 	 * Downloads the organization's latest repository release image and
-	 * returns the assets matching the specified filter
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * returns the assets matching the specified filter.
 	 * @param organization Asset's case-sensitive repository organization
 	 * @param repository Asset's case-sensitive repository name
 	 * @param filter Resource filter
@@ -143,8 +146,6 @@ export class ConfigManager {
 
 	/**
 	 * Creates a default configuration file if it doesn't exist at the specified path.
-	 * @author Mitch Pierias <github.com/MitchPierias>
-	 * @author Kevin Brown <github.com/thekevinbrown>
 	 * @param atPath Optional configuration file path. Defaults to `.lamingtonrc`.
 	 */
 	public static async createConfigIfMissing(atPath = CONFIGURATION_FILE_NAME) {
@@ -167,10 +168,8 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Checks the existence of the configuration
-	 * file at the default [[CONFIGURATION_FILE_NAME]] or
-	 * optional path
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Checks the existence of the configuration file at the
+	 * default [[CONFIGURATION_FILE_NAME]] or optional path.
 	 * @param atPath Optional file path for lookup
 	 * @returns Config exists determiner
 	 */
@@ -181,8 +180,7 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Loads an existing configuration file into [[ConfigManager.config]]
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Loads an existing configuration file into the `config` state.
 	 * @param atPath Optional file path for lookup
 	 */
 	public static async loadConfigFromDisk(atPath = CONFIGURATION_FILE_NAME) {
@@ -194,40 +192,35 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the current EOSIO configuration
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Returns the current EOSIO configuration.
 	 */
 	static get eos() {
 		return (ConfigManager.config && ConfigManager.config.eos) || '';
 	}
 
 	/**
-	 * Returns the current EOSIO.CDT configuration
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Returns the current EOSIO.CDT configuration.
 	 */
 	static get cdt() {
 		return (ConfigManager.config && ConfigManager.config.cdt) || '';
 	}
 
 	/**
-	 * Returns the current eosio.contracts configuration
-	 * @author Johan Nordberg <github.com/jnordberg>
+	 * Returns the current eosio.contracts configuration.
 	 */
 	static get contracts() {
 		return (ConfigManager.config && ConfigManager.config.contracts) || 'master';
 	}
 
 	/**
-	 * Returns the container keep alive setting or false
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Returns the container keep alive setting or `false`.
 	 */
 	static get keepAlive() {
 		return (ConfigManager.config && ConfigManager.config.keepAlive) || DEFAULT_CONFIG.keepAlive;
 	}
 
 	/**
-	 * Returns the container's debug log output setting
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Returns the container's debug log output setting.
 	 */
 	static get debugTransactions() {
 		return (
@@ -237,16 +230,14 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the container's debugLevel output setting
-	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 * Returns the container's `debugLevel` output setting.
 	 */
 	static get debugLevel() {
 		return (ConfigManager.config && ConfigManager.config.debug) || DEFAULT_CONFIG.debug;
 	}
 
 	/**
-	 * Returns the container's debugLevel output setting
-	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 * Returns the container's `debugLevel` output setting
 	 */
 	static get debugLevelNone() {
 		return LamingtonDebugLevel.isNone(this.debugLevel);
@@ -261,40 +252,36 @@ export class ConfigManager {
 	}
 
 	/**
-	 * Returns the output build directory or [[CACHE_DIRECTORY]]
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Returns the output build directory or the default `CACHE_DIRECTORY`.
 	 */
 	static get outDir() {
 		return (ConfigManager.config && ConfigManager.config.outDir) || DEFAULT_CONFIG.outDir;
 	}
 
 	/**
-	 * Returns the array of included strings or patterns. Defaults to include all `*.cpp` files
-	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 * Returns the array of included strings or patterns. Defaults to
+	 * include all `*.cpp` files.
 	 */
 	static get include() {
 		return (ConfigManager.config && ConfigManager.config.include) || DEFAULT_CONFIG.include;
 	}
 
 	/**
-	 * Returns the array of excluded strings or patterns
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Returns the array of excluded strings or patterns.
 	 */
 	static get exclude() {
 		return (ConfigManager.config && ConfigManager.config.exclude) || DEFAULT_CONFIG.exclude;
 	}
 
 	/**
-	 * Returns the array of excluded strings or patterns
-	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 * Returns the array of excluded strings or patterns.
 	 */
 	static get testReporter() {
 		return (ConfigManager.config && ConfigManager.config.reporter) || Mocha.reporters.Min;
 	}
 
 	/**
-	 * Returns the array of excluded strings or patterns
-	 * @author Dallas Johnson <github.com/dallasjohnson>
+	 * Returns the array of excluded strings or patterns.
 	 */
 	static get bailOnFailure() {
 		return (

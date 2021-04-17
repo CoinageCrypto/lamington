@@ -49,8 +49,8 @@ export class Account {
 	}
 
 	/**
-	 * Returns a configured active key permission
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Returns a configured active key permission.
+	 * 
 	 * @returns Valid active key
 	 */
 	public get active() {
@@ -63,8 +63,8 @@ export class Account {
 	}
 
 	/**
-	 * Returns a configured owner key permission
-	 * @author Kevin Brown <github.com/thekevinbrown>
+	 * Returns a configured owner key permission.
+	 * 
 	 * @returns Valid owner key
 	 */
 	public get owner() {
@@ -77,9 +77,8 @@ export class Account {
 	}
 
 	/**
-	 * Adds the `eosio.code` permission to this account
-	 * @author Kevin Brown <github.com/thekevinbrown>
-	 * @author Mitch Pierias <github.com/MitchPierias>
+	 * Adds the `eosio.code` permission to this account.
+	 * 
 	 * @returns Add permission transaction promise
 	 */
 	public addCodePermission = async () => {
